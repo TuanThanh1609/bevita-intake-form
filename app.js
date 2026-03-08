@@ -470,11 +470,10 @@ const App = {
 
             console.log('📤 Sending payload:', JSON.stringify(payload, null, 2));
 
-            const response = await fetch(CONFIG.NOCODB_API, {
+            const response = await fetch('/api/submit', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'xc-token': CONFIG.NOCODB_TOKEN,
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(payload),
             });

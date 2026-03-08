@@ -204,34 +204,7 @@ const App = {
 
     restorePhotosUI(type, data) {
         if (type === 'skin') {
-            ['front', 'left', 'right'].forEach(slotId => {
-                const url = data[slotId];
-                if (url) {
-                    const slotEl = document.getElementById(`slot-${slotId}`);
-                    const previewEl = document.getElementById(`preview-${slotId}`);
-                    const statusEl = document.getElementById(`status-${slotId}`);
-                    const uploadLabelDirect = document.getElementById(`upload-label-${slotId}`);
-                    
-                    if (slotEl && previewEl && statusEl && uploadLabelDirect) {
-                        slotEl.classList.add('has-photo');
-                        statusEl.textContent = 'Đã tải lên';
-                        uploadLabelDirect.style.display = 'none';
-                        previewEl.innerHTML = `
-                            <div class="photo-preview">
-                                <button class="remove-btn" onclick="App.removeSkinPhotoSlot('${slotId}')">×</button>
-                                <div class="photo-check"></div>
-                                <img src="${url}" alt="Preview">
-                            </div>
-                        `;
-                    }
-                }
-            });
-            
-            if (data.front && !data.left) document.getElementById('slot-left').classList.add('active');
-            if (data.left && !data.right) document.getElementById('slot-right').classList.add('active');
-            if (data.front || data.left || data.right) document.getElementById('slot-front').classList.add('active');
-            
-            this.checkSkinPhotosComplete();
+            this.updateWizardUI();
             return;
         }
 
@@ -379,71 +352,100 @@ const App = {
         this.goToScreen('photo-skin');
     },
 
-    // ── Step 1: Skin Photos (Multi-step Wizard) ──
-    async handleSkinPhotoSlot(files, slotId) {
+    // ── Step 1: Skin Photos (1-Button Sequential Wizard) ──
+    getMissingSkinPhotoSlot() {
+        if (!state.skinPhotoUrls.front) return 'front';
+        if (!state.skinPhotoUrls.left) return 'left';
+        if (!state.skinPhotoUrls.right) return 'right';
+        return null;
+    },
+
+    updateWizardUI() {
+        const slots = [
+            { id: 'front', title: 'Góc 1<br>Thẳng', text: 'Góc 1 (Chính diện)' },
+            { id: 'left', title: 'Góc 2<br>Trái', text: 'Góc 2 (Nghiêng trái)' },
+            { id: 'right', title: 'Góc 3<br>Phải', text: 'Góc 3 (Nghiêng phải)' }
+        ];
+
+        const missingSlotId = this.getMissingSkinPhotoSlot();
+        const nextBtn = document.getElementById('btnSkinPhotoNext');
+        const uploadBtn = document.getElementById('wizard-upload-label');
+        const statusText = document.getElementById('wizard-status-text');
+        const btnText = document.getElementById('wizard-btn-text');
+
+        // Render thumbnails
+        slots.forEach(slot => {
+            const thumbEl = document.getElementById(`wizard-thumb-${slot.id}`);
+            if (!thumbEl) return;
+            
+            const url = state.skinPhotoUrls[slot.id];
+            if (url) {
+                thumbEl.classList.add('has-photo');
+                thumbEl.classList.remove('active');
+                thumbEl.innerHTML = `
+                    <button class="remove-btn" onclick="App.removeSkinPhotoSlot('${slot.id}')">×</button>
+                    <img src="${url}" alt="Preview">
+                `;
+            } else {
+                thumbEl.classList.remove('has-photo');
+                thumbEl.innerHTML = slot.title;
+                if (slot.id === missingSlotId) {
+                    thumbEl.classList.add('active');
+                } else {
+                    thumbEl.classList.remove('active');
+                }
+            }
+        });
+
+        // Update actions area
+        if (missingSlotId) {
+            const currentSlot = slots.find(s => s.id === missingSlotId);
+            nextBtn.classList.add('hidden');
+            uploadBtn.style.display = 'inline-flex';
+            uploadBtn.style.opacity = '1';
+            uploadBtn.style.pointerEvents = 'auto';
+            statusText.textContent = `Vui lòng chụp ${currentSlot.text}`;
+            btnText.textContent = `📷 Chụp Góc ${slots.indexOf(currentSlot) + 1}`;
+        } else {
+            nextBtn.classList.remove('hidden');
+            nextBtn.classList.add('animate-in');
+            uploadBtn.style.display = 'none';
+            statusText.textContent = `Đã đủ 3 góc ảnh! Hãy bấm Tiếp tục.`;
+        }
+    },
+
+    async handleWizardUpload(files) {
         if (!files || files.length === 0) return;
         const file = files[0];
-        
-        const slotEl = document.getElementById(`slot-${slotId}`);
-        const previewEl = document.getElementById(`preview-${slotId}`);
-        const statusEl = document.getElementById(`status-${slotId}`);
-        const uploadLabelDirect = document.getElementById(`upload-label-${slotId}`);
+        const missingSlotId = this.getMissingSkinPhotoSlot();
+        if (!missingSlotId) return;
 
-        uploadLabelDirect.style.display = 'none';
-        previewEl.innerHTML = `<div class="photo-preview"><div class="photo-loader"></div></div>`;
-        statusEl.textContent = 'Đang tải...';
+        const statusText = document.getElementById('wizard-status-text');
+        const uploadBtn = document.getElementById('wizard-upload-label');
+        const btnText = document.getElementById('wizard-btn-text');
+        
+        statusText.textContent = 'Đang tải ảnh lên...';
+        btnText.textContent = '⏳ Đang xử lý...';
+        uploadBtn.style.opacity = '0.7';
+        uploadBtn.style.pointerEvents = 'none';
         
         try {
             const url = await this.uploadToImgBB(file);
-            state.skinPhotoUrls[slotId] = url;
-            
-            previewEl.innerHTML = `
-                <div class="photo-preview">
-                    <button class="remove-btn" onclick="App.removeSkinPhotoSlot('${slotId}')">×</button>
-                    <div class="photo-check"></div>
-                    <img src="${url}" alt="Preview">
-                </div>
-            `;
-            slotEl.classList.add('has-photo');
-            statusEl.textContent = 'Đã tải lên';
-            
-            if (slotId === 'front' && !state.skinPhotoUrls['left']) document.getElementById('slot-left').classList.add('active');
-            if (slotId === 'left' && !state.skinPhotoUrls['right']) document.getElementById('slot-right').classList.add('active');
-            
-            this.checkSkinPhotosComplete();
+            state.skinPhotoUrls[missingSlotId] = url;
+            this.updateWizardUI();
         } catch (err) {
-            console.error('Upload error in slot:', err);
-            statusEl.textContent = 'Lỗi tải lên!';
-            previewEl.innerHTML = '';
-            uploadLabelDirect.style.display = 'inline-flex';
+            console.error('Upload error:', err);
+            statusText.textContent = 'Lỗi tải lên! Vui lòng thử lại.';
+            this.updateWizardUI(); // Reset button state
         }
+        
+        // Reset file input
+        document.getElementById('wizard-file-input').value = '';
     },
     
     removeSkinPhotoSlot(slotId) {
         state.skinPhotoUrls[slotId] = null;
-        
-        const slotEl = document.getElementById(`slot-${slotId}`);
-        const previewEl = document.getElementById(`preview-${slotId}`);
-        const statusEl = document.getElementById(`status-${slotId}`);
-        const uploadLabelDirect = document.getElementById(`upload-label-${slotId}`);
-        
-        slotEl.classList.remove('has-photo');
-        statusEl.textContent = 'Chưa có ảnh';
-        previewEl.innerHTML = '';
-        uploadLabelDirect.style.display = 'inline-flex';
-        
-        this.checkSkinPhotosComplete();
-    },
-    
-    checkSkinPhotosComplete() {
-        const { front, left, right } = state.skinPhotoUrls;
-        const nextBtn = document.getElementById('btnSkinPhotoNext');
-        if (front && left && right) {
-            nextBtn.classList.remove('hidden');
-            nextBtn.classList.add('animate-in');
-        } else {
-            nextBtn.classList.add('hidden');
-        }
+        this.updateWizardUI();
     },
 
     skipSkinPhotos() {

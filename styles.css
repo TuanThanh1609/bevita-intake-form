@@ -464,64 +464,86 @@ body {
     font-weight: 700;
 }
 
-/* --- Photo Slots for Skin --- */
-.photo-slots-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.photo-slot-card {
-    border: 2px dashed var(--gray-300);
+/* --- Sequential Photo Wizard --- */
+.photo-wizard-container {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.6);
     padding: 16px;
-    transition: var(--transition);
-    opacity: 0.6;
-}
-
-.photo-slot-card.active {
-    opacity: 1;
-    border-color: var(--teal-300);
-    background: white;
+    text-align: center;
     box-shadow: var(--shadow-sm);
 }
 
-.photo-slot-card.has-photo {
-    opacity: 1;
-    border-color: var(--gold-300);
-    border-style: solid;
-    background: rgba(255, 224, 130, 0.08);
-}
-
-.slot-header {
+.wizard-thumbnails {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    min-height: 80px; /* Reserve space so it doesn't jump */
 }
 
-.slot-title {
-    font-weight: 700;
-    color: var(--gray-800);
-    font-size: 0.95rem;
-}
-
-.slot-status {
-    font-size: 0.8rem;
-    color: var(--gray-500);
-    font-weight: 600;
-}
-
-.photo-slot-card.has-photo .slot-status {
-    color: var(--teal-500);
-}
-
-.slot-body {
+.wizard-thumb-slot {
+    width: 70px;
+    height: 70px;
+    border-radius: var(--radius-sm);
+    border: 2px dashed var(--gray-300);
+    background: var(--gray-100);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--gray-500);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.wizard-thumb-slot.active {
+    border-color: var(--teal-400);
+    background: rgba(79, 209, 197, 0.1);
+    color: var(--teal-600);
+    font-weight: 600;
+}
+
+.wizard-thumb-slot.has-photo {
+    border: 2px solid var(--gold-400);
+    border-style: solid;
+}
+
+.wizard-thumb-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.wizard-thumb-slot .remove-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    font-size: 0.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.wizard-status {
+    font-size: 0.85rem;
+    color: var(--teal-600);
+    margin-bottom: 12px;
+    font-weight: 500;
+    min-height: 20px;
 }
 
 /* --- Bulk Photo Upload (Routine) --- */

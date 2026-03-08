@@ -519,6 +519,7 @@ const App = {
         loader.innerHTML = `<div class="photo-loader"></div>`;
         previewsEl.appendChild(loader);
 
+        let uploadErrors = 0;
         for (const file of Array.from(files)) {
             // Preview
             const reader = new FileReader();
@@ -544,8 +545,7 @@ const App = {
                 }
             } catch (err) {
                 console.error('Upload error:', err);
-                // Still keep the preview, show error status
-                this.showPhotoStatus(type, '⚠️ Lỗi upload, thử lại sau');
+                uploadErrors++;
             }
         }
 
@@ -553,7 +553,9 @@ const App = {
         uploadLabel.style.display = 'inline-flex';
 
         // Check length and toggle Next buttons
-        if (type === 'skin' && state.skinPhotoUrls.length > 0) {
+        const count = type === 'skin' ? state.skinPhotoUrls.length : state.routinePhotoUrls.length;
+
+        if (type === 'skin' && count > 0) {
             const nextBtn = document.getElementById('btnSkinPhotoNext');
             if (nextBtn) {
                 nextBtn.classList.remove('hidden');
@@ -561,8 +563,11 @@ const App = {
             }
         }
 
-        const count = type === 'skin' ? state.skinPhotoUrls.length : state.routinePhotoUrls.length;
-        this.showPhotoStatus(type, `✅ Đã tải lên ${count} ảnh`);
+        if (uploadErrors > 0) {
+            this.showPhotoStatus(type, `⚠️ Lỗi tải lên ${uploadErrors} ảnh. Vui lòng check F12 Console hoặc F5 thử lại.`);
+        } else {
+            this.showPhotoStatus(type, `✅ Đã tải lên ${count} ảnh`);
+        }
     },
 
     showPhotoStatus(type, message) {
@@ -642,10 +647,7 @@ const App = {
                 canvas.width = width;
                 canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
-
-                canvas.toBlob((blob) => {
-                    resolve(blob);
-                }, 'image/jpeg', 0.85);
+                resolve(canvas.toDataURL('image/jpeg', 0.8)); // Force JPEG quality 0.8
             };
 
             img.src = URL.createObjectURL(file);

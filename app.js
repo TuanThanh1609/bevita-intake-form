@@ -129,9 +129,12 @@ const App = {
             if (saved) {
                 const parsedState = JSON.parse(saved);
                 if (parsedState.currentScreen && parsedState.currentScreen !== 'welcome' && parsedState.currentScreen !== 'thankyou') {
+                    const targetScreen = parsedState.currentScreen;
+                    const initialScreen = state.currentScreen; // typically 'welcome'
                     Object.assign(state, parsedState);
+                    state.currentScreen = initialScreen; // temporarily reset so goToScreen hides it
                     this.populateUIFromState();
-                    this.goToScreen(state.currentScreen, true);
+                    this.goToScreen(targetScreen, true);
                 }
             }
         } catch (e) {

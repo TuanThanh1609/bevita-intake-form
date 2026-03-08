@@ -107,6 +107,7 @@ const App = {
 
         this.updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        this.saveState();
     },
 
     goBack() {
@@ -114,6 +115,114 @@ const App = {
             const prevScreen = state.history.pop();
             this.goToScreen(prevScreen, true);
         }
+    },
+
+    saveState() {
+        if (state.currentScreen && state.currentScreen !== 'thankyou') {
+            localStorage.setItem('bevita_form_state', JSON.stringify(state));
+        }
+    },
+
+    restoreState() {
+        try {
+            const saved = localStorage.getItem('bevita_form_state');
+            if (saved) {
+                const parsedState = JSON.parse(saved);
+                if (parsedState.currentScreen && parsedState.currentScreen !== 'welcome' && parsedState.currentScreen !== 'thankyou') {
+                    Object.assign(state, parsedState);
+                    this.populateUIFromState();
+                    this.goToScreen(state.currentScreen, true);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to restore form state', e);
+        }
+    },
+
+    populateUIFromState() {
+        // Text inputs
+        if (state.data.Full_Name) {
+            document.getElementById('inputName').value = state.data.Full_Name;
+            document.getElementById('ageGreeting').textContent = `Cảm ơn ${state.data.Full_Name}`;
+        }
+        if (state.data.Phone_Number) document.getElementById('inputPhone').value = state.data.Phone_Number;
+        if (state.data.Location) document.getElementById('inputLocation').value = state.data.Location;
+        if (state.data.History_Cosmetics) document.getElementById('inputCosmetics').value = state.data.History_Cosmetics;
+        if (state.data.Current_Routine) document.getElementById('inputRoutine').value = state.data.Current_Routine;
+        
+        if (state.healthData.menstrual) document.getElementById('inputMenstrual').value = state.healthData.menstrual;
+        if (state.healthData.pregnancy) document.getElementById('inputPregnancy').value = state.healthData.pregnancy;
+        if (state.healthData.medical) document.getElementById('inputMedical').value = state.healthData.medical;
+        if (state.data.Supplements) document.getElementById('inputSupplements').value = state.data.Supplements;
+        
+        // Helper to re-select pills visually
+        const selectPills = (containerId, values) => {
+            const container = document.getElementById(containerId);
+            if (!container || !values) return;
+            const btnArr = Array.from(container.querySelectorAll('.pill-btn'));
+            const valArray = Array.isArray(values) ? values : [values];
+            btnArr.forEach(btn => {
+                if (valArray.some(v => v.includes(btn.textContent.trim()) || btn.textContent.trim().includes(v))) {
+                    btn.classList.add('selected');
+                }
+            });
+        };
+
+        selectPills('screen-age', state.data.Age_Group);
+        if (state.data.Age_Group) this.updateDynamicTexts(); 
+        
+        if (state.skinGoals.length > 0) {
+           selectPills('screen-skin', state.skinGoals);
+           document.getElementById('btnSkinNext').classList.remove('hidden');
+        }
+        
+        if (state.data.History_Spa) {
+             if (state.data.History_Spa !== "Chưa bao giờ") {
+                 selectPills('screen-spa', "Đã từng đi");
+                 document.getElementById('inputSpaInfo').value = state.data.History_Spa;
+                 document.getElementById('spaExtraInput').classList.remove('hidden');
+             } else {
+                 selectPills('screen-spa', "Chưa bao giờ");
+             }
+        }
+        selectPills('screen-sleep', state.data.Lifestyle_Sleep);
+        selectPills('screen-stress', state.data.Lifestyle_Stress);
+        selectPills('screen-budget', state.data.Budget);
+
+        // Restore photo previews
+        if (state.skinPhotoUrls.length > 0) this.restorePhotosUI('skin', state.skinPhotoUrls);
+        if (state.routinePhotoUrls.length > 0) this.restorePhotosUI('routine', state.routinePhotoUrls);
+    },
+
+    restorePhotosUI(type, urls) {
+        const areaEl = document.getElementById(type === 'skin' ? 'skinPhotoArea' : 'routinePhotoArea');
+        const previewsEl = document.getElementById(type === 'skin' ? 'skinPreviews' : 'routinePreviews');
+        if (!areaEl || !previewsEl) return;
+        
+        areaEl.classList.add('has-photos');
+        
+        urls.forEach((url) => {
+            const preview = document.createElement('div');
+            preview.className = 'photo-preview';
+            preview.innerHTML = `
+                <button class="remove-btn" onclick="App.removePhoto(this, '${type}')">×</button>
+                ${type === 'skin' ? '<div class="photo-check"></div>' : ''}
+                <img src="${url}" alt="Preview">
+            `;
+            const uploadBtn = previewsEl.querySelector('.upload-btn') || previewsEl.lastElementChild;
+            if (uploadBtn) {
+                previewsEl.insertBefore(preview, uploadBtn);
+            } else {
+                previewsEl.appendChild(preview);
+            }
+        });
+        
+        if (type === 'skin' && urls.length > 0) {
+            const nextBtn = document.getElementById('btnSkinPhotoNext');
+            if (nextBtn) nextBtn.classList.remove('hidden');
+        }
+        
+        this.showPhotoStatus(type, `✅ Đã khôi phục ${urls.length} ảnh`);
     },
 
     updateProgress() {
@@ -485,6 +594,7 @@ const App = {
             }
 
             console.log('✅ Lead submitted successfully:', await response.json());
+            localStorage.removeItem('bevita_form_state');
         } catch (err) {
             console.error('❌ Submit error:', err);
             alert('Có lỗi khi gửi thông tin. Vui lòng thử lại!');
@@ -699,4 +809,5 @@ document.addEventListener('keydown', (e) => {
 // ── Initialize ──
 document.addEventListener('DOMContentLoaded', () => {
     App.updateProgress();
+    App.restoreState();
 });

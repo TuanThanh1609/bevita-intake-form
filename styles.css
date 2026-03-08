@@ -170,16 +170,20 @@ body {
 .screens-container {
     flex: 1;
     padding: 20px;
-    padding-bottom: 40px;
+    padding-bottom: 0px; /* Reset padding to allow sticky actions-area */
+    display: flex;
+    flex-direction: column;
 }
 
 .screen {
     display: none;
+    flex: 1;
+    flex-direction: column;
     animation: screenIn 0.5s ease-out forwards;
 }
 
 .screen.active {
-    display: block;
+    display: flex;
 }
 
 @keyframes screenIn {
@@ -223,6 +227,7 @@ body {
 
 .chat-area {
     margin-bottom: 24px;
+    flex: 1;
 }
 
 .chat-bubble {
@@ -286,7 +291,15 @@ body {
 
 /* --- Actions Area --- */
 .actions-area {
-    padding: 4px 0;
+    padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+    margin: 0 -20px 0; /* Pull out of padding, sit at bottom */
+    position: sticky;
+    bottom: 0px;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    z-index: 100;
 }
 
 .pills-grid {
@@ -301,6 +314,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 12px 20px;
+    min-height: 48px;
     border-radius: var(--radius-full);
     border: none;
     font-family: var(--font);
@@ -398,7 +412,7 @@ body {
     border: 1.5px solid var(--gray-200);
     background: white;
     font-family: var(--font);
-    font-size: 0.9rem;
+    font-size: 16px;
     color: var(--gray-800);
     outline: none;
     transition: var(--transition);
@@ -421,9 +435,9 @@ body {
 }
 
 .send-btn {
-    width: 44px;
-    min-width: 44px;
-    height: 44px;
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: none;
     background: linear-gradient(135deg, var(--teal-400), var(--teal-500));

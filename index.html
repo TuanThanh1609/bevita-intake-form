@@ -214,14 +214,53 @@
                     </div>
                 </div>
                 <div class="actions-area animate-in delay-3">
-                    <div class="photo-upload-area" id="skinPhotoArea">
-                        <div class="photo-previews" id="skinPreviews"></div>
-                        <label class="upload-btn">
-                            <span>📷 Chụp / Chọn hình</span>
-                            <input type="file" accept="image/*" multiple onchange="App.handleSkinPhotos(this.files)" hidden>
-                        </label>
+                    <div class="photo-slots-container">
+                        <!-- Thẳng -->
+                        <div class="photo-slot-card active" id="slot-front">
+                            <div class="slot-header">
+                                <span class="slot-title">Góc 1: Chính diện</span>
+                                <span class="slot-status" id="status-front">Chưa có ảnh</span>
+                            </div>
+                            <div class="slot-body">
+                                <div class="photo-previews" id="preview-front"></div>
+                                <label class="upload-btn" id="upload-label-front">
+                                    <span>📷 Chụp / Chọn hình</span>
+                                    <input type="file" accept="image/*" onchange="App.handleSkinPhotoSlot(this.files, 'front')" hidden>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Trái -->
+                        <div class="photo-slot-card" id="slot-left">
+                            <div class="slot-header">
+                                <span class="slot-title">Góc 2: Nghiêng trái</span>
+                                <span class="slot-status" id="status-left">Chưa có ảnh</span>
+                            </div>
+                            <div class="slot-body">
+                                <div class="photo-previews" id="preview-left"></div>
+                                <label class="upload-btn" id="upload-label-left">
+                                    <span>📷 Chụp / Chọn hình</span>
+                                    <input type="file" accept="image/*" onchange="App.handleSkinPhotoSlot(this.files, 'left')" hidden>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Phải -->
+                        <div class="photo-slot-card" id="slot-right">
+                            <div class="slot-header">
+                                <span class="slot-title">Góc 3: Nghiêng phải</span>
+                                <span class="slot-status" id="status-right">Chưa có ảnh</span>
+                            </div>
+                            <div class="slot-body">
+                                <div class="photo-previews" id="preview-right"></div>
+                                <label class="upload-btn" id="upload-label-right">
+                                    <span>📷 Chụp / Chọn hình</span>
+                                    <input type="file" accept="image/*" onchange="App.handleSkinPhotoSlot(this.files, 'right')" hidden>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="photo-actions">
+                    <div class="photo-actions mt-16">
                         <button class="pill-btn primary next-btn hidden" onclick="App.submitSkinPhotos()" id="btnSkinPhotoNext">Tiếp tục →</button>
                         <button class="pill-btn secondary dynamic-text" data-template="⏳ Chụp xong gửi sau, {user} mô tả dưới đây nhé" onclick="App.skipSkinPhotos()">⏳ Chụp xong gửi sau, bạn mô tả dưới đây nhé</button>
                     </div>

@@ -21,29 +21,51 @@
   ],
   "recent_changes": [
     {
-      "timestamp": "2026-03-08T19:22:00Z",
-      "type": "feature",
-      "description": "Implemented global 'Quay lại' back button logic with history array state management in app.js.",
-      "files": ["app.js", "index.html", "styles.css"]
+      "timestamp": "2026-03-08T19:48:20+07:00",
+      "type": "hotfix",
+      "description": "Implemented serverless API proxies (api/upload.js & api/submit.js) for security and squelched Vercel 413 Payload error with JPEG compression API rules.",
+      "files": [
+        "app.js",
+        "api/upload.js",
+        "api/submit.js"
+      ]
     },
     {
-      "timestamp": "2026-03-08T19:10:00Z",
+      "timestamp": "2026-03-08",
       "type": "feature",
-      "description": "Added dynamic bot and user pronoun resolution based on age selection.",
-      "files": ["app.js", "index.html"]
+      "description": "Implemented Dynamic Pronouns based on age criteria and added global back navigation via history state array.",
+      "files": [
+        "app.js",
+        "index.html",
+        "styles.css"
+      ]
     }
   ],
   "errors_encountered": [
     {
-      "error": "NocoDB rejected MultiSelect Health_Status because options were missing.",
-      "solution": "Changed NocoDB column to LongText and updated app.js to send formatted string.",
+      "error": "NocoDB API rejects Health_Status submission",
+      "solution": "Changed Health_Status field in NocoDB from MultiSelect to LongText to accept arbitrary concatenated string data.",
+      "resolved": true
+    },
+    {
+      "error": "Vercel Payload Too Large (413) on Image Uploads",
+      "solution": "Canvas compression forced to image/jpeg (0.8 quality). Vercel serverless size limit explicitly adjusted to 4mb.",
+      "resolved": true
+    },
+    {
+      "error": "Có lỗi khi gửi thông tin (Failed to fetch)",
+      "solution": "App.submitForm was still using deleted CONFIG.NOCODB_API. Fixed to fetch('/api/submit') using Vercel Serverless proxy.",
       "resolved": true
     }
   ],
   "decisions_made": [
     {
-      "decision": "Store form navigation history in a state.history array.",
-      "reason": "Allows the user to confidently navigate backwards to correct mistakes without losing overall state context."
+      "decision": "Use Vercel serverless endpoints instead of NocoDB direct REST",
+      "reason": "Crucial requirement to completely hide standard NOCODB_TOKEN and IMGBB_KEY API secrets from public client context"
+    },
+    {
+      "decision": "Use history array for backward navigation",
+      "reason": "Provides a robust way to go back to the exact previous screen without hardcoding previous screen logic for every step."
     },
     {
       "decision": "Use declarative data-template attributes for easy dynamic text resolution.",

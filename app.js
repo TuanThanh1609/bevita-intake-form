@@ -34,7 +34,7 @@ const state = {
     skinGoals: [],
     supplements: [],
     healthData: {},
-    skinPhotoUrls: [],
+    skinPhotoUrls: { front: null, left: null, right: null },
     routinePhotoUrls: [],
     botPronoun: 'Mai',    // Mặc định ban đầu
     userPronoun: 'bạn',   // Mặc định ban đầu
@@ -129,6 +129,7 @@ const App = {
             if (saved) {
                 const parsedState = JSON.parse(saved);
                 if (parsedState.currentScreen && parsedState.currentScreen !== 'welcome' && parsedState.currentScreen !== 'thankyou') {
+                    if (Array.isArray(parsedState.skinPhotoUrls)) parsedState.skinPhotoUrls = { front: null, left: null, right: null };
                     const targetScreen = parsedState.currentScreen;
                     const initialScreen = state.currentScreen; // typically 'welcome'
                     Object.assign(state, parsedState);
@@ -193,23 +194,59 @@ const App = {
         selectPills('screen-budget', state.data.Budget);
 
         // Restore photo previews
-        if (state.skinPhotoUrls.length > 0) this.restorePhotosUI('skin', state.skinPhotoUrls);
-        if (state.routinePhotoUrls.length > 0) this.restorePhotosUI('routine', state.routinePhotoUrls);
+        if (state.routinePhotoUrls && state.routinePhotoUrls.length > 0) {
+            this.restorePhotosUI('routine', state.routinePhotoUrls);
+        }
+        if (state.skinPhotoUrls && (state.skinPhotoUrls.front || state.skinPhotoUrls.left || state.skinPhotoUrls.right)) {
+            this.restorePhotosUI('skin', state.skinPhotoUrls);
+        }
     },
 
-    restorePhotosUI(type, urls) {
-        const areaEl = document.getElementById(type === 'skin' ? 'skinPhotoArea' : 'routinePhotoArea');
-        const previewsEl = document.getElementById(type === 'skin' ? 'skinPreviews' : 'routinePreviews');
+    restorePhotosUI(type, data) {
+        if (type === 'skin') {
+            ['front', 'left', 'right'].forEach(slotId => {
+                const url = data[slotId];
+                if (url) {
+                    const slotEl = document.getElementById(`slot-${slotId}`);
+                    const previewEl = document.getElementById(`preview-${slotId}`);
+                    const statusEl = document.getElementById(`status-${slotId}`);
+                    const uploadLabelDirect = document.getElementById(`upload-label-${slotId}`);
+                    
+                    if (slotEl && previewEl && statusEl && uploadLabelDirect) {
+                        slotEl.classList.add('has-photo');
+                        statusEl.textContent = 'Đã tải lên';
+                        uploadLabelDirect.style.display = 'none';
+                        previewEl.innerHTML = `
+                            <div class="photo-preview">
+                                <button class="remove-btn" onclick="App.removeSkinPhotoSlot('${slotId}')">×</button>
+                                <div class="photo-check"></div>
+                                <img src="${url}" alt="Preview">
+                            </div>
+                        `;
+                    }
+                }
+            });
+            
+            if (data.front && !data.left) document.getElementById('slot-left').classList.add('active');
+            if (data.left && !data.right) document.getElementById('slot-right').classList.add('active');
+            if (data.front || data.left || data.right) document.getElementById('slot-front').classList.add('active');
+            
+            this.checkSkinPhotosComplete();
+            return;
+        }
+
+        const areaEl = document.getElementById('routinePhotoArea');
+        const previewsEl = document.getElementById('routinePreviews');
         if (!areaEl || !previewsEl) return;
         
         areaEl.classList.add('has-photos');
+        const urls = data;
         
         urls.forEach((url) => {
             const preview = document.createElement('div');
             preview.className = 'photo-preview';
             preview.innerHTML = `
-                <button class="remove-btn" onclick="App.removePhoto(this, '${type}')">×</button>
-                ${type === 'skin' ? '<div class="photo-check"></div>' : ''}
+                <button class="remove-btn" onclick="App.removePhoto(this, 'routine')">×</button>
                 <img src="${url}" alt="Preview">
             `;
             const uploadBtn = previewsEl.querySelector('.upload-btn') || previewsEl.lastElementChild;
@@ -220,12 +257,7 @@ const App = {
             }
         });
         
-        if (type === 'skin' && urls.length > 0) {
-            const nextBtn = document.getElementById('btnSkinPhotoNext');
-            if (nextBtn) nextBtn.classList.remove('hidden');
-        }
-        
-        this.showPhotoStatus(type, `✅ Đã khôi phục ${urls.length} ảnh`);
+        this.showPhotoStatus('routine', `✅ Đã khôi phục ${urls.length} ảnh`);
     },
 
     updateProgress() {
@@ -347,9 +379,71 @@ const App = {
         this.goToScreen('photo-skin');
     },
 
-    // ── Step 1: Skin Photos ──
-    async handleSkinPhotos(files) {
-        await this.processPhotos(files, 'skin');
+    // ── Step 1: Skin Photos (Multi-step Wizard) ──
+    async handleSkinPhotoSlot(files, slotId) {
+        if (!files || files.length === 0) return;
+        const file = files[0];
+        
+        const slotEl = document.getElementById(`slot-${slotId}`);
+        const previewEl = document.getElementById(`preview-${slotId}`);
+        const statusEl = document.getElementById(`status-${slotId}`);
+        const uploadLabelDirect = document.getElementById(`upload-label-${slotId}`);
+
+        uploadLabelDirect.style.display = 'none';
+        previewEl.innerHTML = `<div class="photo-preview"><div class="photo-loader"></div></div>`;
+        statusEl.textContent = 'Đang tải...';
+        
+        try {
+            const url = await this.uploadToImgBB(file);
+            state.skinPhotoUrls[slotId] = url;
+            
+            previewEl.innerHTML = `
+                <div class="photo-preview">
+                    <button class="remove-btn" onclick="App.removeSkinPhotoSlot('${slotId}')">×</button>
+                    <div class="photo-check"></div>
+                    <img src="${url}" alt="Preview">
+                </div>
+            `;
+            slotEl.classList.add('has-photo');
+            statusEl.textContent = 'Đã tải lên';
+            
+            if (slotId === 'front' && !state.skinPhotoUrls['left']) document.getElementById('slot-left').classList.add('active');
+            if (slotId === 'left' && !state.skinPhotoUrls['right']) document.getElementById('slot-right').classList.add('active');
+            
+            this.checkSkinPhotosComplete();
+        } catch (err) {
+            console.error('Upload error in slot:', err);
+            statusEl.textContent = 'Lỗi tải lên!';
+            previewEl.innerHTML = '';
+            uploadLabelDirect.style.display = 'inline-flex';
+        }
+    },
+    
+    removeSkinPhotoSlot(slotId) {
+        state.skinPhotoUrls[slotId] = null;
+        
+        const slotEl = document.getElementById(`slot-${slotId}`);
+        const previewEl = document.getElementById(`preview-${slotId}`);
+        const statusEl = document.getElementById(`status-${slotId}`);
+        const uploadLabelDirect = document.getElementById(`upload-label-${slotId}`);
+        
+        slotEl.classList.remove('has-photo');
+        statusEl.textContent = 'Chưa có ảnh';
+        previewEl.innerHTML = '';
+        uploadLabelDirect.style.display = 'inline-flex';
+        
+        this.checkSkinPhotosComplete();
+    },
+    
+    checkSkinPhotosComplete() {
+        const { front, left, right } = state.skinPhotoUrls;
+        const nextBtn = document.getElementById('btnSkinPhotoNext');
+        if (front && left && right) {
+            nextBtn.classList.remove('hidden');
+            nextBtn.classList.add('animate-in');
+        } else {
+            nextBtn.classList.add('hidden');
+        }
     },
 
     skipSkinPhotos() {
@@ -357,8 +451,9 @@ const App = {
     },
 
     submitSkinPhotos() {
-        if (state.skinPhotoUrls.length === 0) return;
-        state.data.Skin_Photos = state.skinPhotoUrls.join(', ');
+        const { front, left, right } = state.skinPhotoUrls;
+        if (!front || !left || !right) return;
+        state.data.Skin_Photos = [front, left, right].filter(Boolean).join(', ');
         this.goToScreen('cosmetics');
     },
 
@@ -611,16 +706,16 @@ const App = {
 
     // ── Photo Processing ──
     async processPhotos(files, type) {
-        let currentUrls = type === 'skin' ? state.skinPhotoUrls : state.routinePhotoUrls;
-        const maxLimit = type === 'skin' ? 3 : 5;
+        let currentUrls = state.routinePhotoUrls;
+        const maxLimit = 5;
 
         if (currentUrls.length + files.length > maxLimit) {
             alert(`Chỉ được tải lên tối đa ${maxLimit} ảnh`);
             return;
         }
 
-        const areaEl = document.getElementById(type === 'skin' ? 'skinPhotoArea' : 'routinePhotoArea');
-        const previewsEl = document.getElementById(type === 'skin' ? 'skinPreviews' : 'routinePreviews');
+        const areaEl = document.getElementById('routinePhotoArea');
+        const previewsEl = document.getElementById('routinePreviews');
         const uploadLabel = areaEl.querySelector('.upload-btn');
 
         areaEl.classList.add('has-photos');
@@ -639,8 +734,7 @@ const App = {
                 const preview = document.createElement('div');
                 preview.className = 'photo-preview';
                 preview.innerHTML = `
-                    <button class="remove-btn" onclick="App.removePhoto(this, '${type}')">×</button>
-                    ${type === 'skin' ? '<div class="photo-check"></div>' : ''}
+                    <button class="remove-btn" onclick="App.removePhoto(this, 'routine')">×</button>
                     <img src="${e.target.result}" alt="Preview">
                 `;
                 previewsEl.insertBefore(preview, loader);
@@ -650,11 +744,7 @@ const App = {
             // Upload to ImgBB
             try {
                 const url = await this.uploadToImgBB(file);
-                if (type === 'skin') {
-                    state.skinPhotoUrls.push(url);
-                } else {
-                    state.routinePhotoUrls.push(url);
-                }
+                state.routinePhotoUrls.push(url);
             } catch (err) {
                 console.error('Upload error:', err);
                 uploadErrors++;
@@ -665,25 +755,19 @@ const App = {
         uploadLabel.style.display = 'inline-flex';
 
         // Check length and toggle Next buttons
-        const count = type === 'skin' ? state.skinPhotoUrls.length : state.routinePhotoUrls.length;
-
-        if (type === 'skin' && count > 0) {
-            const nextBtn = document.getElementById('btnSkinPhotoNext');
-            if (nextBtn) {
-                nextBtn.classList.remove('hidden');
-                nextBtn.classList.add('animate-in');
-            }
-        }
+        const count = state.routinePhotoUrls.length;
 
         if (uploadErrors > 0) {
-            this.showPhotoStatus(type, `⚠️ Lỗi tải lên ${uploadErrors} ảnh. Vui lòng check F12 Console hoặc F5 thử lại.`);
+            this.showPhotoStatus('routine', `⚠️ Lỗi tải lên ${uploadErrors} ảnh. Vui lòng check F12 Console hoặc F5 thử lại.`);
         } else {
-            this.showPhotoStatus(type, `✅ Đã tải lên ${count} ảnh`);
+            this.showPhotoStatus('routine', `✅ Đã tải lên ${count} ảnh`);
         }
     },
 
     showPhotoStatus(type, message) {
-        const areaEl = document.getElementById(type === 'skin' ? 'skinPhotoArea' : 'routinePhotoArea');
+        if (type !== 'routine') return;
+        const areaEl = document.getElementById('routinePhotoArea');
+        if (!areaEl) return;
         let statusEl = areaEl.querySelector('.photo-status');
         if (!statusEl) {
             statusEl = document.createElement('p');
@@ -694,24 +778,17 @@ const App = {
     },
 
     removePhoto(btn, type) {
+        if (type !== 'routine') return;
         const previewEl = btn.closest('.photo-preview');
-        // Handle indexing differently for skin/routine preview structure vs array state
-        // This is safe since array matches UI sequentially, just filter correctly
         const index = Array.from(previewEl.parentNode.children).indexOf(previewEl);
         previewEl.remove();
 
-        if (type === 'skin') {
-            state.skinPhotoUrls.splice(index, 1);
-            if (state.skinPhotoUrls.length === 0) {
-                const nextBtn = document.getElementById('btnSkinPhotoNext');
-                if (nextBtn) nextBtn.classList.add('hidden');
-                document.getElementById('skinPhotoArea').classList.remove('has-photos');
-            }
+        state.routinePhotoUrls.splice(index, 1);
+        if (state.routinePhotoUrls.length === 0) {
+            document.getElementById('routinePhotoArea').classList.remove('has-photos');
+            this.showPhotoStatus('routine', '');
         } else {
-            state.routinePhotoUrls.splice(index, 1);
-            if (state.routinePhotoUrls.length === 0) {
-                document.getElementById('routinePhotoArea').classList.remove('has-photos');
-            }
+            this.showPhotoStatus('routine', `✅ Đã tải lên ${state.routinePhotoUrls.length} ảnh`);
         }
     },
 

@@ -1,0 +1,459 @@
+﻿
+KỊCH BẢN CHATBOT — INTAKE LEAD
+Toàn bộ tin nhắn, câu hỏi
+và gợi ý trả lời cho khách
+Bevita  ·  Quy trình tư vấn da online  ·  Phase 1
+Tài liệu này mô tả từng tin nhắn bot sẽ tự động gửi trong Messenger/Zalo, kèm các nút gợi ý để khách bấm nhanh — và kịch bản phân nhánh tương ứng với từng lựa chọn. Toàn bộ giọng văn giữ nguyên phong cách thân thiện của Bevita.
+📖  CÁCH ĐỌC TÀI LIỆU NÀY
+Vùng hồng nhạt = Tin nhắn bot gửi tự động vào chat
+Vùng xám nhạt = Ví dụ câu trả lời của khách
+💡 Vàng = Ghi chú kỹ thuật / lưu ý khi setup
+Xanh lá = Điều kiện nhánh / hành động tiếp theo
+💬  LUỒNG CHÍNH — Từ tin đầu tiên đến hết Bước 4
+⚡
+TIN CHÀO — Kích hoạt ngay khi khách nhắn lần đầu
+Trigger: khách gửi bất kỳ tin nhắn nào vào page lần đầu tiên
+TIN 01
+Tin chào tự động — gửi ngay lập tức
+🤖  Bot gửi tự động
+Chào bạn 🌷
+Bạn vừa nhắn tin cho Bevita! Để Mai tư vấn da đúng và hiệu quả cho bạn, Mai cần hỏi bạn một số thông tin về tình trạng da nhé.
+Mình trò chuyện ngắn khoảng 5–7 phút thôi — sau đó Mai sẽ phân tích và tư vấn phác đồ riêng cho bạn 🌿
+Bạn sẵn sàng bắt đầu chưa?
+💡 Bot phải trả lời trong vòng 5 giây sau khi khách nhắn. Thiết lập welcome message trong Messenger Page Settings.
+Nút gợi ý (khách bấm nhanh):
+✅ Sẵn sàng rồi, bắt đầu đi!
+⏳ Để lúc khác nhé
+Nếu chọn: &apos;Để lúc khác&apos;
+Bot: &quot;Dạ không sao ạ! Khi nào bạn sẵn sàng thì nhắn &apos;Tư vấn&apos; để bắt đầu nhé 🌷&quot; → Kết thúc, đợi khách chủ động
+1
+BƯỚC 1 — Thông tin cơ bản + Hình da
+Thu tuổi, vị trí, hình da 3 góc. Bước này quyết định xưng hô toàn bộ cuộc trò chuyện.
+TIN 02
+Hỏi độ tuổi — để phân nhánh xưng hô
+🤖  Bot gửi tự động
+Trước tiên cho Mai hỏi bạn đang ở độ tuổi nào nhé?
+(Để Mai xưng hô cho phù hợp và hiểu rõ nhu cầu da của bạn hơn 🌿)
+Nút gợi ý (khách bấm nhanh):
+Dưới 25 tuổi
+25–34 tuổi
+35–42 tuổi
+Trên 42 tuổi
+Nếu &lt; 42 tuổi
+→ Từ đây bot xưng: &apos;Chị&apos; (bot) — &apos;Em&apos; (khách). Lưu biến: age_group = under_42
+Nếu ≥ 42 tuổi
+→ Từ đây bot xưng: &apos;Em&apos; (bot) — &apos;Chị&apos; (khách). Lưu biến: age_group = over_42
+TIN 03
+Hỏi tỉnh thành
+🤖  Bot gửi tự động
+Bạn đang sống ở tỉnh/thành nào ạ?
+(Khí hậu ảnh hưởng khá nhiều đến da — như ở miền Nam thì nóng ẩm, da dễ tiết dầu và nám đậm hơn so với miền Bắc 😊)
+💡 Cho khách nhắn tên tỉnh tự do. Bot nhận diện keyword và map sang vùng khí hậu. Thiết lập quick reply 3 thành phố lớn nhất để tiện.
+Nút gợi ý (khách bấm nhanh):
+TP.HCM
+Hà Nội
+Đà Nẵng
+Tỉnh khác...
+👤  Khách trả lời
+TP.HCM ạ
+🤖  Bot gửi tự động
+Dạ, khí hậu TP.HCM nóng ẩm nên da thường dễ tiết dầu và nhạy cảm với nắng hơn — Mai sẽ chú ý điều này khi tư vấn cho bạn nhé 🌤️
+TIN 04
+Hỏi vấn đề da chính — để ưu tiên tư vấn
+🤖  Bot gửi tự động
+Hiện tại bạn đang muốn cải thiện vấn đề da nào nhất?
+(Bạn có thể chọn nhiều vấn đề nhé 😊)
+Nút gợi ý (khách bấm nhanh):
+Nám / tàn nhang
+Mụn / thâm mụn
+Lão hoá / nhăn
+Da xỉn / không đều màu
+Nếu khách chọn nhiều: bot nhận list, lưu vào skin_goals[]. Không cần hỏi lại, tiếp tục bước tiếp theo.
+TIN 05
+Yêu cầu gửi hình da 3 góc
+🤖  Bot gửi tự động
+Để xem tình trạng da thật sự của bạn, bạn gửi giúp Mai 3 tấm hình da mặt nhé 📸
+Bạn chụp theo mẫu sau:
+📷 Góc 1: Nhìn thẳng vào camera
+📷 Góc 2: Nghiêng mặt sang trái khoảng 45°
+📷 Góc 3: Nghiêng mặt sang phải khoảng 45°
+Tips để hình đẹp, Mai xem rõ hơn:
+✅ Đứng hướng mặt ra cửa sổ — ánh sáng tự nhiên
+✅ Mặt sạch, không trang điểm nếu có thể
+❌ Không chụp ngược sáng, không dùng đèn flash
+Hình của bạn luôn được bảo mật, chỉ Mai và chuyên gia Bevita xem thôi nhé 🔒
+Nút gợi ý (khách bấm nhanh):
+📷 Gửi hình bây giờ
+⏳ Chụp xong gửi sau
+Nếu chọn &apos;Gửi hình bây giờ&apos;
+Khách upload ảnh → bot nhận → tự động chuyển sang Bước 2
+Nếu chọn &apos;Chụp xong gửi sau&apos;
+Bot: &quot;Dạ bạn cứ chụp xong rồi gửi vào đây nhé, Mai đợi 🌷&quot; → Set reminder sau 2 tiếng nếu chưa thấy ảnh
+TIN 05b
+Nhắc hình da nếu chưa gửi sau 2 tiếng (tự động)
+🤖  Bot gửi tự động
+Bạn ơi, mình chưa gửi ảnh da cho Mai nhé 😊
+Bạn tranh thủ chụp 3 góc nhanh rồi gửi vào đây để Mai xem và tư vấn cho bạn nha!
+(Tips: Ra gần cửa sổ, ánh sáng tự nhiên là đẹp nhất ạ 🌿)
+2
+BƯỚC 2 — Lịch sử mỹ phẩm &amp; điều trị
+Phân nhánh theo tuổi. Toàn bộ kịch bản dưới đây có 2 phiên bản: dưới 42 và từ 42 trở lên.
+Từ Bước 2 trở đi, bot dùng xưng hô đã xác định ở Bước 1. Tài liệu hiển thị phiên bản [dưới 42 — Chị/Em] trước, sau đó là [từ 42 — Em/Chị].
+👩  PHIÊN BẢN A — Khách dưới 42 tuổi  (bot xưng Chị, gọi khách là Em)
+TIN 06A
+Hỏi mỹ phẩm đã dùng — dưới 42 tuổi
+🤖  Bot gửi tự động
+Cảm ơn em đã gửi hình! Chị xem kỹ da em ngay nha 🌷
+Trước khi chị nhận xét, cho chị hỏi thêm một chút về các sản phẩm chăm sóc da nhé:
+Em đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?
+Nút gợi ý (khách bấm nhanh):
+Chưa dùng gì đặc trị
+Dùng dược mỹ phẩm
+Dùng mỹ phẩm thường
+Nghi dùng kem trộn
+👤  Khách trả lời
+Em có dùng một số loại kem của La Roche-Posay, nhưng hồi trước có xài kem trộn của người quen bán 😅
+🤖  Bot gửi tự động
+Dạ chị hiểu rồi! Kem trộn thường chứa corticoid và làm da quen thuốc — da sẽ cần thêm thời gian phục hồi hơn một chút.
+Nhưng không sao nhé, chị sẽ tư vấn phác đồ phù hợp cho da em 🌿
+💡 Nếu khách nhắc đến kem trộn → gắn flag cream_mixed = true. TV sẽ thấy flag này được highlight đỏ trong hồ sơ.
+TIN 07A
+Hỏi về spa / thẩm mỹ viện — dưới 42 tuổi
+🤖  Bot gửi tự động
+Em đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?
+(Ví dụ: peel da, tiêm meso, laser, RF nâng cơ...)
+Nút gợi ý (khách bấm nhanh):
+Chưa bao giờ
+Đã làm 1–2 lần
+Đang điều trị định kỳ
+Nếu chọn &apos;Chưa bao giờ&apos;
+Bot: &quot;Dạ, vậy thì em chưa có tiền sử điều trị gì — dễ bắt đầu phác đồ từ đầu hơn 😊&quot; → Chuyển sang Tin 08A
+Nếu chọn &apos;Đã làm&apos; hoặc &apos;Đang điều trị&apos;
+→ Bot hỏi thêm Tin 07A-b (bên dưới) trước khi chuyển Tin 08A
+TIN 07A-b
+Hỏi thêm về liệu trình spa (chỉ hiện khi có làm spa)
+🤖  Bot gửi tự động
+Em làm dịch vụ gì vậy? Và lần gần nhất là khoảng bao lâu trước?
+Nút gợi ý (khách bấm nhanh):
+Peel da / tẩy tế bào chết
+Tiêm meso / PRP
+Laser trị nám / mụn
+RF / HIFU nâng cơ
+👤  Khách trả lời
+Laser trị nám, khoảng 2 tháng trước
+🤖  Bot gửi tự động
+Dạ, 2 tháng sau laser da thường còn đang trong giai đoạn nhạy cảm — chị sẽ lưu ý điều này khi lên phác đồ cho em nhé.
+Sau khi laser xong da em có phản ứng gì không? (Ví dụ: đỏ, bong tróc, nám sáng lên hay sạm lại...)
+Nút gợi ý (khách bấm nhanh):
+Da đỏ rồi hết
+Nám sáng hơn
+Nám sạm lại sau đó
+Da bình thường, không thay đổi nhiều
+👑  PHIÊN BẢN B — Khách từ 42 tuổi trở lên  (bot xưng Em, gọi khách là Chị)
+TIN 06B
+Hỏi mỹ phẩm đã dùng — từ 42 tuổi
+🤖  Bot gửi tự động
+Cảm ơn chị đã gửi hình! Em xem kỹ da chị ngay nha 🌷
+Trước khi em nhận xét, cho em hỏi thêm một chút về các sản phẩm chăm sóc da nhé:
+Các loại mỹ phẩm chị đã từng dùng để trị nám, chăm sóc da... là của hãng nào ạ?
+Nút gợi ý (khách bấm nhanh):
+Chưa dùng gì đặc trị
+Dược mỹ phẩm (La Roche, Avène...)
+Cao cấp (SK-II, Estée Lauder...)
+Sản phẩm thuốc / bác sĩ kê
+TIN 07B
+Hỏi về spa / thẩm mỹ viện — từ 42 tuổi
+🤖  Bot gửi tự động
+Chị đã từng đến spa hoặc thẩm mỹ viện điều trị da chưa ạ?
+(Ví dụ: peel da, tiêm meso, laser, RF nâng cơ, căng chỉ...)
+Nút gợi ý (khách bấm nhanh):
+Chưa bao giờ
+Đã làm vài lần
+Đang điều trị định kỳ
+👤  Khách trả lời
+Chị hay làm peel và có tiêm meso 3 tháng trước
+🤖  Bot gửi tự động
+Dạ, peel và meso là 2 liệu trình khá phổ biến và hiệu quả nếu chọn đúng nơi uy tín ạ.
+Sau khi làm, chị thấy da phản ứng như thế nào? Da cải thiện nhiều không ạ?
+Nút gợi ý (khách bấm nhanh):
+Sáng, đều màu hơn
+Cải thiện nhưng không lâu
+Không thay đổi nhiều
+Da nhạy cảm hơn sau đó
+3
+BƯỚC 3 — Mỹ phẩm đang dùng hiện tại
+Biết routine hiện tại để TV đề xuất giữ lại / thay / bổ sung. Cho khách chọn cách cung cấp thông tin.
+TIN 08
+Hỏi về sản phẩm đang dùng — 2 cách khách có thể trả lời
+🤖  Bot gửi tự động
+Hiện tại bạn đang dùng những sản phẩm nào ở nhà?
+(Tẩy trang, sữa rửa mặt, toner, serum, kem dưỡng, kem chống nắng... các loại ạ)
+Bạn muốn cung cấp thông tin theo cách nào cho tiện?
+💡 Bước này KHÔNG yêu cầu form. Khách có thể chọn chụp hình hoặc nhắn tên sản phẩm thẳng vào chat.
+Nút gợi ý (khách bấm nhanh):
+📷 Chụp hình tủ mỹ phẩm gửi luôn
+✍️ Nhắn tên sản phẩm cho bạn
+Nếu chọn &apos;Chụp hình&apos;
+Bot: &quot;Bạn chụp hết các sản phẩm đang dùng và gửi vào đây nhé, chụp chung 1 hình hoặc nhiều hình đều được 📸&quot; → Chờ khách gửi ảnh → TV xem ảnh khi tư vấn
+Nếu chọn &apos;Nhắn tên&apos;
+→ Bot hỏi từng bước skincare theo Tin 08b (bên dưới)
+TIN 08b
+Hỏi từng bước skincare (chỉ khi khách chọn nhắn tên)
+🤖  Bot gửi tự động
+Dạ bạn nhắn tên sản phẩm cho mình nhé — chỉ cần nhớ tên hãng hoặc tên sản phẩm là được, không cần chính xác 100% đâu 😊
+Bước 1 — Làm sạch: Bạn đang dùng tẩy trang và sữa rửa mặt gì?
+👤  Khách trả lời
+Tẩy trang Bioderma, sữa rửa mặt CeraVe
+🤖  Bot gửi tự động
+Dạ! Bioderma và CeraVe đều là lựa chọn rất tốt, da nhạy cảm dùng an toàn 🌿
+Bạn đang dùng kem chống nắng gì không?
+👤  Khách trả lời
+Anessa loại màu vàng
+🤖  Bot gửi tự động
+Anessa vàng — SPF 50+ chống nắng tốt nhưng hơi bí với da dầu. Mình ghi nhận lại nhé 😊
+Còn serum hoặc sản phẩm đặc trị nám/mụn gì không bạn?
+Bot hỏi tuần tự theo bước skincare: Làm sạch → Chống nắng → Serum → Kem dưỡng → Đặc trị. Khách không nhớ bước nào thì bỏ qua.
+4
+BƯỚC 4 — Sức khoẻ, lối sống &amp; ngân sách
+Nhạy cảm nhất. Bot giải thích lý do TRƯỚC khi hỏi. Hỏi từng nhóm nhỏ, không dump tất cả một lúc.
+TIN 09
+Tin dẫn vào Bước 4 — giải thích lý do
+🤖  Bot gửi tự động
+Bạn ơi, Mai hỏi thêm bạn vài điều về sức khoẻ nha 💊
+Vì nám, mụn và lão hoá đều liên quan RẤT NHIỀU đến yếu tố bên trong cơ thể — không chỉ mỹ phẩm bên ngoài.
+Những thông tin này giúp Mai lên phác đồ đúng cho bạn hơn. Bạn yên tâm — chỉ Mai và chuyên gia Bevita được xem thôi nhé 🔒
+Nút gợi ý (khách bấm nhanh):
+Dạ, tiếp tục đi ạ
+Mình muốn bỏ qua phần này
+Nếu chọn &apos;Bỏ qua&apos;
+Bot: &quot;Dạ không sao ạ! Sau này trong quá trình tư vấn Mai hỏi thêm cũng được nhé.&quot; → Chuyển thẳng sang Tin 14 (Ngân sách)
+TIN 10
+Hỏi kinh nguyệt — nội tiết
+🤖  Bot gửi tự động
+Hiện tại kinh nguyệt của bạn như thế nào ạ?
+(Nội tiết tố ảnh hưởng rất nhiều đến tình trạng nám và mụn nhé 🌸)
+Nút gợi ý (khách bấm nhanh):
+Đều, bình thường
+Không đều / loạn chu kỳ
+Đã mãn kinh
+Đang dùng thuốc tránh thai
+Nếu &apos;Không đều&apos; hoặc &apos;Mãn kinh&apos; → gắn flag: hormonal_imbalance. Nếu &apos;Thuốc tránh thai&apos; → gắn flag: on_contraceptives. TV thấy trong Lead Card.
+TIN 11
+Hỏi về mang thai / con cái
+🤖  Bot gửi tự động
+Bạn đã có con chưa ạ? Và lần gần nhất bạn mang thai là khoảng bao lâu trước?
+(Nám sau sinh rất phổ biến và cần phác đồ riêng 🌷)
+Nút gợi ý (khách bấm nhanh):
+Chưa có con
+Đang mang thai
+Sinh con &lt; 1 năm
+Sinh con &gt; 1 năm
+Nếu chọn &apos;Đang mang thai&apos;
+Bot: &quot;Dạ bạn đang mang thai thì cần lưu ý một số hoạt chất đặc biệt — Mai sẽ tư vấn riêng cho bạn nhé 🤍&quot; → Gắn flag: pregnant = true. TV nhận alert ưu tiên.
+TIN 12
+Hỏi bệnh lý đang điều trị
+🤖  Bot gửi tự động
+Bạn có đang điều trị bệnh lý nào không ạ?
+(Một số bệnh ảnh hưởng đến da và cần điều chỉnh phác đồ cho phù hợp nhé)
+Nút gợi ý (khách bấm nhanh):
+Không có
+Tuyến giáp
+Tiểu đường / huyết áp
+Có bệnh khác...
+👤  Khách trả lời
+Có bệnh khác...
+🤖  Bot gửi tự động
+Dạ bạn bị bệnh gì vậy ạ? (nhắn tên bệnh hoặc loại thuốc đang uống cũng được nhé, không cần chi tiết quá 😊)
+Nếu khách nhắc đến gan / thận / tiểu đường → gắn flag: medical_flag. Hiển thị highlight đỏ trong Lead Card để TV không bỏ sót.
+TIN 13
+Hỏi thực phẩm chức năng đang uống
+🤖  Bot gửi tự động
+Bạn có đang uống thực phẩm chức năng hay vitamin gì không?
+(Một số loại như Vitamin A liều cao sẽ ảnh hưởng đến việc tư vấn sản phẩm nhé)
+Nút gợi ý (khách bấm nhanh):
+Không uống gì
+Collagen
+Vitamin C / E
+Vitamin A / Retinol uống
+Nếu &apos;Vitamin A uống&apos; → gắn flag: oral_retinol. TV cần tránh stack thêm retinol topical. Collagen → cơ hội upsell TPCN của Bevita.
+TIN 14a
+Hỏi thói quen sinh hoạt
+🤖  Bot gửi tự động
+Bạn thường ngủ mấy tiếng mỗi đêm và hay thức đến mấy giờ?
+Nút gợi ý (khách bấm nhanh):
+Ngủ đủ 7–8 tiếng
+Thỉnh thoảng thức khuya
+Hay thức khuya sau 12h
+Làm ca đêm
+TIN 14b
+Hỏi mức độ stress
+🤖  Bot gửi tự động
+Dạo này bạn có hay bị stress nhiều không?
+(Stress cao kéo dài làm nám và mụn khó trị hơn nhiều đó nhé 😊)
+Nút gợi ý (khách bấm nhanh):
+Ít stress
+Stress trung bình
+Stress cao, hay lo lắng
+Stress rất nhiều
+TIN 15
+Hỏi ngân sách — quan trọng để phân khúc phác đồ
+🤖  Bot gửi tự động
+Câu cuối cùng rồi bạn ơi 🌷
+Để Mai tư vấn phác đồ phù hợp với điều kiện của bạn, bạn đang dự tính đầu tư khoảng bao nhiêu cho việc chăm da trong giai đoạn này?
+(Không có đúng sai nhé — mỗi mức đều có giải pháp hiệu quả 😊)
+Nút gợi ý (khách bấm nhanh):
+2–5 triệu / tháng
+5–8 triệu / tháng
+8–12 triệu / tháng
+Chưa xác định
+Nếu chọn &apos;Chưa xác định&apos;
+→ Bot gửi Tin 15b: Đưa ra 3 mức gợi ý để khách hình dung
+TIN 15b
+Gợi ý 3 mức ngân sách (chỉ khi khách chọn &apos;Chưa xác định&apos;)
+🤖  Bot gửi tự động
+Không sao, để Mai gợi ý 3 mức để bạn dễ hình dung nhé:
+🌱 Mức 1 — 2–5 triệu: Sản phẩm tầm trung, tập trung phục hồi và ổn định nền da. Phù hợp nếu bạn muốn cải thiện từ từ, an toàn.
+🌿 Mức 2 — 5–8 triệu: Sản phẩm chất lượng tốt hơn, vừa phục hồi vừa tác động vào sắc tố. Kết quả rõ hơn và nhanh hơn Mức 1.
+🌳 Mức 3 — 8–12 triệu: Sản phẩm chuyên sâu, hoạt chất mạnh, cải thiện nám rõ và chăm sóc toàn diện hơn.
+Bạn đang nghiêng về mức nào?
+Nút gợi ý (khách bấm nhanh):
+🌱 Mức 1: 2–5 triệu
+🌿 Mức 2: 5–8 triệu
+🌳 Mức 3: 8–12 triệu
+✅  KẾT THÚC INTAKE — Cảm ơn &amp; chuyển cho tư vấn viên
+TIN 16
+Tin cảm ơn — gửi ngay sau khi hoàn thành Bước 4
+🤖  Bot gửi tự động
+Cảm ơn bạn rất nhiều vì đã chia sẻ thông tin chi tiết 🙏🌷
+Mai đang xem kỹ hình da và thông tin bạn gửi.
+Chuyên gia Bevita sẽ phân tích và quay lại tư vấn cho bạn trong vòng [2–4 tiếng] trong giờ hành chính nhé.
+Bạn có thể nhắn thêm bất kỳ điều gì muốn hỏi trong lúc chờ đợi nha 😊
+💡 Thay [2–4 tiếng] bằng SLA thực tế của team. Sau tin này, hệ thống tạo Lead Card và push notification cho TV.
+⚡  CÁC KỊCH BẢN NGOẠI LỆ — Xử lý tình huống đặc biệt
+💬  KỊCH BẢN A — Khách hỏi giá / hỏi mua sản phẩm ngay (chưa có hồ sơ)
+👤  Khách trả lời
+Bên bạn serum nám giá bao nhiêu vậy?
+🤖  Bot gửi tự động
+Chào bạn 🌷 Bên Bevita có một số dòng serum hỗ trợ nám khác nhau — từ 600k đến hơn 2 triệu — tuỳ tình trạng da và nhu cầu của bạn nhé.
+Để tư vấn đúng sản phẩm phù hợp nhất (tránh mua nhầm không hiệu quả), Mai cần xem qua tình trạng da của bạn một chút trước ạ.
+Chỉ mất 5 phút thôi — sau đó Mai tư vấn thẳng sản phẩm phù hợp và giá cụ thể cho bạn nhé!
+Nút gợi ý (khách bấm nhanh):
+✅ Được, bắt đầu đi!
+Cho hỏi giá trước đi ạ
+Nếu khách vẫn hỏi giá
+Bot: &quot;Dạ bên em có dòng từ 600k đến 2.5 triệu ạ — để tư vấn chính xác em cần biết loại da và vấn đề da của bạn nha. Bạn thử trả lời nhanh vài câu cho em nhé? 🌿&quot; → Mời lần nữa. Nếu vẫn không đồng ý → tag &apos;price_only_intent&apos;, TV xử lý thủ công.
+⏸️  KỊCH BẢN B — Khách đang trả lời rồi dừng giữa chừng
+Dừng tại
+Chờ bao lâu
+Tin nhắc tự động
+Sau khi nhắc vẫn không phản hồi
+Chưa gửi hình da
+2 tiếng
+&quot;Bạn ơi, mình chưa gửi ảnh da cho Mai nhé 😊 Bạn ra gần cửa sổ chụp nhanh 3 góc rồi gửi vào đây là xong bước này rồi nha 📸&quot;
+Sau 24h → bot nhắc lần 2 ngắn hơn. Sau 48h → tag TV theo dõi
+Dừng giữa Bước 2 hoặc 3
+3 tiếng
+&quot;Bạn ơi, mình đang trả lời dở dang đó 🌷 Vào đây tiếp tục nhé — còn vài câu nữa thôi là xong!&quot;
+Sau 24h → bot nhắc lần 2. Sau 48h → close session
+Dừng ở Bước 4
+3 tiếng
+&quot;Câu cuối cùng rồi bạn ơi 😊 Bạn trả lời nốt để Mai tư vấn cho bạn ngay nhé!&quot;
+Sau 24h → TV có thể tự hỏi thêm khi tư vấn
+🔀  KỊCH BẢN C — Khách hỏi linh tinh trong lúc đang intake
+👤  Khách trả lời
+Bạn ơi shop có ship tỉnh không?
+🤖  Bot gửi tự động
+Dạ Bevita có ship toàn quốc bạn nhé 🚚
+Bạn tiếp tục trả lời để Mai hoàn thiện hồ sơ da cho bạn nhé — còn [X câu] nữa thôi là xong rồi 😊
+💡 Bot trả lời ngắn gọn câu hỏi phụ, rồi nhắc quay lại intake. Không để khách bị mất luồng.
+📋  BẢNG TỔNG HỢP — Toàn bộ tin nhắn theo thứ tự
+Tin
+Giai đoạn
+Mục đích / Nội dung ngắn
+Nút gợi ý
+01
+Tin chào
+Chào + hỏi sẵn sàng bắt đầu chưa
+2 nút
+02
+Bước 1
+Hỏi độ tuổi → phân nhánh xưng hô
+4 nút
+03
+Bước 1
+Hỏi tỉnh/thành phố
+4 nút
+04
+Bước 1
+Hỏi vấn đề da chính muốn cải thiện
+4 nút
+05
+Bước 1
+Yêu cầu gửi hình da 3 góc + hướng dẫn chụp
+2 nút
+05b
+Bước 1 — Nhắc
+Nhắc gửi ảnh nếu chưa gửi sau 2 tiếng
+Không có
+06A/B
+Bước 2
+Hỏi mỹ phẩm đã dùng (phân nhánh theo tuổi)
+4 nút
+07A/B
+Bước 2
+Hỏi kinh nghiệm spa / thẩm mỹ viện
+3 nút
+07A-b
+Bước 2 — phụ
+Hỏi thêm loại dịch vụ + phản ứng da (khi đã có làm spa)
+4 nút
+08
+Bước 3
+Hỏi sản phẩm đang dùng — chọn cách trả lời
+2 nút
+08b
+Bước 3
+Hỏi từng bước skincare (khi khách chọn nhắn tên)
+Nhắn tự do
+09
+Bước 4 — dẫn
+Giải thích lý do hỏi sức khoẻ, xin phép khách
+2 nút
+10
+Bước 4
+Hỏi kinh nguyệt / nội tiết
+4 nút
+11
+Bước 4
+Hỏi mang thai / số con
+4 nút
+12
+Bước 4
+Hỏi bệnh lý đang điều trị
+4 nút
+13
+Bước 4
+Hỏi thực phẩm chức năng đang uống
+4 nút
+14a
+Bước 4
+Hỏi giờ ngủ / thức khuya
+4 nút
+14b
+Bước 4
+Hỏi mức độ stress
+4 nút
+15
+Bước 4
+Hỏi ngân sách dự kiến
+4 nút
+15b
+Bước 4 — phụ
+Giới thiệu 3 mức ngân sách gợi ý (khi chọn &apos;Chưa xác định&apos;)
+3 nút
+16
+Kết thúc
+Cảm ơn + báo thời gian phản hồi
+Không có
+— Kịch bản chatbot nội bộ Bevita  |  Phase 1  |  Không phân phối ngoài —
+

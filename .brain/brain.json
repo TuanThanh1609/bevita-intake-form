@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "schema_version": "1.1.0",
+    "awf_version": "3.3.0"
+  },
+  "project": {
+    "name": "Bevita Intake Webform",
+    "type": "Frontend Web Application",
+    "status": "Implemented"
+  },
+  "tech_stack": {
+    "frontend": "HTML, Vanilla CSS, Vanilla JS",
+    "backend": "NocoDB (via API)",
+    "storage": "ImgBB (via API)"
+  },
+  "database_schema": {
+    "summary": "NocoDB lưu trữ toàn bộ thông tin thu thập từ khách hàng qua webform.",
+    "tables": [
+      {
+        "name": "muwldo248riapzx (lead-form)",
+        "columns": [
+          "Phone_Number (Primary)",
+          "Full_Name",
+          "Age_Group",
+          "Location",
+          "Skin_Condition",
+          "Note (LongText)",
+          "Skin_Photos (URL)",
+          "History_Cosmetics",
+          "History_Spa",
+          "Current_Routine",
+          "Routine_Photos (URL)",
+          "Health_Status (LongText)",
+          "Supplements",
+          "Lifestyle_Sleep",
+          "Lifestyle_Stress",
+          "Budget",
+          "Status",
+          "Submission_Date"
+        ]
+      }
+    ],
+    "relationships_explained": "Bảng đơn, mỗi dòng lưu trữ thông tin của một khách hàng độc lập."
+  },
+  "api_endpoints": [
+    {
+      "path": "POST NocoDB /api/v2/tables/muwldo248riapzx/records",
+      "explained": "Gửi dữ liệu hồ sơ mới vào NocoDB khi khách hàng bấm nộp form."
+    },
+    {
+      "path": "POST ImgBB /1/upload",
+      "explained": "Upload ảnh chụp da và bộ mỹ phẩm lên server, nhận lại link ảnh để lưu vào NocoDB."
+    }
+  ],
+  "business_rules": [
+    "Khách hàng có thể chọn nhiều vấn đề da cùng lúc.",
+    "Dữ liệu sức khoẻ (kinh nguyệt, thai sản, bệnh lý) được gộp lại thành 1 chuỗi văn bản và lưu vào cột Health_Status (Long Text) để tránh lỗi.",
+    "Bất kỳ ghi chú bổ sung nào của khách hàng đều được lưu dồn vào cột Note.",
+    "Submit form chỉ được kích hoạt ở màn hình cuối cùng; có giao diện loading trong lúc chờ API phản hồi."
+  ],
+  "features": [
+    "Multi-step form với thanh tiến trình (Progress bar).",
+    "Giao diện giả lập tin nhắn chat thân thiện.",
+    "Chụp ảnh trực tiếp từ camera điện thoại (hỗ trợ resize ảnh client-side trước khi upload).",
+    "Tự động upload ảnh lên ImgBB.",
+    "Tự động gửi data về NocoDB.",
+    "Dynamic pronouns (Chị/Em hoặc Em/Chị) tuỳ thuộc vào độ tuổi khách hàng nhập.",
+    "Global 'Quay lại' back button với lịch sử điều hướng các bước."
+  ],
+  "knowledge_items": {
+    "patterns": [
+      "Client-side image resizing sử dụng Canvas để tối ưu dung lượng trước khi upload."
+    ],
+    "gotchas": [
+      "Trường Multi-Select của NocoDB sẽ reject dữ liệu nếu option gửi lên không khai báo sẵn. Giải pháp: Dùng Long Text thay thế."
+    ],
+    "conventions": [
+      "State management đơn giản với biến toàn cục `state` chứa toàn bộ data trước khi submit."
+    ]
+  }
+}

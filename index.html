@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bevita — Tư Vấn Da Online</title>
+    <meta name="description" content="Bevita - Phân tích tình trạng da và tư vấn phác đồ chăm sóc da cá nhân hóa. Chỉ mất 5-7 phút.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <button id="btnBackGlobal" class="back-global-btn hidden" onclick="App.goBack()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+                Quay lại
+            </button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step-dot active" data-step="1">
+                    <span class="step-icon">👤</span>
+                    <span class="step-label">Cơ bản</span>
+                </div>
+                <div class="step-dot" data-step="2">
+                    <span class="step-icon">💊</span>
+                    <span class="step-label">Lịch sử</span>
+                </div>
+                <div class="step-dot" data-step="3">
+                    <span class="step-icon">🧴</span>
+                    <span class="step-label">Hiện tại</span>
+                </div>
+                <div class="step-dot" data-step="4">
+                    <span class="step-icon">💪</span>
+                    <span class="step-label">Sức khoẻ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Screens Container -->
+        <div class="screens-container" id="screensContainer">
+
+            <!-- ==================== WELCOME ==================== -->
+            <div class="screen active" id="screen-welcome">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in">
+                        Chào bạn 🌷
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        Bạn vừa nhắn tin cho <strong>Bevita</strong>! Để Mai tư vấn da đúng và hiệu quả cho bạn, Mai cần hỏi bạn một số thông tin về tình trạng da nhé.
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-2">
+                        Mình trò chuyện ngắn khoảng <strong>5–7 phút</strong> thôi — sau đó Mai sẽ phân tích và tư vấn phác đồ riêng cho bạn 🌿
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-3">
+                        Bạn sẵn sàng bắt đầu chưa?
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-4">
+                    <button class="pill-btn primary" onclick="App.startForm()">✅ Sẵn sàng rồi, bắt đầu đi!</button>
+                    <button class="pill-btn secondary" onclick="App.showLater()">⏳ Để lúc khác nhé</button>
+                </div>
+            </div>
+
+            <!-- Later message -->
+            <div class="screen" id="screen-later">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in">
+                        Dạ không sao ạ! Khi nào bạn sẵn sàng thì quay lại trang này để bắt đầu nhé 🌷
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-1">
+                    <button class="pill-btn primary" onclick="App.startForm()">✅ Mình sẵn sàng rồi!</button>
+                </div>
+            </div>
+
+            <!-- ==================== BƯỚC 1: THÔNG TIN CƠ BẢN ==================== -->
+
+            <!-- 1.1: Hỏi tên & SĐT -->
+            <div class="screen" id="screen-name">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in">
+                        Trước tiên cho Mai biết tên và số điện thoại của bạn nhé? 😊
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-1">
+                    <div class="input-group mb-8">
+                        <input type="text" id="inputName" class="text-input" placeholder="Tên của bạn..." autocomplete="name">
+                    </div>
+                    <div class="input-group">
+                        <input type="tel" id="inputPhone" class="text-input" placeholder="Số điện thoại..." autocomplete="tel">
+                        <button class="send-btn" onclick="App.submitNameAndPhone()" id="btnSubmitName">
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.2: Hỏi tuổi -->
+            <div class="screen" id="screen-age">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in">
+                        <span id="ageGreeting"></span>, cho Mai hỏi bạn đang ở độ tuổi nào nhé?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Để Mai xưng hô cho phù hợp và hiểu rõ nhu cầu da của bạn hơn 🌿)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectAge('Dưới 25 tuổi')">Dưới 25 tuổi</button>
+                        <button class="pill-btn option" onclick="App.selectAge('25–34 tuổi')">25–34 tuổi</button>
+                        <button class="pill-btn option" onclick="App.selectAge('35–42 tuổi')">35–42 tuổi</button>
+                        <button class="pill-btn option" onclick="App.selectAge('Trên 42 tuổi')">Trên 42 tuổi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.3: Hỏi tỉnh/thành -->
+            <div class="screen" id="screen-location">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="{userC} đang sống ở tỉnh/thành nào ạ?">
+                        Bạn đang sống ở tỉnh/thành nào ạ?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Khí hậu ảnh hưởng khá nhiều đến da — như ở miền Nam thì nóng ẩm, da dễ tiết dầu và nám đậm hơn so với miền Bắc 😊)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectLocation('TP.HCM')">TP.HCM</button>
+                        <button class="pill-btn option" onclick="App.selectLocation('Hà Nội')">Hà Nội</button>
+                        <button class="pill-btn option" onclick="App.selectLocation('Đà Nẵng')">Đà Nẵng</button>
+                    </div>
+                    <div class="input-group mt-12">
+                        <input type="text" id="inputLocation" class="text-input" placeholder="Hoặc nhập tỉnh/thành khác...">
+                        <button class="send-btn" onclick="App.submitLocation()">
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1.4: Vấn đề da -->
+            <div class="screen" id="screen-skin">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Hiện tại {user} đang muốn cải thiện vấn đề da nào nhất?">
+                        Hiện tại bạn đang muốn cải thiện vấn đề da nào nhất?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1 dynamic-text" data-template="<em>({userC} có thể chọn <strong>nhiều vấn đề</strong> nhé 😊)</em>">
+                        <em>(Bạn có thể chọn <strong>nhiều vấn đề</strong> nhé 😊)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option multi" onclick="App.toggleSkin(this, 'Nám / tàn nhang')">Nám / tàn nhang</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSkin(this, 'Mụn / thâm mụn')">Mụn / thâm mụn</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSkin(this, 'Lão hoá / nhăn')">Lão hoá / nhăn</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSkin(this, 'Da xỉn / không đều màu')">Da xỉn / không đều màu</button>
+                    </div>
+                    <button class="pill-btn primary next-btn hidden" onclick="App.submitSkin()" id="btnSkinNext">Tiếp tục →</button>
+                </div>
+            </div>
+
+            <!-- 1.5: Ảnh da -->
+            <div class="screen" id="screen-photo-skin">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Để xem tình trạng da thật sự của {user}, {user} gửi giúp {bot} <strong>3 tấm hình da mặt</strong> nhé 📸">
+                        Để xem tình trạng da thật sự của bạn, bạn gửi giúp Mai <strong>3 tấm hình da mặt</strong> nhé 📸
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        📷 <strong>Góc 1:</strong> Nhìn thẳng vào camera<br>
+                        📷 <strong>Góc 2:</strong> Nghiêng mặt sang trái ~45°<br>
+                        📷 <strong>Góc 3:</strong> Nghiêng mặt sang phải ~45°
+                    </div>
+                    <div class="chat-bubble bot tips animate-in delay-2 dynamic-text" data-template="<strong>Tips chụp đẹp:</strong><br>✅ Đứng hướng mặt ra cửa sổ — ánh sáng tự nhiên<br>✅ Mặt sạch, không trang điểm<br>❌ Không chụp ngược sáng, không dùng flash<br><br>🔒 Hình của {user} luôn được bảo mật!">
+                        <strong>Tips chụp đẹp:</strong><br>
+                        ✅ Đứng hướng mặt ra cửa sổ — ánh sáng tự nhiên<br>
+                        ✅ Mặt sạch, không trang điểm<br>
+                        ❌ Không chụp ngược sáng, không dùng flash<br><br>
+                        🔒 Hình của bạn luôn được bảo mật!
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-3">
+                    <div class="photo-upload-area" id="skinPhotoArea">
+                        <div class="photo-previews" id="skinPreviews"></div>
+                        <label class="upload-btn">
+                            <span>📷 Chụp / Chọn hình</span>
+                            <input type="file" accept="image/*" multiple onchange="App.handleSkinPhotos(this.files)" hidden>
+                        </label>
+                    </div>
+                    <div class="photo-actions">
+                        <button class="pill-btn primary next-btn hidden" onclick="App.submitSkinPhotos()" id="btnSkinPhotoNext">Tiếp tục →</button>
+                        <button class="pill-btn secondary dynamic-text" data-template="⏳ Chụp xong gửi sau, {user} mô tả dưới đây nhé" onclick="App.skipSkinPhotos()">⏳ Chụp xong gửi sau, bạn mô tả dưới đây nhé</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== BƯỚC 2: LỊCH SỬ MỸ PHẨM ==================== -->
+
+            <!-- 2.1: Mỹ phẩm đã dùng -->
+            <div class="screen" id="screen-cosmetics">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" id="cosmeticsGreeting" data-template="Cảm ơn {user}! {botC} xem kỹ da {user} ngay nha 🌷">
+                        Cảm ơn bạn! Chị xem kỹ da bạn ngay nha 🌷
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1 dynamic-text" id="cosmeticsQuestion" data-template="{userC} đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?">
+                        Bạn đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectCosmetics('Chưa dùng gì đặc trị')">Chưa dùng gì đặc trị</button>
+                        <button class="pill-btn option" onclick="App.selectCosmetics('Dùng dược mỹ phẩm')">Dùng dược mỹ phẩm</button>
+                        <button class="pill-btn option" onclick="App.selectCosmetics('Dùng mỹ phẩm thường')">Dùng mỹ phẩm thường</button>
+                        <button class="pill-btn option" onclick="App.selectCosmetics('Nghi dùng kem trộn')">Nghi dùng kem trộn</button>
+                    </div>
+                    <div class="input-group mt-12">
+                        <input type="text" id="inputCosmetics" class="text-input" placeholder="Hoặc nhập chi tiết...">
+                        <button class="send-btn" onclick="App.submitCosmeticsText()">
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.2: Kinh nghiệm spa -->
+            <div class="screen" id="screen-spa">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" id="spaQuestion" data-template="{userC} đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?">
+                        Bạn đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Ví dụ: peel da, tiêm meso, laser, RF nâng cơ...)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectSpa('Chưa bao giờ')">Chưa bao giờ</button>
+                        <button class="pill-btn option" onclick="App.selectSpa('Đã làm 1–2 lần')">Đã làm 1–2 lần</button>
+                        <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>
+                    </div>
+                    <div class="input-group mt-12">
+                        <input type="text" id="inputSpa" class="text-input" placeholder="Hoặc nhập chi tiết...">
+                        <button class="send-btn" onclick="App.submitSpaText()">
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== BƯỚC 3: SKINCARE HIỆN TẠI ==================== -->
+
+            <!-- 3.1: Sản phẩm đang dùng -->
+            <div class="screen" id="screen-routine">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Hiện tại {user} đang dùng những sản phẩm nào ở nhà?">
+                        Hiện tại bạn đang dùng những sản phẩm nào ở nhà?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Tẩy trang, sữa rửa mặt, toner, serum, kem dưỡng, kem chống nắng...)</em>
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-2 dynamic-text" data-template="{userC} muốn cung cấp thông tin theo cách nào cho tiện?">
+                        Bạn muốn cung cấp thông tin theo cách nào cho tiện?
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-3">
+                    <div class="input-group">
+                        <textarea id="inputRoutine" class="text-input textarea" placeholder="Nhập tên sản phẩm bạn đang dùng... (VD: Tẩy trang Bioderma, SRM CeraVe, Chống nắng Anessa...)"></textarea>
+                    </div>
+                    <div class="photo-upload-area mt-12" id="routinePhotoArea">
+                        <div class="photo-previews" id="routinePreviews"></div>
+                        <label class="upload-btn small">
+                            <span>📷 Hoặc chụp tủ mỹ phẩm</span>
+                            <input type="file" accept="image/*" multiple onchange="App.handleRoutinePhotos(this.files)" hidden>
+                        </label>
+                    </div>
+                    <button class="pill-btn primary next-btn mt-12" onclick="App.submitRoutine()">Tiếp tục →</button>
+                </div>
+            </div>
+
+            <!-- ==================== BƯỚC 4: SỨC KHOẺ & LỐI SỐNG ==================== -->
+
+            <!-- 4.0: Giải thích -->
+            <div class="screen" id="screen-health-intro">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="{userC} ơi, {bot} hỏi thêm {user} vài điều về sức khoẻ nha 💊">
+                        Bạn ơi, Mai hỏi thêm bạn vài điều về sức khoẻ nha 💊
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        Vì nám, mụn và lão hoá đều liên quan <strong>RẤT NHIỀU</strong> đến yếu tố bên trong cơ thể — không chỉ mỹ phẩm bên ngoài.
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-2 dynamic-text" data-template="Những thông tin này giúp {bot} lên phác đồ đúng cho {user} hơn. {userC} yên tâm — chỉ {bot} và chuyên gia Bevita được xem thôi nhé 🔒">
+                        Những thông tin này giúp Mai lên phác đồ đúng cho bạn hơn. Bạn yên tâm — chỉ Mai và chuyên gia Bevita được xem thôi nhé 🔒
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-3">
+                    <button class="pill-btn primary dynamic-text" data-template="Dạ, tiếp tục đi ạ" onclick="App.continueHealth()">Dạ, tiếp tục đi ạ</button>
+                    <button class="pill-btn secondary dynamic-text" data-template="Mình muốn bỏ qua phần này" onclick="App.skipHealth()">Mình muốn bỏ qua phần này</button>
+                </div>
+            </div>
+
+            <!-- 4.1: Kinh nguyệt -->
+            <div class="screen" id="screen-menstrual">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Hiện tại kinh nguyệt của {user} như thế nào ạ?">
+                        Hiện tại kinh nguyệt của bạn như thế nào ạ?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Nội tiết tố ảnh hưởng rất nhiều đến tình trạng nám và mụn nhé 🌸)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectHealth('menstrual', 'Đều, bình thường')">Đều, bình thường</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('menstrual', 'Không đều / loạn chu kỳ')">Không đều / loạn chu kỳ</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('menstrual', 'Đã mãn kinh')">Đã mãn kinh</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('menstrual', 'Đang dùng thuốc tránh thai')">Đang dùng thuốc tránh thai</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.2: Thai sản -->
+            <div class="screen" id="screen-pregnancy">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="{userC} đã có con chưa ạ? Và lần gần nhất {user} mang thai là khoảng bao lâu trước?">
+                        Bạn đã có con chưa ạ? Và lần gần nhất bạn mang thai là khoảng bao lâu trước?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Nám sau sinh rất phổ biến và cần phác đồ riêng 🌷)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectHealth('pregnancy', 'Chưa có con')">Chưa có con</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('pregnancy', 'Đang mang thai')">Đang mang thai</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('pregnancy', 'Sinh con < 1 năm')">Sinh con &lt; 1 năm</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('pregnancy', 'Sinh con > 1 năm')">Sinh con &gt; 1 năm</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.3: Bệnh lý -->
+            <div class="screen" id="screen-medical">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="{userC} có đang điều trị bệnh lý nào không ạ?">
+                        Bạn có đang điều trị bệnh lý nào không ạ?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Một số bệnh ảnh hưởng đến da và cần điều chỉnh phác đồ cho phù hợp nhé)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectHealth('medical', 'Không có')">Không có</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('medical', 'Tuyến giáp')">Tuyến giáp</button>
+                        <button class="pill-btn option" onclick="App.selectHealth('medical', 'Tiểu đường / huyết áp')">Tiểu đường / huyết áp</button>
+                    </div>
+                    <div class="input-group mt-12">
+                        <input type="text" id="inputMedical" class="text-input" placeholder="Hoặc nhập bệnh khác...">
+                        <button class="send-btn" onclick="App.submitMedicalText()">
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.4: TPCN -->
+            <div class="screen" id="screen-supplements">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="{userC} có đang uống thực phẩm chức năng hay vitamin gì không?">
+                        Bạn có đang uống thực phẩm chức năng hay vitamin gì không?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Một số loại như Vitamin A liều cao sẽ ảnh hưởng đến việc tư vấn sản phẩm nhé)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option multi" onclick="App.toggleSupplement(this, 'Không uống gì')">Không uống gì</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSupplement(this, 'Collagen')">Collagen</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSupplement(this, 'Vitamin C / E')">Vitamin C / E</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSupplement(this, 'Vitamin A / Retinol uống')">Vitamin A / Retinol uống</button>
+                    </div>
+                    <div class="input-group mt-12">
+                        <input type="text" id="inputSupplements" class="text-input" placeholder="Hoặc nhập loại khác...">
+                    </div>
+                    <button class="pill-btn primary next-btn" onclick="App.submitSupplements()" id="btnSupplementsNext">Tiếp tục →</button>
+                </div>
+            </div>
+
+            <!-- 4.5: Giấc ngủ -->
+            <div class="screen" id="screen-sleep">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="{userC} thường ngủ mấy tiếng mỗi đêm và hay thức đến mấy giờ?">
+                        Bạn thường ngủ mấy tiếng mỗi đêm và hay thức đến mấy giờ?
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-1">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectSleep('Ngủ đủ 7–8 tiếng')">Ngủ đủ 7–8 tiếng</button>
+                        <button class="pill-btn option" onclick="App.selectSleep('Thỉnh thoảng thức khuya')">Thỉnh thoảng thức khuya</button>
+                        <button class="pill-btn option" onclick="App.selectSleep('Hay thức khuya sau 12h')">Hay thức khuya sau 12h</button>
+                        <button class="pill-btn option" onclick="App.selectSleep('Làm ca đêm')">Làm ca đêm</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.6: Stress -->
+            <div class="screen" id="screen-stress">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Dạo này {user} có hay bị stress nhiều không?">
+                        Dạo này bạn có hay bị stress nhiều không?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        <em>(Stress cao kéo dài làm nám và mụn khó trị hơn nhiều đó nhé 😊)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectStress('Ít stress')">Ít stress</button>
+                        <button class="pill-btn option" onclick="App.selectStress('Stress trung bình')">Stress trung bình</button>
+                        <button class="pill-btn option" onclick="App.selectStress('Stress cao, hay lo lắng')">Stress cao, hay lo lắng</button>
+                        <button class="pill-btn option" onclick="App.selectStress('Stress rất nhiều')">Stress rất nhiều</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.7: Ngân sách -->
+            <div class="screen" id="screen-budget">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Câu cuối cùng rồi {user} ơi 🌷">
+                        Câu cuối cùng rồi bạn ơi 🌷
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1 dynamic-text" data-template="Để {bot} tư vấn phác đồ phù hợp với điều kiện của {user}, {user} đang dự tính đầu tư khoảng bao nhiêu cho việc chăm da trong giai đoạn này?">
+                        Để Mai tư vấn phác đồ phù hợp với điều kiện của bạn, bạn đang dự tính đầu tư khoảng bao nhiêu cho việc chăm da trong giai đoạn này?
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-2">
+                        <em>(Không có đúng sai nhé — mỗi mức đều có giải pháp hiệu quả 😊)</em>
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-3">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectBudget('2–5 triệu / tháng')">2–5 triệu / tháng</button>
+                        <button class="pill-btn option" onclick="App.selectBudget('5–8 triệu / tháng')">5–8 triệu / tháng</button>
+                        <button class="pill-btn option" onclick="App.selectBudget('8–12 triệu / tháng')">8–12 triệu / tháng</button>
+                        <button class="pill-btn option" onclick="App.selectBudget('Chưa xác định')">Chưa xác định</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.7b: Gợi ý ngân sách -->
+            <div class="screen" id="screen-budget-suggest">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Không sao, để {bot} gợi ý 3 mức để {user} dễ hình dung nhé:">
+                        Không sao, để Mai gợi ý 3 mức để bạn dễ hình dung nhé:
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1">
+                        🌱 <strong>Mức 1 — 2–5 triệu:</strong> Sản phẩm tầm trung, tập trung phục hồi và ổn định nền da.<br><br>
+                        🌿 <strong>Mức 2 — 5–8 triệu:</strong> Sản phẩm chất lượng tốt hơn, vừa phục hồi vừa tác động vào sắc tố.<br><br>
+                        🌳 <strong>Mức 3 — 8–12 triệu:</strong> Sản phẩm chuyên sâu, hoạt chất mạnh, cải thiện nám rõ.
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-2 dynamic-text" data-template="{userC} đang nghiêng về mức nào?">
+                        Bạn đang nghiêng về mức nào?
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-3">
+                    <div class="pills-grid">
+                        <button class="pill-btn option" onclick="App.selectBudget('🌱 Mức 1: 2–5 triệu')">🌱 Mức 1: 2–5 triệu</button>
+                        <button class="pill-btn option" onclick="App.selectBudget('🌿 Mức 2: 5–8 triệu')">🌿 Mức 2: 5–8 triệu</button>
+                        <button class="pill-btn option" onclick="App.selectBudget('🌳 Mức 3: 8–12 triệu')">🌳 Mức 3: 8–12 triệu</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== THANK YOU ==================== -->
+            <div class="screen" id="screen-thankyou">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="Cảm ơn {user} rất nhiều vì đã chia sẻ thông tin chi tiết 🙏🌷">
+                        Cảm ơn bạn rất nhiều vì đã chia sẻ thông tin chi tiết 🙏🌷
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-1 dynamic-text" data-template="{botC} đang xem kỹ hình da và thông tin {user} gửi.">
+                        Mai đang xem kỹ hình da và thông tin bạn gửi.
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-2 dynamic-text" data-template="Chuyên gia Bevita sẽ phân tích và quay lại tư vấn cho {user} trong vòng <strong>2–4 tiếng</strong> trong giờ hành chính nhé.">
+                        Chuyên gia Bevita sẽ phân tích và quay lại tư vấn cho bạn trong vòng <strong>2–4 tiếng</strong> trong giờ hành chính nhé.
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-3 dynamic-text" data-template="Nếu {user} muốn hỏi thêm gì — cứ nhắn tại đây, {bot} sẽ hỗ trợ! 😊">
+                        Nếu bạn muốn hỏi thêm gì — cứ nhắn tại đây, Mai sẽ hỗ trợ! 😊
+                    </div>
+                </div>
+                <div class="thankyou-decoration animate-in delay-4">
+                    <div class="thankyou-icon">🌷</div>
+                    <p class="thankyou-text dynamic-text" data-template="Hồ sơ của {user} đã được gửi thành công!">Hồ sơ của bạn đã được gửi thành công!</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <p>Đang gửi thông tin...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

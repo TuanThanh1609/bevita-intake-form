@@ -254,7 +254,7 @@ const App = {
     },
 
     // ── Personalized Bot Response Utility ──
-    showBotResponse(screenId, message, nextScreen, delay = 1800) {
+    showBotResponse(screenId, message, nextScreen, delay = 5000) {
         const screen = document.getElementById(`screen-${screenId}`);
         if (!screen) {
             this.goToScreen(nextScreen);

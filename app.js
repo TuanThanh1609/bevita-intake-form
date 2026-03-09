@@ -279,7 +279,17 @@ const App = {
         bubble.innerHTML = message;
         chatArea.appendChild(bubble);
 
-        // Scroll to show the response
+        // Create typing indicator
+        const typingBubble = document.createElement('div');
+        typingBubble.className = 'typing-indicator animate-in';
+        typingBubble.innerHTML = `
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        `;
+        chatArea.appendChild(typingBubble);
+
+        // Scroll to show the response and typing indicator
         chatArea.scrollTop = chatArea.scrollHeight;
 
         // Navigate after delay
@@ -287,8 +297,9 @@ const App = {
             this.goToScreen(nextScreen);
             // Restore actions area for when user navigates back
             if (actionsArea) actionsArea.style.display = '';
-            // Remove the dynamic bubble so it doesn't duplicate on revisit
+            // Remove the bubbles so they don't duplicate on revisit
             bubble.remove();
+            typingBubble.remove();
         }, delay);
     },
 

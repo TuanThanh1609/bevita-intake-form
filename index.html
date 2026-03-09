@@ -218,15 +218,15 @@
                         <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
                         <span class="bot-name">Mai — Bevita</span>
                     </div>
-                    <div class="chat-bubble bot animate-in dynamic-text" id="cosmeticsGreeting" data-template="Cảm ơn {user}! {botC} xem kỹ da {user} ngay nha 🌷">
-                        Cảm ơn bạn! Chị xem kỹ da bạn ngay nha 🌷
+                    <div class="chat-bubble bot animate-in dynamic-text" id="cosmeticsGreeting" data-template="Cảm ơn {user} đã gửi hình! {botC} xem kỹ da {user} ngay nha 🌷">
+                        Cảm ơn bạn đã gửi hình! Chị xem kỹ da bạn ngay nha 🌷
                     </div>
-                    <div class="chat-bubble bot animate-in delay-1 dynamic-text" id="cosmeticsQuestion" data-template="{userC} đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?">
-                        Bạn đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?
+                    <div class="chat-bubble bot animate-in delay-1 dynamic-text" id="cosmeticsQuestion" data-template="Trước khi {bot} nhận xét, cho {bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:&lt;br&gt;&lt;br&gt;{userC} đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?">
+                        Trước khi chị nhận xét, cho chị hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>Em đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?
                     </div>
                 </div>
                 <div class="actions-area animate-in delay-2">
-                    <div class="pills-grid">
+                    <div class="pills-grid" id="cosmeticsGrid">
                         <button class="pill-btn option" onclick="App.selectCosmetics('Chưa dùng gì đặc trị')">Chưa dùng gì đặc trị</button>
                         <button class="pill-btn option" onclick="App.selectCosmetics('Dùng dược mỹ phẩm')">Dùng dược mỹ phẩm</button>
                         <button class="pill-btn option" onclick="App.selectCosmetics('Dùng mỹ phẩm thường')">Dùng mỹ phẩm thường</button>
@@ -249,14 +249,14 @@
                         <span class="bot-name">Mai — Bevita</span>
                     </div>
                     <div class="chat-bubble bot animate-in dynamic-text" id="spaQuestion" data-template="{userC} đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?">
-                        Bạn đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?
+                        Em đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?
                     </div>
-                    <div class="chat-bubble bot animate-in delay-1">
+                    <div class="chat-bubble bot animate-in delay-1" id="spaExample">
                         <em>(Ví dụ: peel da, tiêm meso, laser, RF nâng cơ...)</em>
                     </div>
                 </div>
                 <div class="actions-area animate-in delay-2">
-                    <div class="pills-grid">
+                    <div class="pills-grid" id="spaGrid">
                         <button class="pill-btn option" onclick="App.selectSpa('Chưa bao giờ')">Chưa bao giờ</button>
                         <button class="pill-btn option" onclick="App.selectSpa('Đã làm 1–2 lần')">Đã làm 1–2 lần</button>
                         <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>

@@ -270,8 +270,8 @@ const App = {
     selectAge(value) {
         state.data.Age_Group = value;
         
-        // Update pronouns based on age
-        if (value === '35–42 tuổi' || value === 'Trên 42 tuổi') {
+        // Update pronouns based on age — only ≥42 swaps to em/chị
+        if (value === 'Trên 42 tuổi') {
             state.botPronoun = 'em';
             state.userPronoun = 'chị';
         } else {
@@ -280,6 +280,7 @@ const App = {
         }
         
         this.updateDynamicTexts();
+        this.updateAgeBasedContent();
         this.highlightSelected(event.target);
         setTimeout(() => this.goToScreen('location'), 300);
     },
@@ -302,6 +303,97 @@ const App = {
                 el.innerHTML = template;
             }
         });
+    },
+
+    // ── Update content based on age group (TIN 06A/B, TIN 07A/B) ──
+    updateAgeBasedContent() {
+        const isOver42 = state.data.Age_Group === 'Trên 42 tuổi';
+        const bot = state.botPronoun;
+        const user = state.userPronoun;
+        const botC = bot.charAt(0).toUpperCase() + bot.slice(1);
+        const userC = user.charAt(0).toUpperCase() + user.slice(1);
+
+        // ── TIN 06: Cosmetics screen ──
+        const cosmeticsGreeting = document.getElementById('cosmeticsGreeting');
+        const cosmeticsQuestion = document.getElementById('cosmeticsQuestion');
+        const cosmeticsGrid = document.getElementById('cosmeticsGrid');
+
+        if (isOver42) {
+            // TIN 06B — ≥42 tuổi
+            if (cosmeticsGreeting) {
+                cosmeticsGreeting.innerHTML = `Cảm ơn ${user} đã gửi hình! ${botC} xem kỹ da ${user} ngay nha 🌷`;
+                cosmeticsGreeting.dataset.template = `Cảm ơn {user} đã gửi hình! {botC} xem kỹ da {user} ngay nha 🌷`;
+            }
+            if (cosmeticsQuestion) {
+                cosmeticsQuestion.innerHTML = `Trước khi ${bot} nhận xét, cho ${bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>Các loại mỹ phẩm ${user} đã từng dùng để trị nám, chăm sóc da... là của hãng nào ạ?`;
+                cosmeticsQuestion.dataset.template = `Trước khi {bot} nhận xét, cho {bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>Các loại mỹ phẩm {user} đã từng dùng để trị nám, chăm sóc da... là của hãng nào ạ?`;
+            }
+            if (cosmeticsGrid) {
+                cosmeticsGrid.innerHTML = `
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Chưa dùng gì đặc trị')">Chưa dùng gì đặc trị</button>
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Dược mỹ phẩm (La Roche, Avène...)')">Dược mỹ phẩm (La Roche, Avène...)</button>
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Cao cấp (SK-II, Estée Lauder...)')">Cao cấp (SK-II, Estée Lauder...)</button>
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Sản phẩm thuốc / bác sĩ kê')">Sản phẩm thuốc / bác sĩ kê</button>
+                `;
+            }
+        } else {
+            // TIN 06A — <42 tuổi
+            if (cosmeticsGreeting) {
+                cosmeticsGreeting.innerHTML = `Cảm ơn ${user} đã gửi hình! ${botC} xem kỹ da ${user} ngay nha 🌷`;
+                cosmeticsGreeting.dataset.template = `Cảm ơn {user} đã gửi hình! {botC} xem kỹ da {user} ngay nha 🌷`;
+            }
+            if (cosmeticsQuestion) {
+                cosmeticsQuestion.innerHTML = `Trước khi ${bot} nhận xét, cho ${bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>${userC} đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?`;
+                cosmeticsQuestion.dataset.template = `Trước khi {bot} nhận xét, cho {bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>{userC} đã từng dùng loại mỹ phẩm nào để trị mụn, nám, hay chăm sóc da chưa?`;
+            }
+            if (cosmeticsGrid) {
+                cosmeticsGrid.innerHTML = `
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Chưa dùng gì đặc trị')">Chưa dùng gì đặc trị</button>
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Dùng dược mỹ phẩm')">Dùng dược mỹ phẩm</button>
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Dùng mỹ phẩm thường')">Dùng mỹ phẩm thường</button>
+                    <button class="pill-btn option" onclick="App.selectCosmetics('Nghi dùng kem trộn')">Nghi dùng kem trộn</button>
+                `;
+            }
+        }
+
+        // ── TIN 07: Spa screen ──
+        const spaQuestion = document.getElementById('spaQuestion');
+        const spaExample = document.getElementById('spaExample');
+        const spaGrid = document.getElementById('spaGrid');
+
+        if (isOver42) {
+            // TIN 07B — ≥42 tuổi
+            if (spaQuestion) {
+                spaQuestion.innerHTML = `${userC} đã từng đến spa hoặc thẩm mỹ viện điều trị da chưa ạ?`;
+                spaQuestion.dataset.template = `{userC} đã từng đến spa hoặc thẩm mỹ viện điều trị da chưa ạ?`;
+            }
+            if (spaExample) {
+                spaExample.innerHTML = `<em>(Ví dụ: peel da, tiêm meso, laser, RF nâng cơ, căng chỉ...)</em>`;
+            }
+            if (spaGrid) {
+                spaGrid.innerHTML = `
+                    <button class="pill-btn option" onclick="App.selectSpa('Chưa bao giờ')">Chưa bao giờ</button>
+                    <button class="pill-btn option" onclick="App.selectSpa('Đã làm vài lần')">Đã làm vài lần</button>
+                    <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>
+                `;
+            }
+        } else {
+            // TIN 07A — <42 tuổi
+            if (spaQuestion) {
+                spaQuestion.innerHTML = `${userC} đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?`;
+                spaQuestion.dataset.template = `{userC} đã từng đến spa hoặc thẩm mỹ viện để chăm sóc da chưa?`;
+            }
+            if (spaExample) {
+                spaExample.innerHTML = `<em>(Ví dụ: peel da, tiêm meso, laser, RF nâng cơ...)</em>`;
+            }
+            if (spaGrid) {
+                spaGrid.innerHTML = `
+                    <button class="pill-btn option" onclick="App.selectSpa('Chưa bao giờ')">Chưa bao giờ</button>
+                    <button class="pill-btn option" onclick="App.selectSpa('Đã làm 1–2 lần')">Đã làm 1–2 lần</button>
+                    <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>
+                `;
+            }
+        }
     },
 
     // ── Step 1: Location ──

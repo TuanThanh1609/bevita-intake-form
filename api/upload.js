@@ -1,7 +1,32 @@
+// Simple in-memory rate limiter per lambda instance
+const ipRequests = new Map();
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
+const MAX_REQUESTS = 30; // 30 uploads allowed per 10 min
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
+
+  // --- Rate Limiting ---
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  
+  if (!ipRequests.has(ip)) {
+    ipRequests.set(ip, { count: 1, startTime: now });
+  } else {
+    const record = ipRequests.get(ip);
+    if (now - record.startTime > RATE_LIMIT_WINDOW) {
+      ipRequests.set(ip, { count: 1, startTime: now });
+    } else {
+      record.count++;
+      if (record.count > MAX_REQUESTS) {
+        console.warn(`[RATE LIMIT] Blocked IP: ${ip} for exceeding ${MAX_REQUESTS} requests in upload.`);
+        return res.status(429).json({ success: false, message: 'Too Many Requests, please try again later.' });
+      }
+    }
+  }
+  // ---------------------
 
   // Khai báo các API Key qua biến môi trường (Environment Variables) trong Vercel
   const imgbbApiUrl = 'https://api.imgbb.com/1/upload';

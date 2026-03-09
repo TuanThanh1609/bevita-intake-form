@@ -1,7 +1,32 @@
+// Simple in-memory rate limiter per lambda instance
+const ipRequests = new Map();
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
+const MAX_REQUESTS = 15;
+
 export default async function handler(req, res) {
   if (req.method !== 'POST' && req.method !== 'PATCH') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
+
+  // --- Rate Limiting ---
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  
+  if (!ipRequests.has(ip)) {
+    ipRequests.set(ip, { count: 1, startTime: now });
+  } else {
+    const record = ipRequests.get(ip);
+    if (now - record.startTime > RATE_LIMIT_WINDOW) {
+      ipRequests.set(ip, { count: 1, startTime: now });
+    } else {
+      record.count++;
+      if (record.count > MAX_REQUESTS) {
+        console.warn(`[RATE LIMIT] Blocked IP: ${ip} for exceeding ${MAX_REQUESTS} requests in submit.`);
+        return res.status(429).json({ success: false, message: 'Too Many Requests, please try again later.' });
+      }
+    }
+  }
+  // ---------------------
 
   // Khai báo API NocoDB và Token qua biến môi trường Vercel
   const nocoDbApiUrl = 'https://nocodb.smax.in/api/v2/tables/muwldo248riapzx/records';

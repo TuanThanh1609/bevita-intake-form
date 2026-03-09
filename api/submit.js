@@ -41,15 +41,38 @@ export default async function handler(req, res) {
 
     let url = nocoDbApiUrl;
     let method = req.method; // either POST or PATCH
+    let body = payload;
+
+    // --- Deduplication Logic via fb_pid ---
+    if (method === 'POST' && payload.fb_pid) {
+      console.log(`🔍 Checking if fb_pid ${payload.fb_pid} exists...`);
+      const checkUrl = `${nocoDbApiUrl}?where=(fb_pid,eq,${payload.fb_pid})&limit=1`;
+      const checkRes = await fetch(checkUrl, {
+        method: 'GET',
+        headers: {
+          'xc-token': nocoDbToken,
+        }
+      });
+      
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.list && checkData.list.length > 0) {
+          const existingRecord = checkData.list[0];
+          console.log(`🔄 Found existing record (Id: ${existingRecord.Id}) for fb_pid: ${payload.fb_pid}. Switching POST to PATCH.`);
+          method = 'PATCH';
+          body.Id = existingRecord.Id; // Append the exact Id for NocoDB PATCH
+        }
+      } else {
+        console.warn(`⚠️ Failed to check fb_pid existence. Falling back to POST. Status:`, checkRes.status);
+      }
+    }
+    // --------------------------------------
     
     // NocoDB V2 PATCH requires an array of record objects with Id field
     // POST accepts a single object or array
-    let body;
     if (method === 'PATCH') {
       // Wrap in array if not already an array
-      body = Array.isArray(payload) ? payload : [payload];
-    } else {
-      body = payload;
+      body = Array.isArray(body) ? body : [body];
     }
 
     console.log(`📤 ${method} to NocoDB:`, JSON.stringify(body).substring(0, 500));

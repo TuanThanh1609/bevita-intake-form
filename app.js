@@ -47,29 +47,32 @@ const state = {
 // ── Screen Flow ──
 const FLOW = [
     'welcome',
-    'name', 'age', 'location', 'skin', 'photo-skin',           // Step 1
+    'age', 'location', 'skin', 'photo-skin',                    // Step 1
     'cosmetics', 'spa',                                          // Step 2
     'routine',                                                   // Step 3
     'health-intro', 'menstrual', 'pregnancy', 'medical',         // Step 4
     'supplements', 'sleep', 'stress', 'budget',
+    'confirm-phone',                                             // Xác nhận + SĐT
     'thankyou',
 ];
 
 const STEP_MAP = {
-    'welcome': 0, 'name': 1, 'age': 1, 'location': 1, 'skin': 1, 'photo-skin': 1,
+    'welcome': 0, 'age': 1, 'location': 1, 'skin': 1, 'photo-skin': 1,
     'cosmetics': 2, 'spa': 2,
     'routine': 3,
     'health-intro': 4, 'menstrual': 4, 'pregnancy': 4, 'medical': 4,
     'supplements': 4, 'sleep': 4, 'stress': 4, 'budget': 4, 'budget-suggest': 4,
+    'confirm-phone': 4,
     'thankyou': 4,
 };
 
 const PROGRESS_MAP = {
-    'welcome': 0, 'name': 5, 'age': 12, 'location': 20, 'skin': 28, 'photo-skin': 35,
-    'cosmetics': 42, 'spa': 50,
-    'routine': 58,
-    'health-intro': 62, 'menstrual': 68, 'pregnancy': 73, 'medical': 78,
-    'supplements': 83, 'sleep': 88, 'stress': 92, 'budget': 96, 'budget-suggest': 98,
+    'welcome': 0, 'age': 8, 'location': 16, 'skin': 24, 'photo-skin': 32,
+    'cosmetics': 40, 'spa': 48,
+    'routine': 56,
+    'health-intro': 60, 'menstrual': 66, 'pregnancy': 72, 'medical': 78,
+    'supplements': 82, 'sleep': 86, 'stress': 90, 'budget': 94, 'budget-suggest': 96,
+    'confirm-phone': 98,
     'thankyou': 100,
 };
 
@@ -149,11 +152,12 @@ const App = {
     populateUIFromState() {
         // Text inputs
         if (state.data.Full_Name) {
-            const nameEl = document.getElementById('nameFromUrl');
-            if (nameEl) nameEl.textContent = state.data.Full_Name;
             document.getElementById('ageGreeting').textContent = `Cảm ơn ${state.data.Full_Name}`;
         }
-        if (state.data.Phone_Number) document.getElementById('inputPhone').value = state.data.Phone_Number;
+        if (state.data.Phone_Number) {
+            const phoneInput = document.getElementById('inputConfirmPhone');
+            if (phoneInput) phoneInput.value = state.data.Phone_Number;
+        }
         if (state.data.Location) document.getElementById('inputLocation').value = state.data.Location;
         if (state.data.History_Cosmetics) document.getElementById('inputCosmetics').value = state.data.History_Cosmetics;
         if (state.data.Current_Routine) document.getElementById('inputRoutine').value = state.data.Current_Routine;
@@ -251,25 +255,15 @@ const App = {
 
     // ── Welcome ──
     startForm() {
-        this.goToScreen('name');
+        // Set ageGreeting from URL name (since we skip screen-name)
+        if (state.data.Full_Name) {
+            document.getElementById('ageGreeting').textContent = `Cảm ơn ${state.data.Full_Name}`;
+        }
+        this.goToScreen('age');
     },
 
     showLater() {
         this.goToScreen('later');
-    },
-
-    // ── Step 1: SĐT (Tên đã lấy từ URL params) ──
-    submitPhone() {
-        const phone = document.getElementById('inputPhone').value.trim();
-        
-        if (!phone || !/^[0-9+]{9,15}$/.test(phone)) {
-            this.shakeInput('inputPhone');
-            return;
-        }
-        
-        state.data.Phone_Number = phone;
-        document.getElementById('ageGreeting').textContent = `Cảm ơn ${state.data.Full_Name}`;
-        this.goToScreen('age');
     },
 
     // ── Step 1: Tuổi ──
@@ -629,7 +623,7 @@ const App = {
 
         state.data.Budget = value;
         this.highlightSelected(event.target);
-        setTimeout(() => this.submitForm(), 300);
+        setTimeout(() => this.goToScreen('confirm-phone'), 300);
     },
 
     // ── Submit Form ──
@@ -710,7 +704,60 @@ const App = {
         }
 
         document.getElementById('loadingOverlay').classList.remove('active');
+
+        // Render summary on thankyou screen
+        const summaryEl = document.getElementById('summaryContent');
+        if (summaryEl) summaryEl.innerHTML = this.generateSummaryHTML();
+
         this.goToScreen('thankyou');
+    },
+
+    // ── Confirm Phone (cuối form) ──
+    submitConfirmPhone() {
+        const phone = document.getElementById('inputConfirmPhone').value.trim();
+
+        if (!phone || !/^[0-9+]{9,15}$/.test(phone)) {
+            this.shakeInput('inputConfirmPhone');
+            return;
+        }
+
+        state.data.Phone_Number = phone;
+        this.submitForm();
+    },
+
+    // ── Generate Summary HTML ──
+    generateSummaryHTML() {
+        const d = state.data;
+        const botC = state.botPronoun.charAt(0).toUpperCase() + state.botPronoun.slice(1);
+
+        const rows = [
+            { icon: '👤', label: 'Họ tên', value: d.Full_Name },
+            { icon: '📞', label: 'Số điện thoại', value: d.Phone_Number },
+            { icon: '🎂', label: 'Độ tuổi', value: d.Age_Group },
+            { icon: '📍', label: 'Tỉnh/Thành', value: d.Location },
+            { icon: '🌿', label: 'Vấn đề da', value: d.Skin_Condition },
+            { icon: '💊', label: 'Mỹ phẩm đã dùng', value: d.History_Cosmetics },
+            { icon: '💆', label: 'Spa / Thẩm mỹ', value: d.History_Spa },
+            { icon: '🧴', label: 'Routine hiện tại', value: d.Current_Routine },
+            { icon: '💪', label: 'Sức khoẻ', value: d.Health_Status },
+            { icon: '💊', label: 'TPCN', value: d.Supplements },
+            { icon: '😴', label: 'Giấc ngủ', value: d.Lifestyle_Sleep },
+            { icon: '😰', label: 'Stress', value: d.Lifestyle_Stress },
+            { icon: '💰', label: 'Ngân sách', value: d.Budget },
+        ];
+
+        let html = '';
+        rows.forEach(r => {
+            if (r.value) {
+                html += `<div class="summary-row">
+                    <span class="summary-icon">${r.icon}</span>
+                    <span class="summary-label">${r.label}</span>
+                    <span class="summary-value">${r.value}</span>
+                </div>`;
+            }
+        });
+
+        return html;
     },
 
     // ── Photo Processing ──
@@ -883,14 +930,11 @@ const App = {
 
         if (name) {
             state.data.Full_Name = decodeURIComponent(name);
-            // Update the greeting in name screen
-            const nameEl = document.getElementById('nameFromUrl');
-            if (nameEl) nameEl.textContent = state.data.Full_Name;
         }
 
         if (phone) {
             state.data.Phone_Number = decodeURIComponent(phone);
-            const phoneInput = document.getElementById('inputPhone');
+            const phoneInput = document.getElementById('inputConfirmPhone');
             if (phoneInput) phoneInput.value = state.data.Phone_Number;
         }
 

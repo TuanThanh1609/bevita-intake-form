@@ -88,27 +88,6 @@
 
             <!-- ==================== BƯỚC 1: THÔNG TIN CƠ BẢN ==================== -->
 
-            <!-- 1.1: Hỏi tên & SĐT -->
-            <div class="screen" id="screen-name">
-                <div class="chat-area">
-                    <div class="bot-avatar-row">
-                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
-                        <span class="bot-name">Mai — Bevita</span>
-                    </div>
-                    <div class="chat-bubble bot animate-in">
-                        Xin chào <strong id="nameFromUrl"></strong>, cho Mai thông tin về Số điện thoại để Mai chủ động liên hệ nhé 😊
-                    </div>
-                </div>
-                <div class="actions-area animate-in delay-1">
-                    <div class="input-group">
-                        <input type="tel" id="inputPhone" class="text-input" placeholder="Số điện thoại..." autocomplete="tel">
-                        <button class="send-btn" onclick="App.submitPhone()" id="btnSubmitName">
-                            <span class="send-icon">→</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <!-- 1.2: Hỏi tuổi -->
             <div class="screen" id="screen-age">
                 <div class="chat-area">
@@ -555,8 +534,8 @@
                 </div>
             </div>
 
-            <!-- ==================== THANK YOU ==================== -->
-            <div class="screen" id="screen-thankyou">
+            <!-- ==================== XÁC NHẬN + SĐT ==================== -->
+            <div class="screen" id="screen-confirm-phone">
                 <div class="chat-area">
                     <div class="bot-avatar-row">
                         <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
@@ -571,13 +550,41 @@
                     <div class="chat-bubble bot animate-in delay-2 dynamic-text" data-template="Chuyên gia Bevita sẽ phân tích và quay lại tư vấn cho {user} trong vòng <strong>2–4 tiếng</strong> trong giờ hành chính nhé.">
                         Chuyên gia Bevita sẽ phân tích và quay lại tư vấn cho bạn trong vòng <strong>2–4 tiếng</strong> trong giờ hành chính nhé.
                     </div>
-                    <div class="chat-bubble bot animate-in delay-3 dynamic-text" data-template="Nếu {user} muốn hỏi thêm gì — cứ nhắn tại đây, {bot} sẽ hỗ trợ! 😊">
+                    <div class="chat-bubble bot animate-in delay-3 dynamic-text" data-template="{userC} cho {bot} xin Số điện thoại tại đây để có thể chủ động liên hệ nhé">
+                        Bạn cho Mai xin Số điện thoại tại đây để có thể chủ động liên hệ nhé
+                    </div>
+                    <div class="chat-bubble bot animate-in delay-4 dynamic-text" data-template="Nếu {user} muốn hỏi thêm gì — cứ nhắn tại đây, {bot} sẽ hỗ trợ! 😊">
                         Nếu bạn muốn hỏi thêm gì — cứ nhắn tại đây, Mai sẽ hỗ trợ! 😊
                     </div>
                 </div>
-                <div class="thankyou-decoration animate-in delay-4">
+                <div class="actions-area animate-in delay-5">
+                    <div class="input-group">
+                        <input type="tel" id="inputConfirmPhone" class="text-input" placeholder="Số điện thoại..." autocomplete="tel">
+                        <button class="send-btn" onclick="App.submitConfirmPhone()" id="btnConfirmPhone">
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== THANK YOU + TÓM TẮT ==================== -->
+            <div class="screen" id="screen-thankyou">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                </div>
+                <div class="thankyou-decoration animate-in">
                     <div class="thankyou-icon">🌷</div>
                     <p class="thankyou-text dynamic-text" data-template="Hồ sơ của {user} đã được gửi thành công!">Hồ sơ của bạn đã được gửi thành công!</p>
+                </div>
+                <div class="summary-container animate-in delay-1">
+                    <h3 class="summary-title">📋 Thông tin tóm tắt</h3>
+                    <div id="summaryContent"></div>
+                </div>
+                <div class="actions-area animate-in delay-2">
+                    <button class="pill-btn primary" onclick="window.close()" id="btnClosePage">Đóng trang ✕</button>
                 </div>
             </div>
 

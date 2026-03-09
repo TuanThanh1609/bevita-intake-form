@@ -61,22 +61,20 @@ const FLOW = [
 ];
 
 const STEP_MAP = {
-    'welcome': 0, 'age': 1, 'location': 1, 'skin': 1, 'photo-skin': 1,
-    'cosmetics': 2, 'spa': 2,
-    'routine': 3,
-    'health-intro': 4, 'menstrual': 4, 'pregnancy': 4, 'medical': 4,
-    'supplements': 4, 'sleep': 4, 'stress': 4, 'budget': 4, 'budget-suggest': 4,
+    'welcome': 0, 'age': 1, 'location': 1, 'skin': 1, 'photo-skin': 1, // Bước 1: Thông tin
+    'cosmetics': 2, 'spa': 2, 'spa-services': 2, 'spa-results': 2, 'routine': 2, // Bước 2: Lịch sử (bao gồm cả Hiện tại cũ)
+    'health-intro': 3, 'menstrual': 3, 'pregnancy': 3, 'medical': 3,
+    'supplements': 3, 'sleep': 3, 'stress': 3, 'budget': 3, 'budget-suggest': 3, // Bước 3: Sức khỏe
     'confirm-phone': 4,
-    'thankyou': 4,
+    'thankyou': 4, // Bước 4: Hoàn thành
 };
 
 const PROGRESS_MAP = {
     'welcome': 0, 'age': 8, 'location': 16, 'skin': 24, 'photo-skin': 32,
-    'cosmetics': 40, 'spa': 48,
-    'routine': 56,
-    'health-intro': 60, 'menstrual': 66, 'pregnancy': 72, 'medical': 78,
-    'supplements': 82, 'sleep': 86, 'stress': 90, 'budget': 94, 'budget-suggest': 96,
-    'confirm-phone': 98,
+    'cosmetics': 40, 'spa': 48, 'spa-services': 52, 'spa-results': 56, 'routine': 60,
+    'health-intro': 64, 'menstrual': 70, 'pregnancy': 76, 'medical': 82,
+    'supplements': 88, 'sleep': 92, 'stress': 96, 'budget': 98, 'budget-suggest': 98,
+    'confirm-phone': 100,
     'thankyou': 100,
 };
 

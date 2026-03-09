@@ -940,6 +940,28 @@ const App = {
 
         console.log('📋 Smax URL Params parsed:', { fbpageid, fbid, name, fbadid, phone });
     },
+
+    // ── Close Webview ──
+    closeWebview() {
+        // Try Messenger Extensions (if available)
+        if (typeof MessengerExtensions !== 'undefined') {
+            MessengerExtensions.requestCloseBrowser(
+                function success() {},
+                function error(err) { console.error('Messenger close error:', err); }
+            );
+        }
+        // Try standard close
+        window.close();
+        
+        // Mobile fallback tricks
+        setTimeout(() => {
+            // For iOS / generic webviews
+            window.location.href = 'about:blank';
+        }, 300);
+        
+        // Zalo / some other local webviews specific scheme hook if needed
+        // but about:blank usually triggers the webview to close or reset
+    },
 };
 
 // ── Shake Animation (injected via JS) ──

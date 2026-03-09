@@ -96,16 +96,13 @@
                         <span class="bot-name">Mai — Bevita</span>
                     </div>
                     <div class="chat-bubble bot animate-in">
-                        Trước tiên cho Mai biết tên và số điện thoại của bạn nhé? 😊
+                        Xin chào <strong id="nameFromUrl"></strong>, cho Mai thông tin về Số điện thoại để Mai chủ động liên hệ nhé 😊
                     </div>
                 </div>
                 <div class="actions-area animate-in delay-1">
-                    <div class="input-group mb-8">
-                        <input type="text" id="inputName" class="text-input" placeholder="Tên của bạn..." autocomplete="name">
-                    </div>
                     <div class="input-group">
                         <input type="tel" id="inputPhone" class="text-input" placeholder="Số điện thoại..." autocomplete="tel">
-                        <button class="send-btn" onclick="App.submitNameAndPhone()" id="btnSubmitName">
+                        <button class="send-btn" onclick="App.submitPhone()" id="btnSubmitName">
                             <span class="send-icon">→</span>
                         </button>
                     </div>

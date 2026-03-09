@@ -30,6 +30,9 @@ const state = {
         Lifestyle_Stress: '',
         Budget: '',
         Note: '',
+        fbpageid: '',
+        fb_pid: '',
+        fbads_id: '',
     },
     skinGoals: [],
     supplements: [],
@@ -146,7 +149,8 @@ const App = {
     populateUIFromState() {
         // Text inputs
         if (state.data.Full_Name) {
-            document.getElementById('inputName').value = state.data.Full_Name;
+            const nameEl = document.getElementById('nameFromUrl');
+            if (nameEl) nameEl.textContent = state.data.Full_Name;
             document.getElementById('ageGreeting').textContent = `Cảm ơn ${state.data.Full_Name}`;
         }
         if (state.data.Phone_Number) document.getElementById('inputPhone').value = state.data.Phone_Number;
@@ -254,23 +258,17 @@ const App = {
         this.goToScreen('later');
     },
 
-    // ── Step 1: Tên & SĐT ──
-    submitNameAndPhone() {
-        const name = document.getElementById('inputName').value.trim();
+    // ── Step 1: SĐT (Tên đã lấy từ URL params) ──
+    submitPhone() {
         const phone = document.getElementById('inputPhone').value.trim();
         
-        if (!name) {
-            this.shakeInput('inputName');
-            return;
-        }
         if (!phone || !/^[0-9+]{9,15}$/.test(phone)) {
             this.shakeInput('inputPhone');
             return;
         }
         
-        state.data.Full_Name = name;
         state.data.Phone_Number = phone;
-        document.getElementById('ageGreeting').textContent = `Cảm ơn ${name}`;
+        document.getElementById('ageGreeting').textContent = `Cảm ơn ${state.data.Full_Name}`;
         this.goToScreen('age');
     },
 
@@ -675,6 +673,11 @@ const App = {
                 Submission_Date: now.toISOString(),
             };
 
+            // Add Facebook tracking fields from Smax URL params
+            if (state.data.fbpageid) payload.fbpageid = state.data.fbpageid;
+            if (state.data.fb_pid) payload.fb_pid = state.data.fb_pid;
+            if (state.data.fbads_id) payload.fbads_id = state.data.fbads_id;
+
             // Only add URL fields if they have values (NocoDB URL type rejects empty strings)
             if (state.data.Skin_Photos) payload.Skin_Photos = state.data.Skin_Photos;
             if (state.data.Skin_photo_2) payload.Skin_photo_2 = state.data.Skin_photo_2;
@@ -864,6 +867,35 @@ const App = {
         el.focus();
         setTimeout(() => { el.style.animation = ''; }, 400);
     },
+    // ── Parse Smax URL Parameters ──
+    parseUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+
+        const fbpageid = params.get('fbpageid');
+        const fbid = params.get('fbid');
+        const name = params.get('name');
+        const fbadid = params.get('fbadid');
+        const phone = params.get('phone');
+
+        if (fbpageid) state.data.fbpageid = fbpageid;
+        if (fbid) state.data.fb_pid = fbid;
+        if (fbadid) state.data.fbads_id = fbadid;
+
+        if (name) {
+            state.data.Full_Name = decodeURIComponent(name);
+            // Update the greeting in name screen
+            const nameEl = document.getElementById('nameFromUrl');
+            if (nameEl) nameEl.textContent = state.data.Full_Name;
+        }
+
+        if (phone) {
+            state.data.Phone_Number = decodeURIComponent(phone);
+            const phoneInput = document.getElementById('inputPhone');
+            if (phoneInput) phoneInput.value = state.data.Phone_Number;
+        }
+
+        console.log('📋 Smax URL Params parsed:', { fbpageid, fbid, name, fbadid, phone });
+    },
 };
 
 // ── Shake Animation (injected via JS) ──
@@ -894,6 +926,7 @@ document.addEventListener('keydown', (e) => {
 
 // ── Initialize ──
 document.addEventListener('DOMContentLoaded', () => {
+    App.parseUrlParams();
     App.updateProgress();
     App.restoreState();
 });

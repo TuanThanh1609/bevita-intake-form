@@ -270,6 +270,55 @@
                 </div>
             </div>
 
+            <!-- 2.3: Dịch vụ Spa chi tiết (Sub-question) -->
+            <div class="screen" id="screen-spa-services">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" data-template="{userC} làm dịch vụ gì vậy? Và lần gần nhất là khoảng bao lâu trước?">
+                        Em làm dịch vụ gì vậy? Và lần gần nhất là khoảng bao lâu trước?
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-1">
+                    <div class="pills-grid">
+                        <button class="pill-btn option multi" onclick="App.toggleSpaService(this, 'Peel da / tẩy tế bào chết')">Peel da / tẩy tế bào chết</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSpaService(this, 'Tiêm meso / PRP')">Tiêm meso / PRP</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSpaService(this, 'Laser trị nám / mụn')">Laser trị nám / mụn</button>
+                        <button class="pill-btn option multi" onclick="App.toggleSpaService(this, 'RF / HIFU nâng cơ')">RF / HIFU nâng cơ</button>
+                    </div>
+                    <div class="input-group mt-12">
+                        <input type="text" id="inputSpaServices" class="text-input" placeholder="Hoặc dịch vụ khác / thời gian làm...">
+                    </div>
+                    <button class="pill-btn primary next-btn" onclick="App.submitSpaServices()" id="btnSpaServicesNext">Tiếp tục →</button>
+                </div>
+            </div>
+
+            <!-- 2.4: Kết quả sau Spa (Sub-question) -->
+            <div class="screen" id="screen-spa-results">
+                <div class="chat-area">
+                    <div class="bot-avatar-row">
+                        <img src="104143894_725343728224198_3614738744742336894_n.jpg" class="bot-avatar" alt="Bevita">
+                        <span class="bot-name">Mai — Bevita</span>
+                    </div>
+                    <div class="chat-bubble bot animate-in dynamic-text" id="spaResultsQuestion" data-template="Sau khi làm xong da {user} có phản ứng gì không? (Ví dụ: đỏ, bong tróc, nám sáng lên hay sạm lại...)">
+                        Sau khi làm xong da em có phản ứng gì không? (Ví dụ: đỏ, bong tróc, nám sáng lên hay sạm lại...)
+                    </div>
+                </div>
+                <div class="actions-area animate-in delay-1">
+                    <div class="pills-grid" id="spaResultsGrid">
+                        <!-- Nút sẽ được render qua updateAgeBasedContent -->
+                    </div>
+                    <div class="input-group mt-12">
+                        <input type="text" id="inputSpaResults" class="text-input" placeholder="Hoặc mô tả thêm...">
+                        <button class="send-btn" onclick="App.submitSpaResultsText()">
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- ==================== BƯỚC 3: SKINCARE HIỆN TẠI ==================== -->
 
             <!-- 3.1: Sản phẩm đang dùng -->

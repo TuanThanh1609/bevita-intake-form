@@ -22,6 +22,8 @@ const state = {
         Skin_Photos: '',
         History_Cosmetics: '',
         History_Spa: '',
+        History_Spa_Service: '',
+        History_Spa_Results: '',
         Current_Routine: '',
         Routine_Photos: '',
         Health_Status: '',
@@ -36,6 +38,7 @@ const state = {
     },
     skinGoals: [],
     supplements: [],
+    spaServices: [],
     healthData: {},
     skinPhotoUrls: { front: null, left: null, right: null },
     routinePhotoUrls: [],
@@ -413,6 +416,15 @@ const App = {
                     <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>
                 `;
             }
+            const spaResultsGrid = document.getElementById('spaResultsGrid');
+            if (spaResultsGrid) {
+                spaResultsGrid.innerHTML = `
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Sáng, đều màu hơn')">Sáng, đều màu hơn</button>
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Cải thiện nhưng không lâu')">Cải thiện nhưng không lâu</button>
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Không thay đổi nhiều')">Không thay đổi nhiều</button>
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Da nhạy cảm hơn sau đó')">Da nhạy cảm hơn sau đó</button>
+                `;
+            }
 
             // ── TIN 09: Health Intro ──
             const btnContinueHealth = document.getElementById('btnContinueHealth');
@@ -435,6 +447,15 @@ const App = {
                     <button class="pill-btn option" onclick="App.selectSpa('Chưa bao giờ')">Chưa bao giờ</button>
                     <button class="pill-btn option" onclick="App.selectSpa('Đã làm 1–2 lần')">Đã làm 1–2 lần</button>
                     <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>
+                `;
+            }
+            const spaResultsGrid = document.getElementById('spaResultsGrid');
+            if (spaResultsGrid) {
+                spaResultsGrid.innerHTML = `
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Da đỏ rồi hết')">Da đỏ rồi hết</button>
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Nám sáng hơn')">Nám sáng hơn</button>
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Nám sạm lại sau đó')">Nám sạm lại sau đó</button>
+                    <button class="pill-btn option" onclick="App.selectSpaResult('Da bình thường, không thay đổi nhiều')">Da bình thường, không thay đổi nhiều</button>
                 `;
             }
 
@@ -631,7 +652,7 @@ const App = {
 
 
 
-    // ── Step 2: Spa ──
+    // ── Step 2.2: Spa ──
     selectSpa(value) {
         state.data.History_Spa = value;
         this.highlightSelected(event.target);
@@ -642,7 +663,8 @@ const App = {
                 `Dạ, vậy thì ${user} chưa có tiền sử điều trị gì — dễ bắt đầu phác đồ từ đầu hơn 😊`,
                 'routine');
         } else {
-            setTimeout(() => this.goToScreen('routine'), 300);
+            // "Đã làm..." / "Đang điều trị..."
+            setTimeout(() => this.goToScreen('spa-services'), 300);
         }
     },
 
@@ -653,6 +675,63 @@ const App = {
             return;
         }
         state.data.History_Spa = val;
+        this.goToScreen('spa-services');
+    },
+
+    // ── Step 2.3: Spa Services (Sub-question) ──
+    toggleSpaService(btn, value) {
+        if (!state.spaServices) state.spaServices = [];
+        const index = state.spaServices.indexOf(value);
+        if (index > -1) {
+            state.spaServices.splice(index, 1);
+            btn.classList.remove('selected');
+        } else {
+            state.spaServices.push(value);
+            btn.classList.add('selected');
+        }
+    },
+
+    submitSpaServices() {
+        const input = document.getElementById('inputSpaServices');
+        const customService = input ? input.value.trim() : '';
+
+        const allServices = [...(state.spaServices || [])];
+        if (customService) allServices.push(customService);
+
+        if (allServices.length === 0) {
+            this.shakeInput('inputSpaServices');
+            return;
+        }
+
+        state.data.History_Spa_Service = allServices.join(', ');
+
+        const isOver42 = state.data.Age_Group === 'Trên 42 tuổi';
+        const bot = state.botPronoun;
+        const user = state.userPronoun;
+        const userC = user.charAt(0).toUpperCase() + user.slice(1);
+
+        const message = isOver42 
+            ? `Dạ, các liệu trình xâm lấn khá phổ biến và hiệu quả nếu chọn đúng nơi uy tín ạ.`
+            : `Dạ, tuỳ liệu trình mà da sẽ có phản ứng khác nhau — ${bot} sẽ lưu ý điều này khi lên phác đồ cho ${user} nhé.`;
+
+        // Using default 5000ms delay for responses
+        this.showBotResponse('spa-services', message, 'spa-results');
+    },
+
+    // ── Step 2.4: Spa Results (Sub-question) ──
+    selectSpaResult(value) {
+        state.data.History_Spa_Results = value;
+        this.highlightSelected(event.target);
+        setTimeout(() => this.goToScreen('routine'), 300);
+    },
+
+    submitSpaResultsText() {
+        const input = document.getElementById('inputSpaResults');
+        if (!input || !input.value.trim()) {
+            this.shakeInput('inputSpaResults');
+            return;
+        }
+        state.data.History_Spa_Results = input.value.trim();
         this.goToScreen('routine');
     },
 
@@ -824,6 +903,8 @@ const App = {
                 Skin_Condition: state.data.Skin_Condition,
                 History_Cosmetics: state.data.History_Cosmetics,
                 History_Spa: state.data.History_Spa,
+                History_Spa_Service: state.data.History_Spa_Service || null,
+                History_Spa_Results: state.data.History_Spa_Results || null,
                 Current_Routine: state.data.Current_Routine,
                 Supplements: state.data.Supplements || null,
                 Lifestyle_Sleep: state.data.Lifestyle_Sleep || null,
@@ -906,6 +987,8 @@ const App = {
             { icon: '🌿', label: 'Vấn đề da', value: d.Skin_Condition },
             { icon: '💊', label: 'Mỹ phẩm đã dùng', value: d.History_Cosmetics },
             { icon: '💆', label: 'Spa / Thẩm mỹ', value: d.History_Spa },
+            { icon: '💆‍♀️', label: 'Liệu trình đã làm', value: d.History_Spa_Service },
+            { icon: '✨', label: 'Kết quả Spa', value: d.History_Spa_Results },
             { icon: '🧴', label: 'Routine hiện tại', value: d.Current_Routine },
             { icon: '💪', label: 'Sức khoẻ', value: d.Health_Status },
             { icon: '💊', label: 'TPCN', value: d.Supplements },

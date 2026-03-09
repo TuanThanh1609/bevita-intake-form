@@ -1,75 +1,59 @@
 {
-  "updated_at": "2026-03-08T19:22:00Z",
+  "updated_at": "2026-03-09T17:45:00Z",
   "working_on": {
-    "feature": "UI Polish & Navigation Enhancement",
-    "task": "Reviewing saved context",
+    "feature": "NocoDB Tracking & Slot-based Upload",
+    "task": "Brain sync and handover",
     "status": "completed",
     "files": [
-      "index.html",
       "app.js",
-      "styles.css"
+      "api/submit.js",
+      "CHANGELOG.md",
+      "index.html"
     ],
     "blockers": [],
-    "notes": "Added dynamic pronoun templates based on age and a global back button that traces screen history."
+    "notes": "Implemented real-time last_step tracking and slot-based photo capture UI."
   },
   "pending_tasks": [
     {
-      "task": "Chờ review từ người dùng về giao diện mới và logic quay lại",
-      "priority": "low",
-      "notes": "Tất cả các tính năng chính và luồng data đã ổn định."
+      "task": "Theo dõi hiệu năng của Bot response delay 5s trên mobile thực tế.",
+      "priority": "medium",
+      "notes": "Kiểm tra xem khách có kiên nhẫn đợi 5s không hay cần giảm xuống 3-4s."
     }
   ],
   "recent_changes": [
     {
-      "timestamp": "2026-03-08T19:48:20+07:00",
-      "type": "hotfix",
-      "description": "Implemented serverless API proxies (api/upload.js & api/submit.js) for security and squelched Vercel 413 Payload error with JPEG compression API rules.",
-      "files": [
-        "app.js",
-        "api/upload.js",
-        "api/submit.js"
-      ]
+      "timestamp": "2026-03-09T16:15:00+07:00",
+      "type": "fix",
+      "description": "Fixed NocoDB V2 PATCH payload requirement by wrapping objects in an array. Restored accidentally deleted submitForm function.",
+      "files": ["app.js", "api/submit.js"]
     },
     {
-      "timestamp": "2026-03-08",
+      "timestamp": "2026-03-09T14:30:00+07:00",
       "type": "feature",
-      "description": "Implemented Dynamic Pronouns based on age criteria and added global back navigation via history state array.",
-      "files": [
-        "app.js",
-        "index.html",
-        "styles.css"
-      ]
+      "description": "Implemented slot-based photo capture for 3 facial angles and routine photos.",
+      "files": ["app.js", "index.html", "styles.css"]
     }
   ],
   "errors_encountered": [
     {
-      "error": "NocoDB API rejects Health_Status submission",
-      "solution": "Changed Health_Status field in NocoDB from MultiSelect to LongText to accept arbitrary concatenated string data.",
+      "error": "NocoDB PATCH rejects single object payload",
+      "solution": "Wrapped object in array [payload] in api/submit.js and app.js.",
       "resolved": true
     },
     {
-      "error": "Vercel Payload Too Large (413) on Image Uploads",
-      "solution": "Canvas compression forced to image/jpeg (0.8 quality). Vercel serverless size limit explicitly adjusted to 4mb.",
-      "resolved": true
-    },
-    {
-      "error": "Có lỗi khi gửi thông tin (Failed to fetch)",
-      "solution": "App.submitForm was still using deleted CONFIG.NOCODB_API. Fixed to fetch('/api/submit') using Vercel Serverless proxy.",
+      "error": "Facebook tracking data missing on first save",
+      "solution": "Fixed URL param keys mapping for Smax (facebook.name, fb_pid).",
       "resolved": true
     }
   ],
   "decisions_made": [
     {
-      "decision": "Use Vercel serverless endpoints instead of NocoDB direct REST",
-      "reason": "Crucial requirement to completely hide standard NOCODB_TOKEN and IMGBB_KEY API secrets from public client context"
+      "decision": "Add 5s delay and typing indicator for bot bubbles",
+      "reason": "Prevents screen jumping and gives users time to digest personalized bot responses."
     },
     {
-      "decision": "Use history array for backward navigation",
-      "reason": "Provides a robust way to go back to the exact previous screen without hardcoding previous screen logic for every step."
-    },
-    {
-      "decision": "Use declarative data-template attributes for easy dynamic text resolution.",
-      "reason": "Keeps HTML clean and cleanly handles replacing variables like {bot} and {user} across elements when age is selected."
+      "decision": "Implicit POST on 'age' screen for tracking",
+      "reason": "Crucial for calculating funnel drop-off at early stages."
     }
   ]
 }

@@ -5,34 +5,37 @@ Base URL: `Client-side fetch`
 
 ---
 
-## 📝 NocoDB Integration
+## 🔗 NocoDB API - `muwldo248riapzx`
 
-### POST NocoDB `/api/v2/tables/muwldo248riapzx/records`
-Tạo bản ghi mới để lưu trữ hồ sơ tư vấn da của khách hàng.
+Base URL: `https://nocodb.smax.in/api/v2/tables/muwldo248riapzx/records` (Proxy via `/api/submit`)
 
-**Headers:**
-```
-xc-token: {NOCODB_TOKEN}
-Content-Type: application/json
-```
+### 1. POST - Tạo Lead mới / Lưu nháp
+Dùng khi khách bắt đầu tương tác hoặc chưa có `nocoDbId`.
 
-**Request Body (JSON):**
+**Payload (JSON):**
 ```json
 {
-  "Phone_Number": "0901234567",
-  "Full_Name": "Nguyễn Văn A",
-  "Age_Group": "25–34 tuổi",
-  "Location": "TP.HCM",
-  "Skin_Condition": "Mụn nội tiết, Thâm đỏ",
-  "Note": "Khách hàng muốn tư vấn chi tiết về mụn",
-  "Skin_Photos": "url_to_image_1.jpg, url_to_image_2.jpg",
-  "History_Cosmetics": "Dùng dược mỹ phẩm",
+  "Full_Name": "Tên khách",
+  "Age_Group": "30-42",
+  "fb_pid": "...",
+  "last_step": "age"
+}
+```
+
+### 2. PATCH - Cập nhật thông tin / Hoàn tất flow
+Dùng để update record hiện có qua trường `Id`.
+
+> [!IMPORTANT]
+> **NocoDB V2 PATCH requirement:** Payload gửi lên `/api/submit` (PATCH) phải được bọc trong một **MẢNG (Array)**.
+> Example: `[{ "Id": 123, "Phone_Number": "090...", "last_step": "completed" }]`
+
+**Proxy logic (`api/submit.js`):**
+Hệ thống tự động wrap payload trong `[]` nếu method là PATCH trước khi forward tới NocoDB.
   "History_Spa": "Chưa bao giờ",
   "Current_Routine": "Srm Cerave, Toner cocoon",
   "Routine_Photos": "url_to_routine_1.jpg",
   "Health_Status": "Đang mang thai, Tiêu hoá kém",
   "Supplements": "Vitamin C, Kẽm",
-  "Lifestyle_Sleep": "Trước 11h đêm",
   "Lifestyle_Stress": "Thỉnh thoảng",
   "Budget": "1–3 triệu",
   "Status": "new"

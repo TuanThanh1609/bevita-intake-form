@@ -11,71 +11,77 @@
   "tech_stack": {
     "frontend": "HTML, Vanilla CSS, Vanilla JS",
     "backend": "NocoDB (via API)",
-    "storage": "ImgBB (via API)"
+    "storage": "ImgBB (via API)",
+    "deployment": "Vercel Serverless Functions"
   },
   "database_schema": {
-    "summary": "NocoDB lưu trữ toàn bộ thông tin thu thập từ khách hàng qua webform.",
+    "summary": "NocoDB lưu trữ dữ liệu lead và tracking tiến trình form.",
     "tables": [
       {
         "name": "muwldo248riapzx (lead-form)",
         "columns": [
-          "Phone_Number (Primary)",
+          "Phone_Number (Primary/Display)",
           "Full_Name",
           "Age_Group",
           "Location",
           "Skin_Condition",
-          "Note (LongText)",
           "Skin_Photos (URL)",
+          "Skin_photo_2 (URL)",
+          "Skin_photo_3 (URL)",
           "History_Cosmetics",
           "History_Spa",
+          "History_Spa_Service",
+          "History_Spa_Results",
           "Current_Routine",
           "Routine_Photos (URL)",
-          "Health_Status (LongText)",
+          "Health_Status",
           "Supplements",
           "Lifestyle_Sleep",
           "Lifestyle_Stress",
           "Budget",
-          "Status",
-          "Submission_Date"
+          "Status (draft/new)",
+          "last_step (tracking)",
+          "Submission_Date",
+          "fbpageid",
+          "fb_pid",
+          "fbads_id"
         ]
       }
     ],
-    "relationships_explained": "Bảng đơn, mỗi dòng lưu trữ thông tin của một khách hàng độc lập."
+    "relationships_explained": "Lead-form chủ yếu lưu thông tin khách hàng. last_step dùng để re-marketing qua chatbot."
   },
   "api_endpoints": [
     {
-      "path": "POST NocoDB /api/v2/tables/muwldo248riapzx/records",
-      "explained": "Gửi dữ liệu hồ sơ mới vào NocoDB khi khách hàng bấm nộp form."
+      "path": "POST/PATCH /api/submit",
+      "explained": "Proxy serverless tới NocoDB. POST tạo record mới, PATCH cập nhật record theo Id."
     },
     {
-      "path": "POST ImgBB /1/upload",
-      "explained": "Upload ảnh chụp da và bộ mỹ phẩm lên server, nhận lại link ảnh để lưu vào NocoDB."
+      "path": "POST /api/upload",
+      "explained": "Proxy serverless tới ImgBB để lưu trữ ảnh."
     }
   ],
   "business_rules": [
-    "Khách hàng có thể chọn nhiều vấn đề da cùng lúc.",
-    "Dữ liệu sức khoẻ (kinh nguyệt, thai sản, bệnh lý) được gộp lại thành 1 chuỗi văn bản và lưu vào cột Health_Status (Long Text) để tránh lỗi.",
-    "Bất kỳ ghi chú bổ sung nào của khách hàng đều được lưu dồn vào cột Note.",
-    "Submit form chỉ được kích hoạt ở màn hình cuối cùng; có giao diện loading trong lúc chờ API phản hồi."
+    "Tự động lưu nháp (POST) ngay khi khách chọn tuổi để tracking tỉ lệ drop-off.",
+    "Bot response delay 5s kèm typing indicator để tăng tính chân thực và thời gian đọc.",
+    "Xưng hô linh hoạt dựa theo nhóm tuổi khách hàng chọn.",
+    "Ảnh chụp da gồm 3 slot: Trực diện, Trái, Phải."
   ],
   "features": [
-    "Multi-step form với thanh tiến trình (Progress bar).",
-    "Giao diện giả lập tin nhắn chat thân thiện.",
-    "Chụp ảnh trực tiếp từ camera điện thoại (hỗ trợ resize ảnh client-side trước khi upload).",
-    "Tự động upload ảnh lên ImgBB.",
-    "Tự động gửi data về NocoDB.",
-    "Dynamic pronouns (Chị/Em hoặc Em/Chị) tuỳ thuộc vào độ tuổi khách hàng nhập.",
-    "Global 'Quay lại' back button với lịch sử điều hướng các bước."
+    "Slot-based photo capturing workflow.",
+    "Real-time progress tracking (last_step).",
+    "Automatic draft creation on first interaction.",
+    "Serverless API proxy for security.",
+    "Dynamic templates for pronouns ({bot}, {user})."
   ],
   "knowledge_items": {
     "patterns": [
-      "Client-side image resizing sử dụng Canvas để tối ưu dung lượng trước khi upload."
+      "Serverless Proxy pattern để ẩn API Keys khỏi client-side code.",
+      "History-based back navigation."
     ],
     "gotchas": [
-      "Trường Multi-Select của NocoDB sẽ reject dữ liệu nếu option gửi lên không khai báo sẵn. Giải pháp: Dùng Long Text thay thế."
-    ],
-    "conventions": [
-      "State management đơn giản với biến toàn cục `state` chứa toàn bộ data trước khi submit."
+      "NocoDB V2 PATCH API yêu cầu payload phải là MẢNG object [{Id, ...fields}].",
+      "Smax truyền URL params với dấu chấm (ví dụ facebook.name) cần xử lý đặc biệt trong URLSearchParams.",
+      "Trường Display Field (Phone_Number) trong NocoDB nên được gửi ở dạng String để tránh lỗi mapping nếu kiểu dữ liệu thay đổi."
     ]
   }
 }

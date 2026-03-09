@@ -1,0 +1,1 @@
+[09:14] DONE task: Tách riêng 3 field ?nh da cho NocoDB (Skin_Photos, Skin_photo_2, Skin_photo_3)

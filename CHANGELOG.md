@@ -1,19 +1,15 @@
-# Changelog
-
-Mọi thay đổi đáng chú ý của project Bevita Intake Webform sẽ được ghi lại trong file này.
-
-## [2026-03-08]
+## [2026-03-09]
 ### Added
-- Tính năng **Dynamic Pronouns**: Tự động đổi xưng hô Chị/Em hoặc Em/Chị giữa Bot và User tuỳ thuộc vào nhóm độ tuổi mà khách hàng chọn ở Bước 1. (Update ở `app.js` logic và các CSS/HTML templates).
-- Tính năng **Global Quay Lại**: Nút "Quay lại" xuất hiện ở góc trái thanh Progress Bar (trừ màn hình chào) cho phép người dùng lùi trình duyệt lại lịch sử (`state.history`) để thay đổi các lựa chọn trước đó. Đoạn mã sẽ đồng bộ vị trí thanh process bar.
-- Hình ảnh đại diện Bot: Thay icon text mặc định bằng Logo ảnh của Bevita, thay đổi CSS `object-fit: cover` cho icon.
-- Tạo files tài liệu: `docs/api/endpoints.md` cho NocoDB và ImgBB API.
+- Tính năng **Slot-based Photo Upload**: Thay thế giao diện upload hàng loạt bằng một nút động duy nhất (Capture/Slot) kèm thumbnail ngang. Hỗ trợ chụp 3 góc mặt (Front, Left, Right) tuần tự và slots ảnh Routine.
+- Tính năng **Tracking last_step**: Tự động lưu bản nháp (Draft) lên NocoDB ngay khi khách tương tác (Age screen). Gán `last_step` để Messenger Bot có thể nhắc hẹn (Remind) chính xác bước khách dừng lại.
+- Bổ sung thông tin Spa: Thêm câu hỏi và trường dữ liệu `History_Spa_Service`, `History_Spa_Results` vào webform.
 
 ### Changed
-- Khắc phục lỗi NocoDB API reject dữ liệu trên trường `Health_Status` (chuyển MultiSelect thành LongText).
-- Đổi tên biến gửi lên NocoDB cho text tự do từ `Text` thành `Note`.
-- Sửa lại Flow upload ảnh: Hiện/Ẩn nút "Tiếp tục" thay vì can thiệp `style.display`.
+- Tăng thời gian phản hồi của Bot (Bubble) lên **5.0 giây** và thêm hiệu ứng **Typing indicator** (...) để khách hàng có đủ thời gian đọc nội dung trước khi chuyển trang.
+- Cập nhật logic Parse URL Params: Hỗ trợ mapping chuẩn các tham số từ Smax (`facebook.name`, `fb_pid`, `fbads_id`) để tracking chính xác ngay từ đầu.
 
 ### Fixed
-- Lỗi không xuất hiện nút Weiter (`Tiếp tục`) khi chọn tình trạng da.
-- Lỗi không xuất hiện nút Submit ảnh (`btnSkinPhotoNext`) sau khi upload ảnh trong bước 1 và bước 3. Cập nhật lại logic `toggleSkin` và vòng lặp check condition.
+- **NocoDB V2 PATCH Format**: Sửa lỗi API reject khi update bản nháp. Chuyển payload PATCH từ Object đơn sang Array `[{Id, ...fields}]` theo yêu cầu của NocoDB V2.
+- Khôi phục hàm `submitForm` bị mất trong quá trình refactor trước đó.
+- Sửa lỗi mapping `Phone_Number` (Display Field) trên NocoDB đảm bảo luôn là kiểu String để tránh xung đột dữ liệu.
+

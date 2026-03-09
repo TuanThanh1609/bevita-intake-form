@@ -253,6 +253,42 @@ const App = {
         });
     },
 
+    // ── Personalized Bot Response Utility ──
+    showBotResponse(screenId, message, nextScreen, delay = 1800) {
+        const screen = document.getElementById(`screen-${screenId}`);
+        if (!screen) {
+            this.goToScreen(nextScreen);
+            return;
+        }
+        const chatArea = screen.querySelector('.chat-area');
+        if (!chatArea) {
+            this.goToScreen(nextScreen);
+            return;
+        }
+
+        // Hide buttons to prevent double-clicks
+        const actionsArea = screen.querySelector('.actions-area');
+        if (actionsArea) actionsArea.style.display = 'none';
+
+        // Create and append bot response bubble
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble bot animate-in';
+        bubble.innerHTML = message;
+        chatArea.appendChild(bubble);
+
+        // Scroll to show the response
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        // Navigate after delay
+        setTimeout(() => {
+            this.goToScreen(nextScreen);
+            // Restore actions area for when user navigates back
+            if (actionsArea) actionsArea.style.display = '';
+            // Remove the dynamic bubble so it doesn't duplicate on revisit
+            bubble.remove();
+        }, delay);
+    },
+
     // ── Welcome ──
     startForm() {
         // Set ageGreeting from URL name (since we skip screen-name)
@@ -570,11 +606,17 @@ const App = {
         // Flag kem trộn
         if (value.includes('kem trộn')) {
             state.data.Text = (state.data.Text ? state.data.Text + '; ' : '') + 'FLAG: cream_mixed';
+            const bot = state.botPronoun;
+            const user = state.userPronoun;
+            const botC = bot.charAt(0).toUpperCase() + bot.slice(1);
+            this.showBotResponse('cosmetics',
+                `Dạ ${bot} hiểu rồi! Kem trộn thường chứa corticoid và làm da quen thuốc — da sẽ cần thêm thời gian phục hồi hơn một chút.<br><br>Nhưng không sao nhé, ${bot} sẽ tư vấn phác đồ phù hợp cho da ${user} 🌷`,
+                'spa');
+        } else {
+            setTimeout(() => {
+                this.goToScreen('spa');
+            }, 300);
         }
-
-        setTimeout(() => {
-            this.goToScreen('spa');
-        }, 300);
     },
 
     submitCosmeticsText() {
@@ -593,7 +635,15 @@ const App = {
     selectSpa(value) {
         state.data.History_Spa = value;
         this.highlightSelected(event.target);
-        setTimeout(() => this.goToScreen('routine'), 300);
+
+        if (value === 'Chưa bao giờ') {
+            const user = state.userPronoun;
+            this.showBotResponse('spa',
+                `Dạ, vậy thì ${user} chưa có tiền sử điều trị gì — dễ bắt đầu phác đồ từ đầu hơn 😊`,
+                'routine');
+        } else {
+            setTimeout(() => this.goToScreen('routine'), 300);
+        }
     },
 
     submitSpaText() {
@@ -628,7 +678,9 @@ const App = {
     },
 
     skipHealth() {
-        this.goToScreen('budget');
+        this.showBotResponse('health-intro',
+            `Dạ không sao ạ! Sau này trong quá trình tư vấn Mai hỏi thêm cũng được nhé 😊`,
+            'budget');
     },
 
     // ── Step 4: Health sub-questions ──
@@ -649,7 +701,16 @@ const App = {
 
         setTimeout(() => {
             if (type === 'menstrual') this.goToScreen('pregnancy');
-            else if (type === 'pregnancy') this.goToScreen('medical');
+            else if (type === 'pregnancy') {
+                if (value === 'Đang mang thai') {
+                    const user = state.userPronoun;
+                    this.showBotResponse('pregnancy',
+                        `Dạ ${user} đang mang thai thì cần lưu ý một số hoạt chất đặc biệt — Mai sẽ tư vấn riêng cho ${user} nhé 🤰`,
+                        'medical');
+                } else {
+                    this.goToScreen('medical');
+                }
+            }
             else if (type === 'medical') this.goToScreen('supplements');
         }, 300);
     },

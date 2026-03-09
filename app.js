@@ -377,6 +377,14 @@ const App = {
                     <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>
                 `;
             }
+
+            // ── TIN 09: Health Intro ──
+            const btnContinueHealth = document.getElementById('btnContinueHealth');
+            if (btnContinueHealth) {
+                btnContinueHealth.innerHTML = `Tiếp tục đi em`;
+                btnContinueHealth.dataset.template = `Tiếp tục đi em`;
+            }
+
         } else {
             // TIN 07A — <42 tuổi
             if (spaQuestion) {
@@ -392,6 +400,13 @@ const App = {
                     <button class="pill-btn option" onclick="App.selectSpa('Đã làm 1–2 lần')">Đã làm 1–2 lần</button>
                     <button class="pill-btn option" onclick="App.selectSpa('Đang điều trị định kỳ')">Đang điều trị định kỳ</button>
                 `;
+            }
+
+            // ── TIN 09: Health Intro ──
+            const btnContinueHealth = document.getElementById('btnContinueHealth');
+            if (btnContinueHealth) {
+                btnContinueHealth.innerHTML = `Dạ, tiếp tục đi ạ`;
+                btnContinueHealth.dataset.template = `Dạ, tiếp tục đi ạ`;
             }
         }
     },

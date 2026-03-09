@@ -915,7 +915,8 @@ const App = {
             // Build payload — only include fields that exist in NocoDB
             // Note: Phone_Number is the display/primary field in NocoDB
             const payload = {
-                Phone_Number: state.data.Phone_Number,
+                Title: state.data.Title,
+                Phone_Number: String(state.data.Phone_Number || ''),
                 Full_Name: state.data.Full_Name,
                 Age_Group: state.data.Age_Group,
                 Location: state.data.Location,
@@ -933,6 +934,7 @@ const App = {
                 Health_Status: healthText || null,
                 Note: state.data.Note || null,
                 Submission_Date: now.toISOString(),
+                last_step: 'completed',
             };
 
             // Add Facebook tracking fields from Smax URL params

@@ -14,14 +14,20 @@ export default async function handler(req, res) {
   try {
     const payload = req.body; // Payload nhận từ Frontend
 
-    // NocoDB PATCH logic
     let url = nocoDbApiUrl;
     let method = req.method; // either POST or PATCH
     
-    // NocoDB API structure might require different URL for PATCH usually 
-    // it's the exact same endpoint if an array of objects is passed with 'Id', 
-    // however for a single record update usually it requires the ID in the URL or the body. 
-    // NocoDB V2 allows bulk PATCH at the same /records endpoint.
+    // NocoDB V2 PATCH requires an array of record objects with Id field
+    // POST accepts a single object or array
+    let body;
+    if (method === 'PATCH') {
+      // Wrap in array if not already an array
+      body = Array.isArray(payload) ? payload : [payload];
+    } else {
+      body = payload;
+    }
+
+    console.log(`📤 ${method} to NocoDB:`, JSON.stringify(body).substring(0, 500));
     
     const response = await fetch(url, {
       method: method,
@@ -29,7 +35,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'xc-token': nocoDbToken,
       },
-      body: JSON.stringify(payload) // Assuming NocoDB V2 bulk endpoint accepts objects/arrays
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {

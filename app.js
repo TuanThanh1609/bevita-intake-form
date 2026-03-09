@@ -45,6 +45,7 @@ const state = {
     botPronoun: 'Mai',    // Mặc định ban đầu
     userPronoun: 'bạn',   // Mặc định ban đầu
     history: [],          // Lịch sử duyệt form
+    nocoDbId: null,       // Track NocoDB Record ID
 };
 
 // ── Screen Flow ──
@@ -117,6 +118,13 @@ const App = {
         this.updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         this.saveState();
+
+        // ── Auto-save to NocoDB ──
+        // Only start auto-saving after welcome screen and when name/phone exists initially
+        if (screenId !== 'welcome' && (state.data.Full_Name || state.data.Phone_Number || state.history.length > 0)) {
+            // Wait slightly for any other state updates to settle
+            setTimeout(() => this.submitPartialProgress(screenId), 800);
+        }
     },
 
     goBack() {
@@ -941,11 +949,11 @@ const App = {
             console.log('📤 Sending payload:', JSON.stringify(payload, null, 2));
 
             const response = await fetch('/api/submit', {
-                method: 'POST',
+                method: state.nocoDbId ? 'PATCH' : 'POST', // Use PATCH if record exists, though on final submit we'd prefer final update
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(state.nocoDbId ? Object.assign({ Id: state.nocoDbId }, payload) : payload),
             });
 
             if (!response.ok) {
@@ -970,6 +978,62 @@ const App = {
         if (summaryEl) summaryEl.innerHTML = this.generateSummaryHTML();
 
         this.goToScreen('thankyou');
+    },
+
+    // ── Auto-save Progress (Partial Submit) ──
+    async submitPartialProgress(currentScreen) {
+        // Build minimal payload with last_step
+        const now = new Date();
+        const title = state.data.Full_Name
+             ? `Lead_${state.data.Full_Name}_${now.toISOString().slice(0,10)}` 
+             : `Lead_Partial_${now.toISOString().slice(0,10)}`;
+
+        const payload = {
+            Full_Name: state.data.Full_Name || null,
+            Phone_Number: state.data.Phone_Number || null,
+            Age_Group: state.data.Age_Group || null,
+            Location: state.data.Location || null,
+            Skin_Condition: state.data.Skin_Condition || null,
+            History_Cosmetics: state.data.History_Cosmetics || null,
+            History_Spa: state.data.History_Spa || null,
+            Current_Routine: state.data.Current_Routine || null,
+            Budget: state.data.Budget || null,
+            Status: 'draft', // Identify as partial draft
+            last_step: currentScreen,
+        };
+
+        if (state.data.fbpageid) payload.fbpageid = state.data.fbpageid;
+        if (state.data.fb_pid) payload.fb_pid = state.data.fb_pid;
+        if (state.data.fbads_id) payload.fbads_id = state.data.fbads_id;
+
+        try {
+            const isPatch = Boolean(state.nocoDbId);
+            const method = isPatch ? 'PATCH' : 'POST';
+            
+            // If patching in NocoDB, must include Id and maybe pass as array or directly
+            const reqBody = isPatch ? { Id: state.nocoDbId, ...payload } : payload;
+
+            const response = await fetch('/api/submit', {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reqBody),
+            });
+
+            if (!response.ok) {
+                console.warn('Partial save failed (expected if tracking off). Status:', response.status);
+                return;
+            }
+
+            const data = await response.json();
+            
+            // If it was a POST, NocoDB returns the new record Id
+            if (!isPatch && data && data.data && data.data.Id) {
+                state.nocoDbId = data.data.Id;
+                this.saveState(); // store nocoDbId
+            }
+        } catch (err) {
+            console.warn('Silent partial submit error:', err);
+        }
     },
 
     // ── Confirm Phone (cuối form) ──

@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'PATCH') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
@@ -14,13 +14,22 @@ export default async function handler(req, res) {
   try {
     const payload = req.body; // Payload nhận từ Frontend
 
-    const response = await fetch(nocoDbApiUrl, {
-      method: 'POST',
+    // NocoDB PATCH logic
+    let url = nocoDbApiUrl;
+    let method = req.method; // either POST or PATCH
+    
+    // NocoDB API structure might require different URL for PATCH usually 
+    // it's the exact same endpoint if an array of objects is passed with 'Id', 
+    // however for a single record update usually it requires the ID in the URL or the body. 
+    // NocoDB V2 allows bulk PATCH at the same /records endpoint.
+    
+    const response = await fetch(url, {
+      method: method,
       headers: {
         'Content-Type': 'application/json',
         'xc-token': nocoDbToken,
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload) // Assuming NocoDB V2 bulk endpoint accepts objects/arrays
     });
 
     if (!response.ok) {

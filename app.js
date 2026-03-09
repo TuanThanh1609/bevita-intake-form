@@ -455,7 +455,9 @@ const App = {
     submitSkinPhotos() {
         const { front, left, right } = state.skinPhotoUrls;
         if (!front || !left || !right) return;
-        state.data.Skin_Photos = [front, left, right].filter(Boolean).join(', ');
+        state.data.Skin_Photos = front;
+        state.data.Skin_photo_2 = left;
+        state.data.Skin_photo_3 = right;
         this.goToScreen('cosmetics');
     },
 
@@ -675,6 +677,8 @@ const App = {
 
             // Only add URL fields if they have values (NocoDB URL type rejects empty strings)
             if (state.data.Skin_Photos) payload.Skin_Photos = state.data.Skin_Photos;
+            if (state.data.Skin_photo_2) payload.Skin_photo_2 = state.data.Skin_photo_2;
+            if (state.data.Skin_photo_3) payload.Skin_photo_3 = state.data.Skin_photo_3;
             if (state.data.Routine_Photos) payload.Routine_Photos = state.data.Routine_Photos;
 
             console.log('📤 Sending payload:', JSON.stringify(payload, null, 2));

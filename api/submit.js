@@ -1,7 +1,7 @@
 // Simple in-memory rate limiter per lambda instance
 const ipRequests = new Map();
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
-const MAX_REQUESTS = 15;
+const MAX_REQUESTS = 60; // Form has ~17 screens, each triggers auto-save
 
 export default async function handler(req, res) {
   if (req.method !== 'POST' && req.method !== 'PATCH') {

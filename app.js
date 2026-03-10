@@ -117,11 +117,11 @@ const App = {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         this.saveState();
 
-        // ── Auto-save to NocoDB ──
-        // Only start auto-saving after welcome screen and when name/phone exists initially
-        if (screenId !== 'welcome' && (state.data.Full_Name || state.data.Phone_Number || state.history.length > 0)) {
-            // Wait slightly for any other state updates to settle
-            setTimeout(() => this.submitPartialProgress(screenId), 800);
+        // ── Auto-save to NocoDB (debounced) ──
+        if (screenId !== 'welcome' && (state.data.fb_pid || state.data.Full_Name || state.data.Phone_Number || state.history.length > 0)) {
+            // Debounce: cancel previous pending save, wait 3s before actually saving
+            if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
+            this._autoSaveTimer = setTimeout(() => this.submitPartialProgress(screenId), 3000);
         }
     },
 

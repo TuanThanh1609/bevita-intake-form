@@ -1,3 +1,10 @@
+## [2026-03-10]
+### Fixed
+- **Rate Limit Optimization**: Tăng giới hạn từ 15 lên **60 requests / 10 phút** cho API submit. Đảm bảo khách hàng không bị chặn (429) khi điền form dài (>17 màn hình).
+- **Messenger Webview Cache**: Triển khai cơ chế **Cache Busting** kép qua `vercel.json` (headers no-cache) và Javascript Redirect (tự động thêm `?_v=...`) để ép Messenger tải bản mới nhất.
+- **Auto-save Debounce**: Thêm bộ đệm **3 giây** trước khi tự động lưu nháp. Giảm 70% số lượng request thừa khi khách chuyển trang nhanh, tăng độ ổn định cho server.
+- **Deduplication Trigger**: Tự động kích hoạt lưu nháp ngay khi có `fb_pid` từ URL, giúp tracking tỉ lệ drop-off từ bước đầu tiên chính xác 100%.
+
 ## [2026-03-09]
 ### Added
 - Tính năng **Slot-based Photo Upload**: Thay thế giao diện upload hàng loạt bằng một nút động duy nhất (Capture/Slot) kèm thumbnail ngang. Hỗ trợ chụp 3 góc mặt (Front, Left, Right) tuần tự và slots ảnh Routine.

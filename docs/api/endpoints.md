@@ -1,6 +1,6 @@
 # API Documentation
 
-Ngày cập nhật: 2026-03-08
+Ngày cập nhật: 2026-03-10
 Base URL: `Client-side fetch`
 
 ---
@@ -78,4 +78,18 @@ Upload ảnh lên ImgBB để lấy URL lưu trữ (ảnh đã được resize c
   "success": true,
   "status": 200
 }
-```
+---
+
+## 🛡️ Security & Performance
+
+### 1. Rate Limiting
+Để bảo vệ hệ thống khỏi spam, các API proxy được giới hạn theo IP:
+- `/api/submit`: **60 requests / 10 phút**. (Đủ cho ~3-4 lượt điền form đầy đủ liên tiếp).
+- `/api/upload`: **30 requests / 10 phút**.
+
+### 2. Cache Control
+Do Webview của Messenger có cơ chế cache cực kỳ mạnh, hệ thống áp dụng các header sau qua `vercel.json`:
+- `Cache-Control: no-cache, no-store, must-revalidate`
+- `Pragma: no-cache`
+- `Expires: 0`
+Kèm theo logic **JS Redirect** ở `index.html` để ép trình duyệt nhận diện phiên bản mới qua tham số `_v`.

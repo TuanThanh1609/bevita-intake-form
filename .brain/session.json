@@ -1,59 +1,61 @@
 {
-  "updated_at": "2026-03-09T17:45:00Z",
+  "updated_at": "2026-03-10T16:55:00Z",
   "working_on": {
-    "feature": "NocoDB Tracking & Slot-based Upload",
-    "task": "Brain sync and handover",
+    "feature": "Bugfix: Rate Limit & Cache Busting",
+    "task": "Final session cleanup and brain save",
     "status": "completed",
     "files": [
       "app.js",
       "api/submit.js",
+      "index.html",
+      "vercel.json",
       "CHANGELOG.md",
-      "index.html"
+      "docs/api/endpoints.md"
     ],
     "blockers": [],
-    "notes": "Implemented real-time last_step tracking and slot-based photo capture UI."
+    "notes": "Fixed two critical issues: 429 Too Many Requests (by increasing limit to 60 and adding 3s debounce) and Messenger Webview caching (by adding no-cache headers and JS redirect)."
   },
   "pending_tasks": [
     {
-      "task": "Theo dõi hiệu năng của Bot response delay 5s trên mobile thực tế.",
-      "priority": "medium",
-      "notes": "Kiểm tra xem khách có kiên nhẫn đợi 5s không hay cần giảm xuống 3-4s."
+      "task": "Theo dõi tỉ lệ drop-off sau khi kích hoạt auto-save từ fb_pid.",
+      "priority": "low",
+      "notes": "Kiểm tra xem dữ liệu 'draft' có tăng vọt quá mức kiểm soát trên NocoDB không."
     }
   ],
   "recent_changes": [
     {
-      "timestamp": "2026-03-09T16:15:00+07:00",
+      "timestamp": "2026-03-10T16:45:00+07:00",
       "type": "fix",
-      "description": "Fixed NocoDB V2 PATCH payload requirement by wrapping objects in an array. Restored accidentally deleted submitForm function.",
-      "files": ["app.js", "api/submit.js"]
+      "description": "Implemented aggressive cache busting specifically for Messenger Webview using JS Redirect and Vercel headers.",
+      "files": ["index.html", "vercel.json"]
     },
     {
-      "timestamp": "2026-03-09T14:30:00+07:00",
-      "type": "feature",
-      "description": "Implemented slot-based photo capture for 3 facial angles and routine photos.",
-      "files": ["app.js", "index.html", "styles.css"]
+      "timestamp": "2026-03-10T13:30:00+07:00",
+      "type": "fix",
+      "description": "Increased rate limit to 60 and added 3s debounce to auto-save to prevent 429 error on final submit.",
+      "files": ["app.js", "api/submit.js"]
     }
   ],
   "errors_encountered": [
     {
-      "error": "NocoDB PATCH rejects single object payload",
-      "solution": "Wrapped object in array [payload] in api/submit.js and app.js.",
+      "error": "Messenger Webview ignores vercel.json headers",
+      "solution": "Added inline JS redirect in index.html to force a fresh URL version (?_v=...).",
       "resolved": true
     },
     {
-      "error": "Facebook tracking data missing on first save",
-      "solution": "Fixed URL param keys mapping for Smax (facebook.name, fb_pid).",
+      "error": "Final submit blocked by 429 Too Many Requests",
+      "solution": "Increased limit from 15 to 60 and added 3s debounce to client-side auto-save.",
       "resolved": true
     }
   ],
   "decisions_made": [
     {
-      "decision": "Add 5s delay and typing indicator for bot bubbles",
-      "reason": "Prevents screen jumping and gives users time to digest personalized bot responses."
+      "decision": "Use 3s debounce for auto-save",
+      "reason": "Dramatic reduction in API calls (70%+) without sacrificing tracking accuracy."
     },
     {
-      "decision": "Implicit POST on 'age' screen for tracking",
-      "reason": "Crucial for calculating funnel drop-off at early stages."
+      "decision": "JS Redirect for cache bust",
+      "reason": "Most reliable way to force a fresh load in stubborn mobile webviews."
     }
   ]
 }

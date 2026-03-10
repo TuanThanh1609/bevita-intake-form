@@ -53,7 +53,7 @@
   "api_endpoints": [
     {
       "path": "POST/PATCH /api/submit",
-      "explained": "Proxy serverless tới NocoDB. POST tạo record mới, PATCH cập nhật record theo Id."
+      "explained": "Proxy serverless tới NocoDB. POST tạo record mới, PATCH cập nhật record theo Id. Đã tích hợp UPSERT theo fb_pid."
     },
     {
       "path": "POST /api/upload",
@@ -61,27 +61,30 @@
     }
   ],
   "business_rules": [
-    "Tự động lưu nháp (POST) ngay khi khách chọn tuổi để tracking tỉ lệ drop-off.",
+    "Tự động lưu nháp (POST) ngay khi có fb_pid hoặc khách chọn tuổi để tracking tỉ lệ drop-off.",
     "Bot response delay 5s kèm typing indicator để tăng tính chân thực và thời gian đọc.",
     "Xưng hô linh hoạt dựa theo nhóm tuổi khách hàng chọn.",
-    "Ảnh chụp da gồm 3 slot: Trực diện, Trái, Phải."
+    "Ảnh chụp da gồm 3 slot: Trực diện, Trái, Phải.",
+    "Rate Limit: 60 requests/10min cho submit, 30 cho upload."
   ],
   "features": [
     "Slot-based photo capturing workflow.",
-    "Real-time progress tracking (last_step).",
-    "Automatic draft creation on first interaction.",
-    "Serverless API proxy for security.",
-    "Dynamic templates for pronouns ({bot}, {user})."
+    "Real-time progress tracking (last_step) with 3s debounce.",
+    "Automatic draft creation on first interaction (fb_pid trigger).",
+    "Serverless API proxy for security and rate limiting.",
+    "Aggressive cache busting for Messenger Webview (index.html redirect + vercel.json headers)."
   ],
   "knowledge_items": {
     "patterns": [
       "Serverless Proxy pattern để ẩn API Keys khỏi client-side code.",
-      "History-based back navigation."
+      "History-based back navigation.",
+      "Debounced auto-save pattern to reduce API load."
     ],
     "gotchas": [
       "NocoDB V2 PATCH API yêu cầu payload phải là MẢNG object [{Id, ...fields}].",
       "Smax truyền URL params với dấu chấm (ví dụ facebook.name) cần xử lý đặc biệt trong URLSearchParams.",
-      "Trường Display Field (Phone_Number) trong NocoDB nên được gửi ở dạng String để tránh lỗi mapping nếu kiểu dữ liệu thay đổi."
+      "Trường Display Field (Phone_Number) trong NocoDB nên được gửi ở dạng String.",
+      "Messenger Webview cache cực kỳ mạnh, cần dùng JS redirect làm cache-buster hiệu quả nhất."
     ]
   }
 }

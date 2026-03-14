@@ -1323,8 +1323,20 @@ const App = {
         }
 
         // Xử lý nhu cầu từ URL để cá nhân hóa
+        let decodedNhucau = '';
         if (nhucau) {
-            const decodedNhucau = decodeURIComponent(nhucau);
+            // Decode - thử cả single và double decode để xử lý various encoding
+            try {
+                decodedNhucau = decodeURIComponent(nhucau);
+            } catch (e) {
+                console.log('⚠️ Decode lỗi, thử double decode...');
+                try {
+                    decodedNhucau = decodeURIComponent(decodeURIComponent(nhucau));
+                } catch (e2) {
+                    decodedNhucau = nhucau;
+                }
+            }
+
             console.log('📋 Nhu cầu từ URL:', decodedNhucau);
 
             // Phân tích nhu cầu để xác định vấn đề da
@@ -1333,6 +1345,25 @@ const App = {
                 state.data.Skin_Issues = skinIssues;
                 // Đánh dấu đã phân tích từ URL
                 state.data.FromUrl_NhuCau = decodedNhucau;
+            }
+        }
+
+        // Nhận diện giới tính từ nhu cầu để set xưng hô
+        if (decodedNhucau) {
+            const lowerNhucau = decodedNhucau.toLowerCase();
+            if (lowerNhucau.includes('anh ') || lowerNhucau.includes('anh bị') || lowerNhucau.startsWith('anh')) {
+                // Khách là nam - Bot xưng "Anh" hoặc "Em"
+                // Nếu khách là nam và Bot là nữ 42 tuổi, Bot sẽ xưng "Em" với "Anh"
+                state.botPronoun = 'em';
+                state.userPronoun = 'anh';
+                state.data.Age_Group = 'Trên 42 tuổi'; // Mặc định cho nam
+                console.log('📋 Phát hiện khách nam từ URL');
+            } else if (lowerNhucau.includes('chị ') || lowerNhucau.includes('chị bị')) {
+                // Khách là nữ - Bot xưng "Em" với "Chị"
+                state.botPronoun = 'em';
+                state.userPronoun = 'chị';
+                state.data.Age_Group = 'Trên 42 tuổi';
+                console.log('📋 Phát hiện khách nữ từ URL');
             }
         }
 
@@ -1346,10 +1377,10 @@ const App = {
 
         // Các từ khóa vấn đề da
         const keywords = {
-            'Nám / tàn nhang': ['nám', 'tàn nhang', 'nám da', 'nám nội tiết', 'nám mảng', 'nám chân', 'nám sâu', 'nám nặng', 'sạm da', 'sạm nám'],
-            'Mụn / thâm mụn': ['mụn', 'thâm mụn', 'mụn đầu đen', 'mụn trứng cá', 'mụn ẩn', 'mụn viêm', 'mụn nang', 'mụn bọc', 'da mụn', 'mụn dầu'],
-            'Lão hoá / nhăn': ['lão hóa', 'nhăn', 'nếp nhăn', 'lão hoá', 'da nhăn', 'chảy xệch', 'chùng da', 'giãn da', 'thâm quần', 'vết chân chim'],
-            'Da xỉn / không đều màu': ['xỉn', 'không đều màu', 'thâm', 'da xỉn', 'xỉn màu', 'đốm nâu', 'da không đều', 'bắt nắng', 'da sạm', 'xỉn da']
+            'Nám / tàn nhang': ['nám', 'tàn nhang', 'nám da', 'nám nội tiết', 'nám mảng', 'nám chân', 'nám sâu', 'nám nặng', 'sạm da', 'sạm nám', 'nám lâu năm', 'sạm nám', 'sạm'],
+            'Mụn / thâm mụn': ['mụn', 'thâm mụn', 'mụn đầu đen', 'mụn trứng cá', 'mụn ẩn', 'mụn viêm', 'mụn nang', 'mụn bọc', 'da mụn', 'mụn dầu', 'mụn lâu năm', 'mụn tái phát', 'hay nổi mụn', 'mụn dai dẳng'],
+            'Lão hoá / nhăn': ['lão hóa', 'nhăn', 'nếp nhăn', 'lão hoá', 'da nhăn', 'chảy xệch', 'chùng da', 'giãn da', 'thâm quần', 'vết chân chim', 'giảm collagen', 'kém săn chắc'],
+            'Da xỉn / không đều màu': ['xỉn', 'không đều màu', 'thâm', 'da xỉn', 'xỉn màu', 'đốm nâu', 'da không đều', 'bắt nắng', 'da sạm', 'xỉn da', 'da xạm', 'thâm sạm']
         };
 
         for (const [issue, keywordsList] of Object.entries(keywords)) {

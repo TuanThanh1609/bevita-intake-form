@@ -8,19 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20260310_2">
-    <!-- Aggressive Cache Busting for Messenger Webview -->
-    <script>
-        (function() {
-            var currentVersion = '20260310_2';
-            var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('_v') !== currentVersion) {
-                urlParams.set('_v', currentVersion);
-                var newUrl = window.location.pathname + '?' + urlParams.toString() + window.location.hash;
-                window.location.replace(newUrl);
-            }
-        })();
-    </script>
+    <link rel="stylesheet" href="styles.v2.css?v=20260314_1">
 </head>
 <body>
     <div class="app-container">
@@ -652,6 +640,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=20260310_1"></script>
+    <script src="app.v2.js?v=20260314_1"></script>
 </body>
 </html>

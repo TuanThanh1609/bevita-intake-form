@@ -347,6 +347,12 @@ const App = {
         const botC = state.botPronoun.charAt(0).toUpperCase() + state.botPronoun.slice(1);
         const userC = state.userPronoun.charAt(0).toUpperCase() + state.userPronoun.slice(1);
 
+        // Determine polite particle based on age group
+        // When Bot says "Em" (≥42): Bot is younger → uses "ạ"
+        // When Bot says "Chị" (<42): Bot is older → no "ạ"
+        const isOver42 = state.data.Age_Group === 'Trên 42 tuổi';
+        const polite = isOver42 ? 'ạ' : '';
+
         document.querySelectorAll('.dynamic-text').forEach(el => {
             let template = el.dataset.template;
             if (template) {
@@ -355,7 +361,8 @@ const App = {
                     .replace(/{bot}/g, state.botPronoun)
                     .replace(/{botC}/g, botC)
                     .replace(/{user}/g, state.userPronoun)
-                    .replace(/{userC}/g, userC);
+                    .replace(/{userC}/g, userC)
+                    .replace(/{polite}/g, polite);
                 el.innerHTML = template;
             }
         });
@@ -381,8 +388,8 @@ const App = {
                 cosmeticsGreeting.dataset.template = `Cảm ơn {user} đã gửi hình! {botC} xem kỹ da {user} ngay nha 🌷`;
             }
             if (cosmeticsQuestion) {
-                cosmeticsQuestion.innerHTML = `Trước khi ${bot} nhận xét, cho ${bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>Các loại mỹ phẩm ${user} đã từng dùng để trị nám, chăm sóc da... là của hãng nào ạ?`;
-                cosmeticsQuestion.dataset.template = `Trước khi {bot} nhận xét, cho {bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>Các loại mỹ phẩm {user} đã từng dùng để trị nám, chăm sóc da... là của hãng nào ạ?`;
+                cosmeticsQuestion.innerHTML = `Trước khi ${bot} nhận xét, cho ${bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>Các loại mỹ phẩm ${user} đã từng dùng để trị nám, chăm sóc da... là của hãng nào?`;
+                cosmeticsQuestion.dataset.template = `Trước khi {bot} nhận xét, cho {bot} hỏi thêm một chút về các sản phẩm chăm sóc da nhé:<br><br>Các loại mỹ phẩm {user} đã từng dùng để trị nám, chăm sóc da... là của hãng nào?`;
             }
             if (cosmeticsGrid) {
                 cosmeticsGrid.innerHTML = `
@@ -420,8 +427,8 @@ const App = {
         if (isOver42) {
             // TIN 07B — ≥42 tuổi
             if (spaQuestion) {
-                spaQuestion.innerHTML = `${userC} đã từng đến spa hoặc thẩm mỹ viện điều trị da chưa ạ?`;
-                spaQuestion.dataset.template = `{userC} đã từng đến spa hoặc thẩm mỹ viện điều trị da chưa ạ?`;
+                spaQuestion.innerHTML = `${userC} đã từng đến spa hoặc thẩm mỹ viện điều trị da chưa?`;
+                spaQuestion.dataset.template = `{userC} đã từng đến spa hoặc thẩm mỹ viện điều trị da chưa?`;
             }
             if (spaExample) {
                 spaExample.innerHTML = `<em>(Ví dụ: peel da, tiêm meso, laser, RF nâng cơ, căng chỉ...)</em>`;
@@ -479,8 +486,8 @@ const App = {
             // ── TIN 09: Health Intro ──
             const btnContinueHealth = document.getElementById('btnContinueHealth');
             if (btnContinueHealth) {
-                btnContinueHealth.innerHTML = `Dạ, tiếp tục đi ạ`;
-                btnContinueHealth.dataset.template = `Dạ, tiếp tục đi ạ`;
+                btnContinueHealth.innerHTML = `Tiếp tục đi em`;
+                btnContinueHealth.dataset.template = `Tiếp tục đi em`;
             }
         }
     },
@@ -645,11 +652,16 @@ const App = {
         if (value.includes('kem trộn')) {
             state.data.Text = (state.data.Text ? state.data.Text + '; ' : '') + 'FLAG: cream_mixed';
             const bot = state.botPronoun;
-            const user = state.userPronoun;
             const botC = bot.charAt(0).toUpperCase() + bot.slice(1);
-            this.showBotResponse('cosmetics',
-                `Dạ ${bot} hiểu rồi! Kem trộn thường chứa corticoid và làm da quen thuốc — da sẽ cần thêm thời gian phục hồi hơn một chút.<br><br>Nhưng không sao nhé, ${bot} sẽ tư vấn phác đồ phù hợp cho da ${user} 🌷`,
-                'spa');
+            const user = state.userPronoun;
+            const isOver42 = state.data.Age_Group === 'Trên 42 tuổi';
+
+            // Phản hồi khác nhau theo nhóm tuổi
+            const message = isOver42
+                ? `${botC} hiểu rồi! Kem trộn thường chứa corticoid và làm da quen thuốc — da sẽ cần thêm thời gian phục hồi hơn một chút.<br><br>Nhưng không sao nhé, ${bot} sẽ tư vấn phác đồ phù hợp cho da ${user} 🌷`
+                : `Chị hiểu rồi! Kem trộn thường chứa corticoid và làm da quen thuốc — da sẽ cần thêm thời gian phục hồi hơn một chút.<br><br>Nhưng không sao nhé, chị sẽ tư vấn phác đồ phù hợp cho da em 🌷`;
+
+            this.showBotResponse('cosmetics', message, 'spa');
         } else {
             setTimeout(() => {
                 this.goToScreen('spa');
@@ -674,11 +686,15 @@ const App = {
         state.data.History_Spa = value;
         this.highlightSelected(event.target);
 
+        const isOver42 = state.data.Age_Group === 'Trên 42 tuổi';
+
         if (value === 'Chưa bao giờ') {
             const user = state.userPronoun;
-            this.showBotResponse('spa',
-                `Dạ, vậy thì ${user} chưa có tiền sử điều trị gì — dễ bắt đầu phác đồ từ đầu hơn 😊`,
-                'routine');
+            // Phản hồi khác nhau theo nhóm tuổi
+            const message = isOver42
+                ? `Vậy thì ${user} chưa có tiền sử điều trị gì — dễ bắt đầu phác đồ từ đầu hơn 😊`
+                : `Vậy thì em chưa có tiền sử điều trị gì — dễ bắt đầu phác đồ từ đầu hơn 😊`;
+            this.showBotResponse('spa', message, 'routine');
         } else {
             // "Đã làm..." / "Đang điều trị..."
             setTimeout(() => this.goToScreen('spa-services'), 300);
@@ -727,9 +743,10 @@ const App = {
         const user = state.userPronoun;
         const userC = user.charAt(0).toUpperCase() + user.slice(1);
 
-        const message = isOver42 
-            ? `Dạ, các liệu trình xâm lấn khá phổ biến và hiệu quả nếu chọn đúng nơi uy tín ạ.`
-            : `Dạ, tuỳ liệu trình mà da sẽ có phản ứng khác nhau — ${bot} sẽ lưu ý điều này khi lên phác đồ cho ${user} nhé.`;
+        // Phản hồi khác nhau theo nhóm tuổi
+        const message = isOver42
+            ? `Các liệu trình xâm lấn khá phổ biến và hiệu quả nếu chọn đúng nơi uy tín.`
+            : `Tuỳ liệu trình mà da sẽ có phản ứng khác nhau — chị sẽ lưu ý điều này khi lên phác đồ cho em nhé.`;
 
         // Using default 5000ms delay for responses
         this.showBotResponse('spa-services', message, 'spa-results');
@@ -774,9 +791,11 @@ const App = {
     },
 
     skipHealth() {
-        this.showBotResponse('health-intro',
-            `Dạ không sao ạ! Sau này trong quá trình tư vấn Mai hỏi thêm cũng được nhé 😊`,
-            'budget');
+        const isOver42 = state.data.Age_Group === 'Trên 42 tuổi';
+        const message = isOver42
+            ? `Dạ không sao! Sau này trong quá trình tư vấn Mai hỏi thêm cũng được nhé 😊`
+            : `Không sao! Sau này trong quá trình tư vấn chị hỏi thêm cũng được nhé 😊`;
+        this.showBotResponse('health-intro', message, 'budget');
     },
 
     // ── Step 4: Health sub-questions ──
@@ -799,10 +818,11 @@ const App = {
             if (type === 'menstrual') this.goToScreen('pregnancy');
             else if (type === 'pregnancy') {
                 if (value === 'Đang mang thai') {
-                    const user = state.userPronoun;
-                    this.showBotResponse('pregnancy',
-                        `Dạ ${user} đang mang thai thì cần lưu ý một số hoạt chất đặc biệt — Mai sẽ tư vấn riêng cho ${user} nhé 🤰`,
-                        'medical');
+                    const isOver42 = state.data.Age_Group === 'Trên 42 tuổi';
+                    const message = isOver42
+                        ? `Dạ chị đang mang thai thì cần lưu ý một số hoạt chất đặc biệt — Mai sẽ tư vấn riêng cho chị nhé 🤰`
+                        : `Chị đang mang thai thì cần lưu ý một số hoạt chất đặc biệt — chị sẽ tư vấn riêng cho em nhé 🤰`;
+                    this.showBotResponse('pregnancy', message, 'medical');
                 } else {
                     this.goToScreen('medical');
                 }

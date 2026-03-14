@@ -1,9 +1,4 @@
 {
-  "build": {
-    "env": {
-      "NOW_TIMESTAMP": "@now"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i '482s/Dạ, tiếp tục đi ạ/Tiếp tục đi em/g' app.js)",
+      "Bash(sed -i '483s/Dạ, tiếp tục đi ạ/Tiếp tục đi em/g' app.js)",
+      "Bash(sed -i 's/hãng nào ạ/hãng nào/g' app.js)",
+      "Bash(sed -i 's/chưa ạ/chưa/g' app.js)"
+    ]
+  }
+}

@@ -1,4 +1,9 @@
 {
+  "build": {
+    "env": {
+      "NOW_TIMESTAMP": "@now"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
@@ -16,6 +21,12 @@
           "value": "0"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/embed",
+      "destination": "/api/embed.js"
     }
   ]
 }

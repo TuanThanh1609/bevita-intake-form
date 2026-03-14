@@ -529,8 +529,44 @@ const App = {
     },
 
     submitSkin() {
+        // Nếu đã có Skin_Issues từ URL, skip phần chọn vấn đề da
+        if (state.data.Skin_Issues && state.data.Skin_Issues.length > 0 && state.data.FromUrl_NhuCau) {
+            state.data.Skin_Condition = state.data.Skin_Issues.join(', ');
+            // Hiển thị thông báo cá nhân hóa
+            this.showSkinIssuesFromUrl();
+            return;
+        }
+
         state.data.Skin_Condition = state.skinGoals.join(', ');
         this.goToScreen('photo-skin');
+    },
+
+    // ── Hiển thị thông báo khi có nhu cầu từ URL ──
+    showSkinIssuesFromUrl() {
+        const issues = state.data.Skin_Issues;
+
+        // Tạo thông báo cá nhân hóa
+        const issueText = issues.join(', ');
+        const botName = state.botPronoun;
+
+        // Tạo phản hồi tự động từ Bot
+        const botResponse = document.createElement('div');
+        botResponse.className = 'chat-bubble bot animate-in dynamic-text';
+        botResponse.innerHTML = `<strong>${botName} hiểu rồi!</strong><br><br>Từ nhu cầu của em, chị thấy da có vấn đề: <strong>${issueText}</strong>.<br><br>Chị sẽ tư vấn phác đồ phù hợp nhé! 🌷`;
+
+        // Tìm màn hình photo-skin và thêm vào
+        const photoSkinScreen = document.getElementById('screen-photo-skin');
+        if (photoSkinScreen) {
+            const chatArea = photoSkinScreen.querySelector('.chat-area');
+            if (chatArea) {
+                chatArea.insertBefore(botResponse, chatArea.firstChild);
+            }
+        }
+
+        // Chuyển sang màn hình chụp ảnh sau 2 giây
+        setTimeout(() => {
+            this.goToScreen('photo-skin');
+        }, 2000);
     },
 
     // ── Step 1: Skin Photos (1-Button Sequential Wizard) ──
@@ -1270,6 +1306,7 @@ const App = {
         const name = params.get('name');
         const fbadid = params.get('fbadid');
         const phone = params.get('phone');
+        const nhucau = params.get('nhucau');
 
         if (fbpageid) state.data.fbpageid = fbpageid;
         if (fbid) state.data.fb_pid = fbid;
@@ -1285,7 +1322,48 @@ const App = {
             if (phoneInput) phoneInput.value = state.data.Phone_Number;
         }
 
-        console.log('📋 Smax URL Params parsed:', { fbpageid, fbid, name, fbadid, phone });
+        // Xử lý nhu cầu từ URL để cá nhân hóa
+        if (nhucau) {
+            const decodedNhucau = decodeURIComponent(nhucau);
+            console.log('📋 Nhu cầu từ URL:', decodedNhucau);
+
+            // Phân tích nhu cầu để xác định vấn đề da
+            const skinIssues = this.analyzeSkinIssues(decodedNhucau);
+            if (skinIssues.length > 0) {
+                state.data.Skin_Issues = skinIssues;
+                // Đánh dấu đã phân tích từ URL
+                state.data.FromUrl_NhuCau = decodedNhucau;
+            }
+        }
+
+        console.log('📋 Smax URL Params parsed:', { fbpageid, fbid, name, fbadid, phone, nhucau });
+    },
+
+    // ── Phân tích nhu cầu da từ text ──
+    analyzeSkinIssues(text) {
+        const issues = [];
+        const lowerText = text.toLowerCase();
+
+        // Các từ khóa vấn đề da
+        const keywords = {
+            'Nám / tàn nhang': ['nám', 'tàn nhang', 'nám da', 'nám nội tiết', 'nám mảng', 'nám chân', 'nám sâu', 'nám nặng', 'sạm da', 'sạm nám'],
+            'Mụn / thâm mụn': ['mụn', 'thâm mụn', 'mụn đầu đen', 'mụn trứng cá', 'mụn ẩn', 'mụn viêm', 'mụn nang', 'mụn bọc', 'da mụn', 'mụn dầu'],
+            'Lão hoá / nhăn': ['lão hóa', 'nhăn', 'nếp nhăn', 'lão hoá', 'da nhăn', 'chảy xệch', 'chùng da', 'giãn da', 'thâm quần', 'vết chân chim'],
+            'Da xỉn / không đều màu': ['xỉn', 'không đều màu', 'thâm', 'da xỉn', 'xỉn màu', 'đốm nâu', 'da không đều', 'bắt nắng', 'da sạm', 'xỉn da']
+        };
+
+        for (const [issue, keywordsList] of Object.entries(keywords)) {
+            for (const keyword of keywordsList) {
+                if (lowerText.includes(keyword)) {
+                    if (!issues.includes(issue)) {
+                        issues.push(issue);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return issues;
     },
 
     // ── Close Webview ──

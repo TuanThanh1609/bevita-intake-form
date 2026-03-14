@@ -7,33 +7,8 @@ const CONFIG = {
     // Các API keys đã được di chuyển sang cấu hình bảo mật Environment Variables trên Vercel
     // Front-end sẽ tương tác thông qua các thư mục /api ảo của severless server.
     MAX_IMAGE_SIZE: 1200, // Max width/height in px (resize before upload)
-    APP_VERSION: '20260314_1', // Version for cache busting
+    APP_VERSION: '20260314_2', // Version for cache busting
 };
-
-// ── Cache Busting: Force reload if version mismatch ──
-(function() {
-    const params = new URLSearchParams(window.location.search);
-    const urlVersion = params.get('_v');
-
-    // If URL has different version, reload with new version
-    if (urlVersion && urlVersion !== CONFIG.APP_VERSION) {
-        const newUrl = window.location.pathname + '?_v=' + CONFIG.APP_VERSION +
-            (window.location.search.replace('_v=' + urlVersion, '').replace('?&', '?').replace('?', ''));
-        window.location.replace(newUrl);
-        return;
-    }
-
-    // If no version in URL but localStorage has old version, add version to URL
-    const storedVersion = localStorage.getItem('bevita_version');
-    if (!urlVersion && storedVersion && storedVersion !== CONFIG.APP_VERSION) {
-        const newUrl = window.location.pathname + '?_v=' + CONFIG.APP_VERSION + window.location.search;
-        window.location.replace(newUrl);
-        return;
-    }
-
-    // Update stored version
-    localStorage.setItem('bevita_version', CONFIG.APP_VERSION);
-})();
 
 // ── Form State ──
 const state = {

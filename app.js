@@ -503,7 +503,15 @@ const App = {
     selectLocation(value) {
         state.data.Location = value;
         this.highlightSelected(event.target);
-        setTimeout(() => this.goToScreen('skin'), 300);
+
+        // Nếu có nhu cầu từ URL, skip luôn bước skin
+        if (state.data.Skin_Issues && state.data.Skin_Issues.length > 0 && state.data.FromUrl_NhuCau) {
+            state.data.Skin_Condition = state.data.Skin_Issues.join(', ');
+            // Hiển thị tin nhắn cá nhân hóa và chuyển thẳng sang chụp hình
+            setTimeout(() => this.goToScreenWithSkinIssues('photo-skin'), 300);
+        } else {
+            setTimeout(() => this.goToScreen('skin'), 300);
+        }
     },
 
     submitLocation() {
@@ -513,7 +521,25 @@ const App = {
             return;
         }
         state.data.Location = loc;
-        this.goToScreen('skin');
+
+        // Nếu có nhu cầu từ URL, skip luôn bước skin
+        if (state.data.Skin_Issues && state.data.Skin_Issues.length > 0 && state.data.FromUrl_NhuCau) {
+            state.data.Skin_Condition = state.data.Skin_Issues.join(', ');
+            this.goToScreenWithSkinIssues('photo-skin');
+        } else {
+            this.goToScreen('skin');
+        }
+    },
+
+    // ── Chuyển màn hình với tin nhắn cá nhân hóa từ URL ──
+    goToScreenWithSkinIssues(screenId) {
+        // Hiển thị tin nhắn cá nhân hóa trước
+        this.showSkinIssuesFromUrl();
+
+        // Chuyển sang màn hình đích sau 1.5s
+        setTimeout(() => {
+            this.goToScreen(screenId);
+        }, 1500);
     },
 
     // ── Step 1: Skin Condition (multi-select) ──
@@ -1370,24 +1396,8 @@ const App = {
             }
         }
 
-        // Nhận diện giới tính từ nhu cầu để set xưng hô
-        if (decodedNhucau) {
-            const lowerNhucau = decodedNhucau.toLowerCase();
-            if (lowerNhucau.includes('anh ') || lowerNhucau.includes('anh bị') || lowerNhucau.startsWith('anh')) {
-                // Khách là nam - Bot xưng "Anh" hoặc "Em"
-                // Nếu khách là nam và Bot là nữ 42 tuổi, Bot sẽ xưng "Em" với "Anh"
-                state.botPronoun = 'em';
-                state.userPronoun = 'anh';
-                state.data.Age_Group = 'Trên 42 tuổi'; // Mặc định cho nam
-                console.log('📋 Phát hiện khách nam từ URL');
-            } else if (lowerNhucau.includes('chị ') || lowerNhucau.includes('chị bị')) {
-                // Khách là nữ - Bot xưng "Em" với "Chị"
-                state.botPronoun = 'em';
-                state.userPronoun = 'chị';
-                state.data.Age_Group = 'Trên 42 tuổi';
-                console.log('📋 Phát hiện khách nữ từ URL');
-            }
-        }
+        // KHÔNG lấy Age_Group từ URL - chỉ lấy từ webform
+        // Chỉ phân tích vấn đề da từ nhu cầu
 
         console.log('📋 Smax URL Params parsed:', { fbpageid, fbid, name, fbadid, phone, nhucau });
     },

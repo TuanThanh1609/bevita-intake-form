@@ -116,6 +116,12 @@ const App = {
 
         this.updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Khởi tạo màn hình skin nếu có nhu cầu từ URL
+        if (screenId === 'skin') {
+            this.initSkinScreen();
+        }
+
         this.saveState();
 
         // ── Auto-save to NocoDB (debounced) ──
@@ -511,6 +517,39 @@ const App = {
     },
 
     // ── Step 1: Skin Condition (multi-select) ──
+    initSkinScreen() {
+        // Kiểm tra nếu có Skin_Issues từ URL, tự động hiển thị
+        if (state.data.Skin_Issues && state.data.Skin_Issues.length > 0 && state.data.FromUrl_NhuCau) {
+            // Tự động chọn các button tương ứng
+            const issueMap = {
+                'Nám / tàn nhang': 'Nám / tàn nhang',
+                'Mụn / thâm mụn': 'Mụn / thâm mụn',
+                'Lão hoá / nhăn': 'Lão hoá / nhăn',
+                'Da xỉn / không đều màu': 'Da xỉn / không đều màu'
+            };
+
+            state.data.Skin_Issues.forEach(issue => {
+                const btnId = issueMap[issue];
+                if (btnId) {
+                    const btn = document.querySelector(`button[onclick*="${btnId}"]`);
+                    if (btn && !btn.classList.contains('selected')) {
+                        btn.classList.add('selected');
+                        state.skinGoals.push(btnId);
+                    }
+                }
+            });
+
+            // Hiển thị nút tiếp tục
+            const nextBtn = document.getElementById('btnSkinNext');
+            if (nextBtn && state.skinGoals.length > 0) {
+                nextBtn.classList.remove('hidden');
+            }
+
+            // Hiển thị tin nhắn Bot cá nhân hóa
+            this.showSkinIssuesFromUrl();
+        }
+    },
+
     toggleSkin(btn, value) {
         btn.classList.toggle('selected');
         if (state.skinGoals.includes(value)) {

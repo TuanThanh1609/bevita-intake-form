@@ -533,12 +533,39 @@ const App = {
 
     // ── Chuyển màn hình với tin nhắn cá nhân hóa từ URL ──
     goToScreenWithSkinIssues(screenId) {
-        // Hiển thị tin nhắn cá nhân hóa trước
-        this.showSkinIssuesFromUrl();
-
-        // Chuyển sang màn hình đích sau 1.5s
-        setTimeout(() => {
+        const currentScreen = state.currentScreen;
+        const screenEl = document.getElementById(`screen-${currentScreen}`);
+        if (!screenEl) {
             this.goToScreen(screenId);
+            return;
+        }
+
+        // Tạo bubble loading "..." để tạo cảm giác mượt mà
+        const chatArea = screenEl.querySelector('.chat-area');
+        if (chatArea) {
+            const loadingBubble = document.createElement('div');
+            loadingBubble.className = 'chat-bubble bot typing animate-in';
+            loadingBubble.id = 'loading-typing';
+            loadingBubble.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+            chatArea.appendChild(loadingBubble);
+
+            // Cuộn xuống bottom
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // Sau 1.5s: Hiển thị tin nhắn cá nhân hóa và chuyển màn hình
+        setTimeout(() => {
+            // Xóa bubble loading
+            const loadingEl = document.getElementById('loading-typing');
+            if (loadingEl) loadingEl.remove();
+
+            // Hiển thị tin nhắn cá nhân hóa
+            this.showSkinIssuesFromUrl();
+
+            // Chuyển sang màn hình đích sau 1.5s nữa
+            setTimeout(() => {
+                this.goToScreen(screenId);
+            }, 1500);
         }, 1500);
     },
 

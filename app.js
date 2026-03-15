@@ -518,35 +518,18 @@ const App = {
 
     // ── Step 1: Skin Condition (multi-select) ──
     initSkinScreen() {
-        // Kiểm tra nếu có Skin_Issues từ URL, tự động hiển thị
+        // Kiểm tra nếu có Skin_Issues từ URL, skip luôn bước này
         if (state.data.Skin_Issues && state.data.Skin_Issues.length > 0 && state.data.FromUrl_NhuCau) {
-            // Tự động chọn các button tương ứng
-            const issueMap = {
-                'Nám / tàn nhang': 'Nám / tàn nhang',
-                'Mụn / thâm mụn': 'Mụn / thâm mụn',
-                'Lão hoá / nhăn': 'Lão hoá / nhăn',
-                'Da xỉn / không đều màu': 'Da xỉn / không đều màu'
-            };
+            // Lưu dữ liệu và chuyển thẳng sang chụp hình
+            state.data.Skin_Condition = state.data.Skin_Issues.join(', ');
 
-            state.data.Skin_Issues.forEach(issue => {
-                const btnId = issueMap[issue];
-                if (btnId) {
-                    const btn = document.querySelector(`button[onclick*="${btnId}"]`);
-                    if (btn && !btn.classList.contains('selected')) {
-                        btn.classList.add('selected');
-                        state.skinGoals.push(btnId);
-                    }
-                }
-            });
-
-            // Hiển thị nút tiếp tục
-            const nextBtn = document.getElementById('btnSkinNext');
-            if (nextBtn && state.skinGoals.length > 0) {
-                nextBtn.classList.remove('hidden');
-            }
-
-            // Hiển thị tin nhắn Bot cá nhân hóa
+            // Hiển thị tin nhắn Bot cá nhân hóa trước khi chuyển
             this.showSkinIssuesFromUrl();
+
+            // Chuyển sang màn hình chụp hình sau 1.5 giây
+            setTimeout(() => {
+                this.goToScreen('photo-skin');
+            }, 1500);
         }
     },
 

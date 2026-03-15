@@ -553,10 +553,12 @@ const App = {
         // Tạo bubble loading "..." để tạo cảm giác mượt mà
         const chatArea = screenEl.querySelector('.chat-area');
         if (chatArea) {
+            // Tạo loading với HTML rõ ràng hơn
             const loadingBubble = document.createElement('div');
             loadingBubble.className = 'chat-bubble bot typing animate-in';
             loadingBubble.id = 'loading-typing';
-            loadingBubble.innerHTML = '<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>';
+            loadingBubble.innerHTML = '...';
+            loadingBubble.style.cssText = 'background: white; padding: 14px 24px; min-width: 50px; text-align: center;';
             chatArea.appendChild(loadingBubble);
 
             // Cuộn xuống bottom
@@ -1194,15 +1196,59 @@ const App = {
 
     // ── Confirm Phone (cuối form) ──
     submitConfirmPhone() {
-        const phone = document.getElementById('inputConfirmPhone').value.trim();
+        let phone = document.getElementById('inputConfirmPhone').value.trim();
 
-        if (!phone || !/^[0-9+]{9,15}$/.test(phone)) {
-            this.shakeInput('inputConfirmPhone');
+        if (!phone) {
+            this.showError('inputConfirmPhone', 'Vui lòng nhập số điện thoại');
             return;
+        }
+
+        // Chuẩn hóa số điện thoại Việt Nam
+        // Loại bỏ các ký tự không phải số
+        phone = phone.replace(/[^0-9]/g, '');
+
+        // Kiểm tra 10 số (đầu số Việt Nam)
+        if (!/^0[0-9]{9}$/.test(phone) && !/^[0-9]{9,10}$/.test(phone)) {
+            this.showError('inputConfirmPhone', 'Số điện thoại phải có 10 chữ số. Vui lòng nhập lại!');
+            return;
+        }
+
+        // Nếu đầu số 84 (không có 0), thêm 0 vào đầu
+        if (phone.startsWith('84')) {
+            phone = '0' + phone;
         }
 
         state.data.Phone_Number = phone;
         this.submitForm();
+    },
+
+    // Hiển thị lỗi với shake animation
+    showError(inputId, message) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+
+        // Thêm border đỏ
+        input.style.borderColor = '#e74c3c';
+
+        // Hiển thị message lỗi
+        let errorEl = input.parentElement.querySelector('.error-message');
+        if (!errorEl) {
+            errorEl = document.createElement('div');
+            errorEl.className = 'error-message';
+            errorEl.style.cssText = 'color: #e74c3c; font-size: 12px; margin-top: 4px;';
+            input.parentElement.appendChild(errorEl);
+        }
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+
+        // Shake animation
+        this.shakeInput(inputId);
+
+        // Xóa lỗi khi user nhập lại
+        input.addEventListener('input', function() {
+            input.style.borderColor = '';
+            if (errorEl) errorEl.style.display = 'none';
+        }, { once: true });
     },
 
     // ── Generate Summary HTML ──

@@ -39,6 +39,7 @@ const state = {
     },
     skinGoals: [],
     supplements: [],
+    isFromUrl: false, // Flag khi chuyển màn hình từ URL params
     spaServices: [],
     healthData: {},
     skinPhotoUrls: { front: null, left: null, right: null },
@@ -93,12 +94,21 @@ const App = {
         if (currentEl) currentEl.classList.remove('active');
         if (nextEl) {
             nextEl.classList.add('active');
-            // Re-trigger animations
-            nextEl.querySelectorAll('.animate-in').forEach(el => {
-                el.style.animation = 'none';
-                el.offsetHeight; // force reflow
-                el.style.animation = '';
-            });
+            // Skip animations when coming from URL params to avoid flicker
+            if (!state.isFromUrl) {
+                nextEl.querySelectorAll('.animate-in').forEach(el => {
+                    el.style.animation = 'none';
+                    el.offsetHeight; // force reflow
+                    el.style.animation = '';
+                });
+            } else {
+                // Reset flag after first use
+                state.isFromUrl = false;
+                // Also hide animated elements to prevent flicker
+                nextEl.querySelectorAll('.animate-in').forEach(el => {
+                    el.style.opacity = '1';
+                });
+            }
         }
 
         state.currentScreen = screenId;
@@ -619,29 +629,38 @@ const App = {
     // ── Hiển thị thông báo khi có nhu cầu từ URL ──
     showSkinIssuesFromUrl() {
         const issues = state.data.Skin_Issues;
-
-        // Tạo thông báo cá nhân hóa
         const issueText = issues.join(', ');
-        const botName = state.botPronoun;
+        const bot = state.botPronoun;
+        const botC = bot.charAt(0).toUpperCase() + bot.slice(1);
+        const user = state.userPronoun;
+        const userC = user.charAt(0).toUpperCase() + user.slice(1);
 
-        // Tạo phản hồi tự động từ Bot
-        const botResponse = document.createElement('div');
-        botResponse.className = 'chat-bubble bot animate-in dynamic-text';
-        botResponse.innerHTML = `<strong>${botName} hiểu rồi!</strong><br><br>Từ nhu cầu của em, chị thấy da có vấn đề: <strong>${issueText}</strong>.<br><br>Chị sẽ tư vấn phác đồ phù hợp nhé! 🌷`;
+        // Cập nhật câu hỏi chụp hình với nội dung cá nhân hóa
+        const photoQuestion = document.getElementById('photoSkinQuestion');
+        if (photoQuestion) {
+            const personalizedMsg = `Để xem tình trạng da <strong>${issueText}</strong> thật sự của ${user}, ${user} gửi giúp ${bot} <strong>3 tấm hình da mặt</strong> nhé 📸`;
+            photoQuestion.innerHTML = personalizedMsg;
+            photoQuestion.dataset.template = personalizedMsg;
+        }
 
-        // Tìm màn hình photo-skin và thêm vào
+        // Tạo tin nhắn chào cá nhân hóa và thêm vào đầu chat
+        const greetingBubble = document.createElement('div');
+        greetingBubble.className = 'chat-bubble bot animate-in';
+        greetingBubble.innerHTML = `<strong>${botC} hiểu rồi!</strong><br><br>Từ nhu cầu của ${user}, ${bot} thấy da có vấn đề: <strong>${issueText}</strong>.<br><br>${botC} sẽ tư vấn phác đồ phù hợp nhé! 🌷`;
+
         const photoSkinScreen = document.getElementById('screen-photo-skin');
         if (photoSkinScreen) {
             const chatArea = photoSkinScreen.querySelector('.chat-area');
             if (chatArea) {
-                chatArea.insertBefore(botResponse, chatArea.firstChild);
+                // Thêm sau avatar row
+                const avatarRow = chatArea.querySelector('.bot-avatar-row');
+                if (avatarRow && avatarRow.nextSibling) {
+                    chatArea.insertBefore(greetingBubble, avatarRow.nextSibling);
+                } else {
+                    chatArea.insertBefore(greetingBubble, chatArea.firstChild);
+                }
             }
         }
-
-        // Chuyển sang màn hình chụp ảnh sau 2 giây
-        setTimeout(() => {
-            this.goToScreen('photo-skin');
-        }, 2000);
     },
 
     // ── Step 1: Skin Photos (1-Button Sequential Wizard) ──
@@ -1420,6 +1439,7 @@ const App = {
                 state.data.Skin_Issues = skinIssues;
                 // Đánh dấu đã phân tích từ URL
                 state.data.FromUrl_NhuCau = decodedNhucau;
+                state.isFromUrl = true; // Flag để skip animation
             }
         }
 

@@ -275,15 +275,16 @@ body {
 .chat-bubble.bot.typing {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 14px 18px;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 20px;
     background: white;
     border-radius: 18px 18px 18px 4px;
     box-shadow: var(--shadow-sm);
     border: 1px solid rgba(0, 0, 0, 0.03);
     margin-bottom: 8px;
-    max-width: 80px;
-    height: 48px;
+    min-width: 60px;
+    width: auto;
 }
 
 .typing-dots {

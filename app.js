@@ -640,12 +640,17 @@ const App = {
         if (photoQuestion) {
             const personalizedMsg = `Để xem tình trạng da <strong>${issueText}</strong> thật sự của ${user}, ${user} gửi giúp ${bot} <strong>3 tấm hình da mặt</strong> nhé 📸`;
             photoQuestion.innerHTML = personalizedMsg;
-            photoQuestion.dataset.template = personalizedMsg;
+            photoQuestion.dataset_template = personalizedMsg;
         }
+
+        // Kiểm tra nếu đã có tin nhắn cá nhân hóa rồi thì không thêm nữa
+        const existingGreeting = document.getElementById('url-greeting-bubble');
+        if (existingGreeting) return;
 
         // Tạo tin nhắn chào cá nhân hóa và thêm vào đầu chat
         const greetingBubble = document.createElement('div');
         greetingBubble.className = 'chat-bubble bot animate-in';
+        greetingBubble.id = 'url-greeting-bubble'; // Đánh dấu để tránh duplicate
         greetingBubble.innerHTML = `<strong>${botC} hiểu rồi!</strong><br><br>Từ nhu cầu của ${user}, ${bot} thấy da có vấn đề: <strong>${issueText}</strong>.<br><br>${botC} sẽ tư vấn phác đồ phù hợp nhé! 🌷`;
 
         const photoSkinScreen = document.getElementById('screen-photo-skin');

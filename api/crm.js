@@ -19,10 +19,16 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
+    // Check for token
+    if (!NOCO_DB_TOKEN) {
+        console.error('CRM API: Missing NOCODB_TOKEN');
+        return res.status(500).json({ success: false, message: 'Server configuration error: Missing NOCODB_TOKEN' });
+    }
+
     try {
-        // Get all leads from NocoDB
+        // Get all leads from NocoDB (using v2 API like submit.js)
         const response = await fetch(
-            `${NOCO_DB_URL}/api/v1/tables/${TABLE_ID}/records?where=&sort=-CreatedAt&limit=100`,
+            `${NOCO_DB_URL}/api/v2/tables/${TABLE_ID}/records?where=&sort=-CreatedAt&limit=100`,
             {
                 headers: {
                     'xc-token': NOCO_DB_TOKEN,
@@ -32,7 +38,9 @@ export default async function handler(req, res) {
         );
 
         if (!response.ok) {
-            throw new Error(`NocoDB error: ${response.status}`);
+            const errorText = await response.text();
+            console.error('CRM API: NocoDB error:', response.status, errorText);
+            throw new Error(`NocoDB error: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();

@@ -22,7 +22,14 @@ export default async function handler(req, res) {
     // Check for token
     if (!NOCO_DB_TOKEN) {
         console.error('CRM API: Missing NOCODB_TOKEN');
-        return res.status(500).json({ success: false, message: 'Server configuration error: Missing NOCODB_TOKEN' });
+        // Return mock data for demo if no token
+        const mockLeads = getMockLeadsForAPI();
+        return res.status(200).json({
+            success: true,
+            source: 'mock',
+            list: mockLeads,
+            metrics: calculateMockMetrics(mockLeads)
+        });
     }
 
     try {
@@ -126,4 +133,23 @@ function getDefaultStatus(lead) {
     if (lead.current_step >= 3) return 'Đang tư vấn';
     if (lead.current_step >= 1) return 'Khảo sát da';
     return 'Mới tiếp nhận';
+}
+
+// Mock data for demo when NocoDB not available
+function getMockLeadsForAPI() {
+    return [
+        { Id: 1, Full_Name: 'Nguyễn Thị Hoa', Phone_Number: '0912345678', Age_Group: '25-34', Skin_Condition: 'Mụn, Da xỉn', Location: 'TP.HCM', nguon: 'Zalo OA', trang_thai: 'Mới tiếp nhận', current_step: 1, CreatedAt: new Date().toISOString(), UpdatedAt: new Date().toISOString() },
+        { Id: 2, Full_Name: 'Trần Minh Châu', Phone_Number: '0987654321', Age_Group: '35-42', Skin_Condition: 'Nám', Location: 'Hà Nội', nguon: 'Facebook Ads', trang_thai: 'Đang tư vấn', current_step: 3, CreatedAt: new Date(Date.now() - 2*3600000).toISOString(), UpdatedAt: new Date().toISOString() },
+        { Id: 3, Full_Name: 'Lê Thùy Dung', Phone_Number: '0934567890', Age_Group: 'Trên 42', Skin_Condition: 'Lão hóa, Nám', Location: 'Đà Nẵng', nguon: 'Referral', trang_thai: 'Đang tư vấn', current_step: 5, CreatedAt: new Date(Date.now() - 24*3600000).toISOString(), UpdatedAt: new Date().toISOString() },
+        { Id: 4, Full_Name: 'Phạm Lan Anh', Phone_Number: '0978123456', Age_Group: 'Dưới 25', Skin_Condition: 'Mụn', Location: 'TP.HCM', nguon: 'Google Ads', trang_thai: 'Chờ KH phản hồi', current_step: 2, CreatedAt: new Date(Date.now() - 20*3600000).toISOString(), UpdatedAt: new Date(Date.now() - 15*3600000).toISOString() },
+        { Id: 5, Full_Name: 'Vũ Quỳnh Trang', Phone_Number: '0965123456', Age_Group: '30-42', Skin_Condition: 'Nám, Lão hóa', Location: 'Hà Nội', nguon: 'Walk-in', trang_thai: 'Đang tư vấn', current_step: 5, CreatedAt: new Date(Date.now() - 48*3600000).toISOString(), UpdatedAt: new Date().toISOString() },
+    ];
+}
+
+function calculateMockMetrics(leads) {
+    const today = new Date().toDateString();
+    const leadsToday = leads.filter(l => new Date(l.CreatedAt).toDateString() === today).length;
+    const followUpActive = leads.filter(l => l.trang_thai !== 'Đã chốt').length;
+    const waitingReply = 2;
+    return { leadsToday, autoRate: 84, followUpActive, waitingReply };
 }

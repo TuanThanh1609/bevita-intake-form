@@ -259,7 +259,7 @@ const CRM = {
                            stage.includes('Đang') ? 'consulting' :
                            stage.includes('Chờ') ? 'waiting' : 'closed';
 
-        const stepPercent = Math.round((step / 7) * 100);
+        const stepPercent = Math.round((step / 8) * 100);
 
         return `
             <tr onclick="CRM.showLeadDetail(${lead.Id})" style="cursor: pointer;">
@@ -310,7 +310,7 @@ const CRM = {
         const modal = document.getElementById('leadModal');
         const content = document.getElementById('leadModalContent');
 
-        const stepPercent = Math.round((effectiveStep || 1) / 7 * 100);
+        const stepPercent = Math.round((effectiveStep || 1) / 8 * 100);
         // Clean up skin issues display
         const skinIssues = Array.isArray(leadForView.Skin_Condition) 
             ? leadForView.Skin_Condition.join(' / ') 
@@ -333,8 +333,8 @@ const CRM = {
                                 <div class="progress-fill" style="width: ${stepPercent}%"></div>
                             </div>
                             <div class="progress-labels">
-                                <span>Tiến trình: ${effectiveStep || 1}/7 bước</span>
-                                <strong>${effectiveStep >= 7 ? 'Hoàn thành' : 'Đang thực hiện'}</strong>
+                                <span>Tiến trình: ${effectiveStep || 1}/8 bước</span>
+                                <strong>${effectiveStep >= 8 ? 'Hoàn thành' : (effectiveStep >= 6 ? 'Chờ Gửi Phác Đồ' : 'Đang thực hiện')}</strong>
                             </div>
                         </div>
                     </div>
@@ -434,14 +434,18 @@ const CRM = {
     },
 
     renderStepList(lead) {
+        // B0-B5: Thu thập data từ Chatbot
+        // B6: Chờ Consultant gửi Phác đồ
+        // B7: Hoàn thành (đã gửi phác đồ)
         const steps = [
-            { id: 1, name: 'Nhận diện nhu cầu', icon: '🎯' },
-            { id: 2, name: 'Thông tin cơ bản + Hình da', icon: '👤' },
-            { id: 3, name: 'Mỹ phẩm & Dịch vụ làm đẹp', icon: '💄' },
-            { id: 4, name: 'Sức khỏe', icon: '🏥' },
-            { id: 5, name: 'Ngân sách', icon: '💰' },
-            { id: 6, name: 'Xác nhận SĐT & Kết nối', icon: '📞' },
-            { id: 7, name: 'Tư vấn phác đồ', icon: '📋' },
+            { id: 1, name: 'Nhận diện nhu cầu', icon: '🎯', desc: 'B0' },
+            { id: 2, name: 'Thông tin cơ bản + Hình da', icon: '👤', desc: 'B1' },
+            { id: 3, name: 'Mỹ phẩm & Dịch vụ làm đẹp', icon: '💄', desc: 'B2' },
+            { id: 4, name: 'Sức khỏe', icon: '🏥', desc: 'B3' },
+            { id: 5, name: 'Ngân sách', icon: '💰', desc: 'B4' },
+            { id: 6, name: 'Xác nhận SĐT & Kết nối', icon: '📞', desc: 'B5' },
+            { id: 7, name: 'Chờ Gửi Phác Đồ', icon: '⏳', desc: 'B6', isConsultantStep: true },
+            { id: 8, name: 'Hoàn thành', icon: '✅', desc: 'B7', isFinal: true },
         ];
 
         return steps.map((step, index) => {
@@ -449,16 +453,29 @@ const CRM = {
             const isActive = step.id === currentStep;
             const isExpanded = isActive || index === 0;
 
-            const statusKey = step.id < currentStep ? 'hoan_thanh' : (isActive ? (lead.step_status || 'dang_xu_ly') : 'cho');
-            const statusText = this.getStepStatusText(statusKey);
+            // B6 (id=7) là bước consultant gửi phác đồ
+            // B7 (id=8) là hoàn thành sau khi đã gửi phác đồ
+            let statusKey;
+            if (step.isFinal) {
+                // B7: Hoàn thành chỉ khi đã có phác đồ (current_step >= 8)
+                statusKey = currentStep >= 8 ? 'hoan_thanh' : 'cho';
+            } else if (step.isConsultantStep) {
+                // B6: Mặc định là "Chờ Gửi Phác Đồ"
+                statusKey = currentStep >= 8 ? 'hoan_thanh' : (isActive ? 'dang_xu_ly' : (currentStep > step.id ? 'hoan_thanh' : 'cho'));
+            } else {
+                // B0-B5: Theo logic cũ
+                statusKey = step.id < currentStep ? 'hoan_thanh' : (isActive ? (lead.step_status || 'dang_xu_ly') : 'cho');
+            }
+
+            const statusText = this.getStepStatusText(statusKey, step.isConsultantStep);
             const isCompleted = statusKey === 'hoan_thanh';
 
             const statusClass = isCompleted ? 'completed' : '';
             const icon = isCompleted ? '✓' : step.icon;
 
-            const stepLabel = `B${step.id - 1}`;
+            const stepLabel = step.desc || `B${step.id - 1}`;
             const filledCount = this.countStepFilled(step.id, lead);
-            const metaText = `${filledCount} dữ liệu`;
+            const metaText = step.isConsultantStep ? (currentStep >= 8 ? 'Đã gửi' : 'Chờ consultant') : `${filledCount} dữ liệu`;
 
             return `
                 <div class="step-item ${statusClass} ${isExpanded ? 'expanded' : ''}" id="step-${step.id}">
@@ -671,6 +688,39 @@ const CRM = {
             `;
         }
 
+        // B6 - Consultant step: Form nhập phác đồ
+        if (stepId === 7) {
+            const hasPhacDo = lead.phac_do && lead.phac_do.length > 0;
+            const phacDo = this.escapeHtml(lead.phac_do || '');
+            const daGui = lead.current_step >= 8;
+
+            return `
+                <div class="chat-container">
+                    <div class="chat-message system">
+                        <div class="chat-header">
+                            <span>👩‍⚕️ CONSULTANT</span>
+                            <span class="chat-time">${daGui ? this.formatTimeOnly(lead.phac_do_sent_at) : 'Chờ tạo'}</span>
+                        </div>
+                        ${daGui ? `
+                            <div style="background: #E8F5E9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                                <strong>✅ Đã gửi phác đồ</strong>
+                            </div>
+                            <div class="kv">
+                                <div class="k">Phác đồ</div><div class="v">${phacDo}</div>
+                            </div>
+                        ` : `
+                            <div style="background: #FFF3E0; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                                <strong>⏳ Chờ Consultant tạo và gửi phác đồ</strong>
+                            </div>
+                            <button class="btn-primary" onclick="CRM.openPhacDoForm(${lead.Id})" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                                📝 Tạo Phác Đồ
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
         const routine = this.escapeHtml(lead.Current_Routine || 'Chưa có');
         const routinePhotos = this.splitUrls(lead.Routine_Photos);
         const routineGrid = routinePhotos.length
@@ -701,6 +751,132 @@ const CRM = {
     // ── Actions ──
     closeModal() {
         document.getElementById('leadModal').classList.remove('active');
+        // Close phac do form if open
+        const phacDoModal = document.getElementById('phacDoModal');
+        if (phacDoModal) phacDoModal.classList.remove('active');
+    },
+
+    openPhacDoForm(leadId) {
+        const lead = this.state.leads.find(l => l.Id === leadId);
+        if (!lead) return;
+
+        // Create modal if not exists
+        let modal = document.getElementById('phacDoModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'phacDoModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <div class="modal-title">📝 Tạo Phác Đồ Cho ${this.escapeHtml(lead.Full_Name || 'Khách hàng')}</div>
+                    <button class="modal-close" onclick="CRM.closeModal()">×</button>
+                </div>
+                <div class="modal-body" style="padding: 20px;">
+                    <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <strong>📋 Thông tin khách hàng:</strong><br>
+                        <span style="font-size: 13px;">
+                        • Tuổi: ${lead.Age_Group || 'Chưa có'}<br>
+                        • Vấn đề da: ${this.normalizeMulti(lead.Skin_Condition).join(', ') || 'Chưa có'}<br>
+                        • Nhu cầu: ${lead.nhucau || 'Chưa có'}<br>
+                        • Ngân sách: ${lead.Budget || 'Chưa có'}
+                        </span>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Mức độ nghiêm trọng (Severity):</label>
+                        <select id="phacDoSeverity" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="1">Mức 1 - Nhẹ</option>
+                            <option value="2">Mức 2 - Trung bình</option>
+                            <option value="3" selected>Mức 3 - Nặng</option>
+                            <option value="4">Mức 4 - Rất nặng</option>
+                            <option value="5">Mức 5 - Nghiêm trọng</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Chẩn đoán:</label>
+                        <textarea id="phacDoDiagnosis" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;" placeholder="Nhập chẩn đoán da..."></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Phác đồ điều trị:</label>
+                        <textarea id="phacDoTreatment" rows="6" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;" placeholder="1. Phục hồi da barrier (4-6 tuần)
+2. Giảm melanin từ từ
+3. Duy trì ổn định
+..."></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Sản phẩm đề xuất:</label>
+                        <textarea id="phacDoProducts" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;" placeholder="Nhập sản phẩm đề xuất..."></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="phacDoSendZalo" checked style="width: 18px; height: 18px;">
+                            <span>Gửi tin nhắn Zalo cho khách hàng</span>
+                        </label>
+                    </div>
+
+                    <button onclick="CRM.submitPhacDo(${lead.Id})" style="width: 100%; padding: 14px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                        ✅ Gửi Phác Đồ
+                    </button>
+                </div>
+            </div>
+        `;
+
+        modal.classList.add('active');
+    },
+
+    async submitPhacDo(leadId) {
+        const severity = document.getElementById('phacDoSeverity').value;
+        const diagnosis = document.getElementById('phacDoDiagnosis').value;
+        const treatment = document.getElementById('phacDoTreatment').value;
+        const products = document.getElementById('phacDoProducts').value;
+        const sendZalo = document.getElementById('phacDoSendZalo').checked;
+
+        if (!treatment) {
+            alert('Vui lòng nhập phác đồ điều trị!');
+            return;
+        }
+
+        const phacDo = `Mức độ: ${severity}\n\nChẩn đoán: ${diagnosis}\n\nPhác đồ điều trị:\n${treatment}\n\nSản phẩm đề xuất:\n${products}`;
+
+        try {
+            const response = await fetch('/api/crm/phacdo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Id: leadId,
+                    phac_do: phacDo,
+                    phac_do_severity: severity,
+                    phac_do_diagnosis: diagnosis,
+                    phac_do_treatment: treatment,
+                    phac_do_products: products,
+                    phac_do_sent_at: new Date().toISOString(),
+                    send_zalo: sendZalo,
+                    current_step: 8 // Move to B7 - Hoàn thành
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('✅ Đã gửi phác đồ thành công!');
+                this.closeModal();
+                // Reload data
+                this.loadLeads();
+            } else {
+                alert('❌ Lỗi: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error submitting phac do:', error);
+            alert('❌ Có lỗi xảy ra!');
+        }
     },
 
     callLead(leadId) {
@@ -837,11 +1013,11 @@ const CRM = {
         return map[status] || status;
     },
 
-    getStepStatusText(status) {
+    getStepStatusText(status, isConsultantStep = false) {
         const map = {
             'hoan_thanh': 'Hoàn thành',
-            'dang_xu_ly': 'Đang xử lý',
-            'cho': 'Chờ'
+            'dang_xu_ly': isConsultantStep ? 'Chờ Gửi Phác Đồ' : 'Đang xử lý',
+            'cho': isConsultantStep ? 'Chờ Gửi Phác Đồ' : 'Chờ'
         };
         return map[status] || status;
     },
@@ -906,7 +1082,7 @@ const CRM = {
         const raw = Number(lead.current_step);
         const base = Number.isFinite(raw) && raw > 0 ? raw : 1;
         const inferred = this.inferCurrentStepFromData(lead);
-        return Math.max(1, Math.min(7, Math.max(base, inferred)));
+        return Math.max(1, Math.min(8, Math.max(base, inferred)));
     },
 
     inferCurrentStepFromData(lead) {

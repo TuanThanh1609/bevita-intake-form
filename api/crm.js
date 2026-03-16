@@ -110,7 +110,7 @@ export default async function handler(req, res) {
             tuong_tac_dien_thoai: lead.tuong_tac_dien_thoai,
             nguon: lead.nguon || detectSource(lead),
             trang_thai: lead.trang_thai || getDefaultStatus(lead),
-            current_step: lead.current_step || (lead.last_step === 'completed' ? 7 : 1),
+            current_step: lead.current_step || (lead.last_step === 'completed' ? 8 : (lead.phac_do ? 8 : 6)),
             step_status: lead.step_status || (lead.last_step === 'completed' ? 'hoan_thanh' : 'cho'),
             follow_up_status: lead.follow_up_status || 'active',
             last_response: lead.last_response || lead.UpdatedAt,
@@ -118,6 +118,13 @@ export default async function handler(req, res) {
             created: lead.CreatedAt,
             UpdatedAt: lead.UpdatedAt,
             nhucau: lead.nhucau,
+            // Treatment plan fields
+            phac_do: lead.phac_do,
+            phac_do_severity: lead.phac_do_severity,
+            phac_do_diagnosis: lead.phac_do_diagnosis,
+            phac_do_treatment: lead.phac_do_treatment,
+            phac_do_products: lead.phac_do_products,
+            phac_do_sent_at: lead.phac_do_sent_at,
         }));
 
         return res.status(200).json({
@@ -150,7 +157,9 @@ function detectSource(lead) {
 
 // Get default status based on lead progress
 function getDefaultStatus(lead) {
-    if (lead.current_step >= 7) return 'Đã chốt';
+    // B7 (step 8) = Hoàn thành = Đã chốt
+    if (lead.current_step >= 8 || lead.phac_do) return 'Đã chốt';
+    if (lead.current_step >= 6) return 'Chờ Gửi Phác Đồ';
     if (lead.current_step >= 5) return 'Đã tư vấn, chưa mua';
     if (lead.current_step >= 3) return 'Đang tư vấn';
     if (lead.current_step >= 1) return 'Khảo sát da';

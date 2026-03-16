@@ -7,7 +7,7 @@ const CONFIG = {
     // Các API keys đã được di chuyển sang cấu hình bảo mật Environment Variables trên Vercel
     // Front-end sẽ tương tác thông qua các thư mục /api ảo của severless server.
     MAX_IMAGE_SIZE: 1200, // Max width/height in px (resize before upload)
-    APP_VERSION: '20260314_2', // Version for cache busting
+    APP_VERSION: '20260316_1', // Version for cache busting
 };
 
 // ── Form State ──

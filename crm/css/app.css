@@ -485,3 +485,22 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* ─── Theme Toggle ─── */
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bv-gray-100, #F1F5F9);
+    border: none;
+    border-radius: var(--bv-radius-sm, 8px);
+    cursor: pointer;
+    font-size: 18px;
+    transition: all var(--bv-transition-fast);
+}
+
+.theme-toggle:hover {
+    background: var(--bv-gray-200, #E2E8F0);
+}

@@ -91,6 +91,54 @@
     --bv-transition-slow: 350ms ease;
 }
 
+/* ─── Utility Classes ─── */
+.cursor-pointer { cursor: pointer; }
+.cursor-default { cursor: default; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* ─── Focus States ─── */
+:focus-visible {
+    outline: 2px solid var(--bv-primary);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   3. DARK MODE
+   ============================================ */
+[data-theme="dark"] {
+    /* ─── Neutral Colors ─── */
+    --bv-white: #1E293B;
+    --bv-gray-50: #0F172A;
+    --bv-gray-100: #1E293B;
+    --bv-gray-200: #334155;
+    --bv-gray-300: #475569;
+    --bv-gray-400: #64748B;
+    --bv-gray-500: #94A3B8;
+    --bv-gray-600: #CBD5E1;
+    --bv-gray-700: #E2E8F0;
+    --bv-gray-800: #F1F5F9;
+    --bv-gray-900: #F8FAFC;
+    --bv-black: #FFFFFF;
+
+    /* ─── Surface Colors ─── */
+    --bv-surface: #1E293B;
+    --bv-surface-elevated: #334155;
+
+    /* ─── Text Colors ─── */
+    --bv-text-primary: #F8FAFC;
+    --bv-text-secondary: #94A3B8;
+    --bv-text-muted: #64748B;
+
+    /* ─── Borders ─── */
+    --bv-border: #334155;
+    --bv-border-light: #475569;
+}
+
+[data-theme="dark"] body {
+    background: var(--bv-gray-50);
+    color: var(--bv-text-primary);
+}
+
 /* ============================================
    2. COMPONENT CLASSES (Utility Aliases)
    ============================================ */

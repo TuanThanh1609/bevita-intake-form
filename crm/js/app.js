@@ -232,7 +232,7 @@ const CRM = {
         const phone = lead.Phone_Number || '';
         const source = lead.nguon || 'Messenger';
         const stage = lead.trang_thai || 'Mới tiếp nhận';
-        const step = lead.current_step || 1;
+        const step = this.getEffectiveCurrentStep(lead);
         const lastResponse = this.formatTimeAgo(lead.last_response || lead.UpdatedAt);
 
         // Missing data
@@ -295,26 +295,29 @@ const CRM = {
         const lead = this.state.leads.find(l => l.Id === leadId);
         if (!lead) return;
 
-        this.state.selectedLead = lead;
+        const effectiveStep = this.getEffectiveCurrentStep(lead);
+        const leadForView = { ...lead, current_step: effectiveStep };
+
+        this.state.selectedLead = leadForView;
         const modal = document.getElementById('leadModal');
         const content = document.getElementById('leadModalContent');
 
-        const stepPercent = Math.round((lead.current_step || 1) / 7 * 100);
+        const stepPercent = Math.round((effectiveStep || 1) / 7 * 100);
         // Clean up skin issues display
-        const skinIssues = Array.isArray(lead.Skin_Condition) 
-            ? lead.Skin_Condition.join(' / ') 
-            : (lead.Skin_Condition || 'Chưa xác định');
+        const skinIssues = Array.isArray(leadForView.Skin_Condition) 
+            ? leadForView.Skin_Condition.join(' / ') 
+            : (leadForView.Skin_Condition || 'Chưa xác định');
 
         content.innerHTML = `
             <div class="lead-detail">
                 <div class="lead-main">
                     <!-- Header -->
                     <div class="detail-header">
-                        <h2>${lead.Full_Name || 'Khách hàng'}</h2>
+                        <h2>${leadForView.Full_Name || 'Khách hàng'}</h2>
                         <div class="detail-meta">
-                            <span>📱 ${lead.Phone_Number || '09xx xxx xxx'}</span>
-                            <span>📍 ${lead.Location || 'Chưa cập nhật'}</span>
-                            <span>📅 Tạo: ${this.formatDate(lead.created || lead.CreatedAt)}</span>
+                            <span>📱 ${leadForView.Phone_Number || '09xx xxx xxx'}</span>
+                            <span>📍 ${leadForView.Location || 'Chưa cập nhật'}</span>
+                            <span>📅 Tạo: ${this.formatDate(leadForView.created || leadForView.CreatedAt)}</span>
                         </div>
                         
                         <div class="progress-container">
@@ -322,15 +325,15 @@ const CRM = {
                                 <div class="progress-fill" style="width: ${stepPercent}%"></div>
                             </div>
                             <div class="progress-labels">
-                                <span>Tiến trình: ${lead.current_step || 1}/7 bước</span>
-                                <strong>${lead.current_step >= 7 ? 'Hoàn thành' : 'Đang thực hiện'}</strong>
+                                <span>Tiến trình: ${effectiveStep || 1}/7 bước</span>
+                                <strong>${effectiveStep >= 7 ? 'Hoàn thành' : 'Đang thực hiện'}</strong>
                             </div>
                         </div>
                     </div>
 
                     <!-- Steps -->
                     <div class="steps-list">
-                        ${this.renderStepList(lead)}
+                        ${this.renderStepList(leadForView)}
                     </div>
                 </div>
 
@@ -342,20 +345,20 @@ const CRM = {
                             <i>🔜</i> Hành động tiếp theo
                         </div>
                         <div class="action-grid">
-                            <div class="action-btn" onclick="CRM.callLead(${lead.Id})">
+                            <div class="action-btn" onclick="CRM.callLead(${leadForView.Id})">
                                 <span class="action-icon">📞</span>
                                 Gọi điện
                             </div>
-                            <div class="action-btn" onclick="CRM.messageLead(${lead.Id})">
+                            <div class="action-btn" onclick="CRM.messageLead(${leadForView.Id})">
                                 <span class="action-icon">💬</span>
                                 Nhắn tin
                             </div>
-                            <div class="action-btn" onclick="CRM.scheduleMeeting(${lead.Id})">
+                            <div class="action-btn" onclick="CRM.scheduleMeeting(${leadForView.Id})">
                                 <span class="action-icon">📅</span>
                                 Hẹn lịch
                             </div>
                         </div>
-                        <div class="action-btn full" onclick="CRM.addNote(${lead.Id})">
+                        <div class="action-btn full" onclick="CRM.addNote(${leadForView.Id})">
                             <span class="action-icon">📝</span>
                             Ghi chú
                         </div>
@@ -369,7 +372,7 @@ const CRM = {
                         <div class="info-list">
                             <div class="info-item">
                                 <span class="info-label">Độ tuổi</span>
-                                <span class="info-value">${lead.Age_Group || 'Dưới 25 tuổi'}</span>
+                                <span class="info-value">${leadForView.Age_Group || 'Dưới 25 tuổi'}</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Vấn đề da</span>
@@ -377,11 +380,11 @@ const CRM = {
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Ngân sách</span>
-                                <span class="info-value">${lead.Budget || '2-5 triệu / tháng'}</span>
+                                <span class="info-value">${leadForView.Budget || '2-5 triệu / tháng'}</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Nguồn</span>
-                                <span class="info-value">${lead.nguon || 'Facebook Ads'}</span>
+                                <span class="info-value">${leadForView.nguon || 'Facebook Ads'}</span>
                             </div>
                         </div>
                     </div>
@@ -889,6 +892,51 @@ const CRM = {
         if (stepId === 5) return has(lead.Budget) ? 1 : 0;
         if (stepId === 6) return has(lead.Phone_Number) ? 1 : 0;
         return [lead.Current_Routine, lead.Routine_Photos, lead.tu_van_vien_notes, lead.Note].filter(has).length;
+    },
+
+    getEffectiveCurrentStep(lead) {
+        const raw = Number(lead.current_step);
+        const base = Number.isFinite(raw) && raw > 0 ? raw : 1;
+        const inferred = this.inferCurrentStepFromData(lead);
+        return Math.max(1, Math.min(7, Math.max(base, inferred)));
+    },
+
+    inferCurrentStepFromData(lead) {
+        const has = (v) => v !== null && v !== undefined && String(v).trim() !== '';
+
+        if (lead.last_step === 'completed') return 7;
+        if (typeof lead.trang_thai === 'string' && (lead.trang_thai.includes('Đã mua') || lead.trang_thai.includes('Đã chốt'))) return 7;
+
+        let step = 1;
+
+        const step2Filled = this.countStepFilled(2, lead);
+        if (step2Filled >= 2) step = 2;
+        if (step2Filled === 3) step = 2;
+
+        if (this.countStepFilled(3, lead) > 0) step = Math.max(step, 3);
+        if (this.countStepFilled(4, lead) > 0) step = Math.max(step, 4);
+        if (this.countStepFilled(5, lead) === 1) step = Math.max(step, 5);
+        if (this.countStepFilled(6, lead) === 1) step = Math.max(step, 6);
+
+        const step7Signals = [
+            lead.Current_Routine,
+            lead.Routine_Photos,
+            lead.tu_van_vien_notes,
+            lead.Note
+        ].some(has);
+
+        if (step7Signals) step = 7;
+
+        const looksDone =
+            this.countStepFilled(2, lead) === 3 &&
+            this.countStepFilled(3, lead) > 0 &&
+            this.countStepFilled(4, lead) > 0 &&
+            this.countStepFilled(5, lead) === 1 &&
+            this.countStepFilled(6, lead) === 1;
+
+        if (looksDone) step = 7;
+
+        return Math.max(1, Math.min(7, step));
     },
 
     formatTimeOnly(dateString) {

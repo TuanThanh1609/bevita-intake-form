@@ -3,6 +3,232 @@
    CRM-specific components and overrides
    ============================================ */
 
+/* ─── Coming Soon ─── */
+.coming-soon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    text-align: center;
+}
+
+.coming-soon-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+}
+
+.coming-soon h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--bv-gray-800, #1E293B);
+    margin-bottom: 8px;
+}
+
+.coming-soon p {
+    font-size: 16px;
+    color: var(--bv-gray-500, #64748B);
+}
+
+/* ─── Inbox ─── */
+.inbox-container {
+    padding: 24px;
+}
+
+.inbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.inbox-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--bv-gray-900, #0F172A);
+    margin: 0;
+}
+
+.inbox-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--bv-white, #FFFFFF);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--bv-primary, #00B0BD);
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--bv-gray-500, #64748B);
+    margin-top: 4px;
+}
+
+.inbox-content {
+    background: var(--bv-white, #FFFFFF);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.inbox-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    color: var(--bv-gray-500, #64748B);
+}
+
+.inbox-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+    margin-bottom: 16px;
+}
+
+.empty-inbox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.empty-inbox .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-inbox h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--bv-gray-700, #334155);
+    margin-bottom: 8px;
+}
+
+.empty-inbox p {
+    font-size: 14px;
+    color: var(--bv-gray-500, #64748B);
+}
+
+/* Message List */
+.message-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.message-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--bv-gray-100, #F1F5F9);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.message-item:hover {
+    background: var(--bv-gray-50, #F8FAFC);
+}
+
+.message-item.unread {
+    background: var(--bv-primary-50, #E0F7FA);
+}
+
+.message-item.unread:hover {
+    background: var(--bv-primary-100, #B2EBF2);
+}
+
+.message-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bv-primary, #00B0BD) 0%, var(--bv-primary-400, #26C6DA) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.message-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.message-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.message-name {
+    font-weight: 600;
+    color: var(--bv-gray-900, #0F172A);
+    font-size: 14px;
+}
+
+.message-time {
+    font-size: 12px;
+    color: var(--bv-gray-500, #64748B);
+}
+
+.message-preview {
+    font-size: 14px;
+    color: var(--bv-gray-600, #475569);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.unread-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bv-primary, #00B0BD);
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.error-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    color: var(--bv-error, #EF4444);
+}
+
+.error-message p {
+    margin-bottom: 16px;
+}
+
 /* ─── Metrics Cards ─── */
 .metric-card {
     background: var(--bv-white, #FFFFFF);

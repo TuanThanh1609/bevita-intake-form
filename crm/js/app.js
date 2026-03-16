@@ -911,12 +911,192 @@ const CRM = {
     // ── Navigation ──
     navigate(page) {
         console.log('Navigate to:', page);
-        // Update active nav item
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        event.target.closest('.nav-item').classList.add('active');
 
-        // Update breadcrumb
-        document.getElementById('breadcrumb-current').textContent = page.charAt(0).toUpperCase() + page.slice(1).replace('-', ' ');
+        // Update active nav item
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        if (event && event.target) {
+            const target = event.target.closest('.nav-item');
+            if (target) target.classList.add('active');
+        }
+
+        // Update page content based on page name
+        this.renderPage(page);
+    },
+
+    renderPage(page) {
+        const pageContent = document.getElementById('pageContent');
+        if (!pageContent) return;
+
+        const pageTitles = {
+            'dashboard': 'Dashboard',
+            'smart-intake': 'Smart Intake',
+            'skin-profile': 'Skin Profile',
+            'rx-protocol': 'RX Protocol',
+            'ai-engine': 'AI Engine',
+            'inbox': 'Inbox',
+            'revenue': 'Revenue',
+            'retention': 'Retention',
+            'auto-tasks': 'Auto Tasks',
+            'auto-flow': 'Auto Flow'
+        };
+
+        const title = pageTitles[page] || page;
+
+        // Update header title
+        const pageTitle = document.querySelector('.page-title');
+        if (pageTitle) {
+            pageTitle.textContent = title;
+        }
+
+        // Render page content
+        if (page === 'inbox') {
+            this.renderInboxPage(pageContent);
+        } else if (page === 'dashboard') {
+            this.renderDashboardPage(pageContent);
+        } else {
+            // Placeholder for other pages
+            pageContent.innerHTML = `
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h2>${title}</h2>
+                    <p>Tính năng đang được phát triển...</p>
+                </div>
+            `;
+        }
+    },
+
+    renderInboxPage(container) {
+        container.innerHTML = `
+            <div class="inbox-container">
+                <div class="inbox-header">
+                    <h2>📥 Inbox - Tin nhắn Messenger</h2>
+                    <button type="button" class="btn btn-primary" onclick="CRM.loadInbox()">
+                        🔄 Tải lại
+                    </button>
+                </div>
+                <div class="inbox-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="inboxTotal">0</div>
+                        <div class="stat-label">Tổng tin nhắn</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="inboxUnread">0</div>
+                        <div class="stat-label">Chưa đọc</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="inboxToday">0</div>
+                        <div class="stat-label">Hôm nay</div>
+                    </div>
+                </div>
+                <div class="inbox-content">
+                    <div class="inbox-loading">
+                        <div class="spinner"></div>
+                        <p>Đang tải tin nhắn từ Messenger...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Load inbox data
+        this.loadInbox();
+    },
+
+    async loadInbox() {
+        const loadingEl = document.querySelector('.inbox-loading');
+        if (loadingEl) {
+            loadingEl.innerHTML = `
+                <div class="spinner"></div>
+                <p>Đang tải tin nhắn từ Messenger...</p>
+            `;
+        }
+
+        try {
+            const response = await fetch('/api/inbox/messages');
+            const data = await response.json();
+
+            if (data.success) {
+                this.renderInboxMessages(data.messages || []);
+                this.updateInboxStats(data.stats || {});
+            } else {
+                this.renderInboxMessages([]);
+            }
+        } catch (error) {
+            console.error('Error loading inbox:', error);
+            if (loadingEl) {
+                loadingEl.innerHTML = `
+                    <div class="error-message">
+                        <p>❌ Lỗi tải tin nhắn: ${error.message}</p>
+                        <button type="button" class="btn btn-secondary" onclick="CRM.loadInbox()">
+                            Thử lại
+                        </button>
+                    </div>
+                `;
+            }
+        }
+    },
+
+    renderInboxMessages(messages) {
+        const container = document.querySelector('.inbox-content');
+        if (!container) return;
+
+        if (messages.length === 0) {
+            container.innerHTML = `
+                <div class="empty-inbox">
+                    <div class="empty-icon">📭</div>
+                    <h3>Chưa có tin nhắn</h3>
+                    <p>Tin nhắn từ Messenger sẽ hiển thị ở đây</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="message-list">
+                ${messages.map(msg => this.renderMessageItem(msg)).join('')}
+            </div>
+        `;
+    },
+
+    renderMessageItem(msg) {
+        const time = this.formatTimeAgo(msg.created_time);
+        const unreadClass = msg.is_read ? '' : 'unread';
+
+        return `
+            <div class="message-item ${unreadClass}" onclick="CRM.openMessage(${msg.id})">
+                <div class="message-avatar">
+                    ${msg.avatar ? `<img src="${msg.avatar}" alt="">` : msg.sender_name?.charAt(0) || '?'}
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-name">${this.escapeHtml(msg.sender_name || 'Unknown')}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-preview">${this.escapeHtml(msg.message?.substring(0, 100) || '')}</div>
+                </div>
+                ${msg.is_read ? '' : '<div class="unread-dot"></div>'}
+            </div>
+        `;
+    },
+
+    updateInboxStats(stats) {
+        const totalEl = document.getElementById('inboxTotal');
+        const unreadEl = document.getElementById('inboxUnread');
+        const todayEl = document.getElementById('inboxToday');
+
+        if (totalEl) totalEl.textContent = stats.total || 0;
+        if (unreadEl) unreadEl.textContent = stats.unread || 0;
+        if (todayEl) todayEl.textContent = stats.today || 0;
+    },
+
+    openMessage(messageId) {
+        console.log('Open message:', messageId);
+        // TODO: Implement message detail view
+    },
+
+    renderDashboardPage(container) {
+        // Re-render dashboard content
+        this.loadLeads();
     },
 
     switchTab(tab) {

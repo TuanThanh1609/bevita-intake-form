@@ -1012,7 +1012,7 @@ const CRM = {
         }
 
         try {
-            const response = await fetch('/api/inbox/messages');
+            const response = await fetch('/api/inbox');
             const data = await response.json();
 
             if (data.success) {

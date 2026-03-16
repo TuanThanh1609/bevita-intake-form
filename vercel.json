@@ -26,6 +26,14 @@
     {
       "source": "/api/crm/leads",
       "destination": "/api/crm.js"
+    },
+    {
+      "source": "/api/inbox",
+      "destination": "/api/inbox.js"
+    },
+    {
+      "source": "/api/phacdo",
+      "destination": "/api/phacdo.js"
     }
   ]
 }

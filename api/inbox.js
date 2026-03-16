@@ -1,8 +1,7 @@
 // Inbox API - Get Facebook Messenger conversations
-// This endpoint retrieves messages from Facebook Messenger via NocoDB
+// This endpoint retrieves messages from Facebook Messenger via Graph API
 
-const NOCO_DB_URL = process.env.NOCODB_URL || 'https://nocodb.smax.in';
-const NOCO_DB_TOKEN = process.env.NOCODB_TOKEN;
+const FACEBOOK_GRAPH_URL = 'https://graph.facebook.com/v18.0';
 
 export default async function handler(req, res) {
     // Enable CORS
@@ -18,8 +17,17 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, message: 'Method Not Allowed' });
     }
 
-    // If no token, return mock data
-    if (!NOCO_DB_TOKEN) {
+    // Get Facebook credentials from environment
+    const pageId = process.env.FACEBOOK_PAGE_ID;
+    const accessToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+
+    console.log('📋 Inbox API - Credentials check:');
+    console.log('  - Page ID:', pageId ? `${pageId.substring(0, 10)}...` : 'MISSING');
+    console.log('  - Access Token:', accessToken ? `${accessToken.substring(0, 20)}...` : 'MISSING');
+
+    // If no Facebook credentials, return mock data
+    if (!pageId || !accessToken) {
+        console.log('⚠️ Facebook credentials not configured, returning mock data');
         return res.status(200).json({
             success: true,
             source: 'mock',
@@ -33,37 +41,78 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get conversations from NocoDB
-        // Assuming there's a 'conversations' or 'messages' table
-        // You may need to adjust the table ID based on your NocoDB setup
-        const conversationsResponse = await fetch(
-            `${NOCO_DB_URL}/api/v2/tables/muwldo248riapzx/records?where=&sort=-UpdatedAt&limit=50`,
-            {
-                headers: {
-                    'xc-token': NOCO_DB_TOKEN,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+        console.log('📥 Fetching conversations from Facebook Messenger...');
 
-        if (!conversationsResponse.ok) {
-            throw new Error(`NocoDB error: ${conversationsResponse.status}`);
+        // Get conversations from Facebook Graph API
+        const conversationsUrl = `${FACEBOOK_GRAPH_URL}/${pageId}/conversations?access_token=${accessToken}&fields=id,updated_time&limit=25`;
+
+        const response = await fetch(conversationsUrl);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Facebook API error:', response.status, errorText);
+            throw new Error(`Facebook API error: ${response.status}`);
         }
 
-        const data = await conversationsResponse.json();
-        const leads = data.list || [];
+        const data = await response.json();
 
-        // Transform leads to messages format
-        const messages = leads.map(lead => ({
-            id: lead.Id,
-            sender_id: lead.fb_pid || lead.fbpageid,
-            sender_name: lead.Full_Name,
-            message: lead.nhucau || 'Tin nhắn từ chatbot',
-            avatar: null,
-            created_time: lead.CreatedAt,
-            is_read: lead.current_step >= 6,
-            source: 'messenger'
-        }));
+        console.log('📬 Facebook API Response:', JSON.stringify(data, null, 2).substring(0, 1000));
+
+        const conversations = data.data || [];
+
+        console.log(`📬 Found ${conversations.length} conversations`);
+
+        // Transform to messages format
+        const messages = [];
+        const seenSenders = new Set();
+
+        // For each conversation, get the messages
+        for (const conv of conversations) {
+            try {
+                // Fetch messages for this conversation
+                const messagesUrl = `${FACEBOOK_GRAPH_URL}/${conv.id}?access_token=${accessToken}&fields=messages{message,from,created_time}&limit=25`;
+                const msgResponse = await fetch(messagesUrl);
+
+                if (!msgResponse.ok) continue;
+
+                const msgData = await msgResponse.json();
+                const allMessages = (msgData.messages && msgData.messages.data) || [];
+
+                // Find the last message from CUSTOMER (not from page)
+                let customerMsg = null;
+                for (const msg of allMessages) {
+                    const sender = msg.from || {};
+                    // If sender is NOT the page, it's a customer message
+                    if (sender.id && sender.id !== pageId) {
+                        customerMsg = msg;
+                        break; // Take the first customer message (most recent)
+                    }
+                }
+
+                // If no customer message found, skip this conversation
+                if (!customerMsg) continue;
+
+                const sender = customerMsg.from || {};
+
+                // Skip if already added this sender
+                const senderKey = sender.id || sender.name;
+                if (seenSenders.has(senderKey)) continue;
+                seenSenders.add(senderKey);
+
+                messages.push({
+                    id: conv.id,
+                    sender_id: sender.id,
+                    sender_name: sender.name || 'Unknown',
+                    message: customerMsg.message || '',
+                    avatar: null,
+                    created_time: customerMsg.created_time,
+                    is_read: false,
+                    source: 'messenger'
+                });
+            } catch (e) {
+                console.log('Error fetching messages for conversation:', conv.id, e.message);
+            }
+        }
 
         // Calculate stats
         const today = new Date().toDateString();
@@ -73,8 +122,11 @@ export default async function handler(req, res) {
             today: messages.filter(m => new Date(m.created_time).toDateString() === today).length
         };
 
+        console.log(`✅ Loaded ${messages.length} conversations from Facebook`);
+
         return res.status(200).json({
             success: true,
+            source: 'facebook',
             messages,
             stats
         });

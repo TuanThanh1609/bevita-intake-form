@@ -1,0 +1,184 @@
+/* ============================================
+   BEVITA CRM - TOOLTIP COMPONENT
+   ============================================ */
+
+/* Tooltip Container */
+.tooltip {
+    position: relative;
+    display: inline-flex;
+}
+
+/* Tooltip Content */
+.tooltip-content {
+    position: absolute;
+    padding: var(--bv-space-2, 8px) var(--bv-space-3, 12px);
+    font-size: var(--bv-font-size-xs, 12px);
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    background: var(--bv-gray-900, #0F172A);
+    color: var(--bv-white, #FFFFFF);
+    border-radius: var(--bv-radius-sm, 8px);
+    box-shadow: var(--bv-shadow-md, 0 4px 12px rgba(0,0,0,0.15));
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: all var(--bv-transition-fast, 150ms ease);
+    pointer-events: none;
+}
+
+/* Arrow */
+.tooltip-content::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--bv-gray-900, #0F172A);
+    transform: rotate(45deg);
+}
+
+/* Position - Top (default) */
+.tooltip-top .tooltip-content {
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+}
+
+.tooltip-top .tooltip-content::before {
+    bottom: -4px;
+    left: 50%;
+    margin-left: -4px;
+}
+
+.tooltip-top:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Position - Bottom */
+.tooltip-bottom .tooltip-content {
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+}
+
+.tooltip-bottom .tooltip-content::before {
+    top: -4px;
+    left: 50%;
+    margin-left: -4px;
+}
+
+.tooltip-bottom:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Position - Left */
+.tooltip-left .tooltip-content {
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%) translateX(4px);
+}
+
+.tooltip-left .tooltip-content::before {
+    right: -4px;
+    top: 50%;
+    margin-top: -4px;
+}
+
+.tooltip-left:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Position - Right */
+.tooltip-right .tooltip-content {
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
+}
+
+.tooltip-right .tooltip-content::before {
+    left: -4px;
+    top: 50%;
+    margin-top: -4px;
+}
+
+.tooltip-right:hover .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Tooltip Colors */
+.tooltip-primary .tooltip-content {
+    background: var(--bv-primary, #00B0BD);
+}
+
+.tooltip-primary .tooltip-content::before {
+    background: var(--bv-primary, #00B0BD);
+}
+
+.tooltip-success .tooltip-content {
+    background: var(--bv-success, #10B981);
+}
+
+.tooltip-success .tooltip-content::before {
+    background: var(--bv-success, #10B981);
+}
+
+.tooltip-warning .tooltip-content {
+    background: var(--bv-warning, #F59E0B);
+}
+
+.tooltip-warning .tooltip-content::before {
+    background: var(--bv-warning, #F59E0B);
+}
+
+.tooltip-error .tooltip-content {
+    background: var(--bv-error, #EF4444);
+}
+
+.tooltip-error .tooltip-content::before {
+    background: var(--bv-error, #EF4444);
+}
+
+/* Tooltip with Icon Trigger */
+.tooltip-trigger {
+    cursor: help;
+}
+
+/* Large Tooltip */
+.tooltip-lg .tooltip-content {
+    padding: var(--bv-space-3, 12px) var(--bv-space-4, 16px);
+    font-size: var(--bv-font-size-sm, 14px);
+    white-space: normal;
+    max-width: 250px;
+}
+
+/* Tooltip Animation */
+.tooltip-animate .tooltip-content {
+    animation: tooltipFadeIn 200ms ease forwards;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Always Visible Tooltip */
+.tooltip-visible .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+}

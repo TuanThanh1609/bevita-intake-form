@@ -1,0 +1,179 @@
+/* ============================================
+   BEVITA CRM - TABS COMPONENT
+   ============================================ */
+
+/* Tabs Container */
+.tabs {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs-list {
+    display: flex;
+    gap: var(--bv-space-1, 4px);
+    border-bottom: 2px solid var(--bv-gray-200, #E2E8F0);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabs-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* Tab Button */
+.tab {
+    padding: var(--bv-space-3, 12px) var(--bv-space-4, 16px);
+    font-family: var(--bv-font-family, 'Nunito', sans-serif);
+    font-size: var(--bv-font-size-sm, 14px);
+    font-weight: 500;
+    color: var(--bv-gray-500, #64748B);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--bv-transition-fast, 150ms ease);
+    white-space: nowrap;
+    position: relative;
+    margin-bottom: -2px;
+}
+
+.tab:hover {
+    color: var(--bv-gray-700, #334155);
+}
+
+.tab:focus-visible {
+    outline: 2px solid var(--bv-primary, #00B0BD);
+    outline-offset: 2px;
+}
+
+.tab.active {
+    color: var(--bv-primary, #00B0BD);
+    border-bottom-color: var(--bv-primary, #00B0BD);
+}
+
+/* Tab with Badge */
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--bv-gray-100, #F1F5F9);
+    color: var(--bv-gray-600, #475569);
+    border-radius: var(--bv-radius-full, 9999px);
+    margin-left: var(--bv-space-2, 8px);
+}
+
+.tab.active .tab-badge {
+    background: var(--bv-primary-100, #B2EBF2);
+    color: var(--bv-primary, #00B0BD);
+}
+
+/* Tab Content */
+.tabs-content {
+    padding-top: var(--bv-space-4, 16px);
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+    animation: fadeIn var(--bv-transition-fast, 150ms ease);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Pills Style Tabs */
+.tabs-pills .tabs-list {
+    border-bottom: none;
+    background: var(--bv-gray-100, #F1F5F9);
+    padding: var(--bv-space-1, 4px);
+    border-radius: var(--bv-radius-md, 12px);
+    gap: var(--bv-space-1, 4px);
+}
+
+.tabs-pills .tab {
+    border-radius: var(--bv-radius-sm, 8px);
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.tabs-pills .tab:hover {
+    background: var(--bv-white, #FFFFFF);
+}
+
+.tabs-pills .tab.active {
+    background: var(--bv-white, #FFFFFF);
+    box-shadow: var(--bv-shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
+}
+
+/* Vertical Tabs */
+.tabs-vertical {
+    display: flex;
+    gap: var(--bv-space-4, 16px);
+}
+
+.tabs-vertical .tabs-list {
+    flex-direction: column;
+    border-bottom: none;
+    border-right: 2px solid var(--bv-gray-200, #E2E8F0);
+    padding-right: var(--bv-space-4, 16px);
+    min-width: 200px;
+}
+
+.tabs-vertical .tab {
+    border-bottom: none;
+    border-right: 2px solid transparent;
+    margin-right: -2px;
+    margin-bottom: var(--bv-space-1, 4px);
+    border-radius: var(--bv-radius-sm, 8px) 0 0 var(--bv-radius-sm, 8px);
+}
+
+.tabs-vertical .tab.active {
+    border-right-color: var(--bv-primary, #00B0BD);
+    background: var(--bv-primary-50, #E0F7FA);
+}
+
+.tabs-vertical .tabs-content {
+    padding-top: 0;
+}
+
+/* Tabs with Icon */
+.tab-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: var(--bv-space-2, 8px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Disabled Tab */
+.tab:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Tabs Loading */
+.tabs-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.tabs-loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

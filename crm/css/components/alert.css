@@ -1,0 +1,97 @@
+/* ============================================
+   BEVITA CRM - ALERT COMPONENT
+   ============================================ */
+
+/* Alert */
+.alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--bv-space-3, 12px);
+    padding: var(--bv-space-4, 16px);
+    border-radius: var(--bv-radius-md, 12px);
+    font-size: var(--bv-font-size-sm, 14px);
+    line-height: 1.5;
+}
+
+.alert-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 600;
+    margin-bottom: var(--bv-space-1, 4px);
+}
+
+.alert-message {
+    opacity: 0.9;
+}
+
+/* Alert Colors */
+.alert-info {
+    background: var(--bv-info-light, #DBEAFE);
+    border: 1px solid var(--bv-info, #3B82F6);
+    color:AF;
+}
+
+.alert #1E40-success {
+    background: var(--bv-success-light, #D1FAE5);
+    border: 1px solid var(--bv-success, #10B981);
+    color: #065F46;
+}
+
+.alert-warning {
+    background: var(--bv-warning-light, #FEF3C7);
+    border: 1px solid var(--bv-warning, #F59E0B);
+    color: #92400E;
+}
+
+.alert-error {
+    background: var(--bv-error-light, #FEE2E2);
+    border: 1px solid var(--bv-error, #EF4444);
+    color: #991B1B;
+}
+
+/* Alert Sizes */
+.alert-sm {
+    padding: var(--bv-space-2, 8px) var(--bv-space-3, 12px);
+    font-size: var(--bv-font-size-xs, 12px);
+}
+
+.alert-lg {
+    padding: var(--bv-space-5, 20px);
+    font-size: var(--bv-font-size-base, 16px);
+}
+
+/* Alert with Dismiss */
+.alert-dismissible {
+    position: relative;
+    padding-right: var(--bv-space-10, 40px);
+}
+
+.alert-close {
+    position: absolute;
+    top: var(--bv-space-3, 12px);
+    right: var(--bv-space-3, 12px);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity var(--bv-transition-fast);
+    border-radius: var(--bv-radius-sm);
+}
+
+.alert-close:hover {
+    opacity: 1;
+}

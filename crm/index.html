@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEVITA CRM - Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3b69;
+            --primary-light: #2d5a9e;
+            --accent: #10B981;
+            --accent-light: #D1FAE5;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg: #F3F4F6;
+            --surface: #FFFFFF;
+            --border: #E5E7EB;
+            --text: #111827;
+            --text-secondary: #6B7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Layout */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--primary);
+            color: white;
+            padding: 0;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .sidebar-nav {
+            padding: 16px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            padding: 0 20px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-left: 3px solid var(--accent);
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .top-header {
+            background: var(--surface);
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .breadcrumb span {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 8px 16px;
+            gap: 8px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Page Content */
+        .page-content {
+            padding: 24px 32px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .metric-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .metric-icon.teal {
+            background: #CCFBF1;
+            color: #0D9488;
+        }
+
+        .metric-icon.blue {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .metric-icon.orange {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .metric-icon.red {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .metric-trend {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .metric-trend.up {
+            color: var(--accent);
+        }
+
+        .metric-trend.down {
+            color: var(--danger);
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .metric-sublabel {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: var(--surface);
+            border-radius: 12px 12px 0 0;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            padding: 0 20px;
+        }
+
+        .tab {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            color: var(--text);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--surface);
+            border-radius: 0 0 12px 12px;
+            border: 1px solid var(--border);
+            border-top: none;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: var(--bg);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Customer Cell */
+        .customer-cell {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .customer-phone {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Source Badge */
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .source-badge.zalo {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .source-badge.facebook {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .source-badge.website {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.new {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .status-badge.survey {
+            background: #FFF8E1;
+            color: #F57F17;
+        }
+
+        .status-badge.consulting {
+            background: #F3E5F5;
+            color: #7B1FA2;
+        }
+
+        .status-badge.waiting {
+            background: #FCE4EC;
+            color: #C2185B;
+        }
+
+        .status-badge.closed {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        /* Step Progress */
+        .step-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-bar {
+            width: 80px;
+            height: 6px;
+            background: var(--bg);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .step-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .step-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        /* Missing Data */
+        .missing-data {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .missing-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            background: #FEE2E2;
+            color: #DC2626;
+            border-radius: 4px;
+        }
+
+        /* Time */
+        .time-cell {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .time-cell.recent {
+            color: var(--accent);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Loading */
+        .loading {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+        }
+
+        /* Lead Detail */
+        .lead-detail {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+        }
+
+        .lead-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-header {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .detail-info h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .detail-contact {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .detail-contact span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-progress {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Step Cards */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .step-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .step-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .step-card.completed {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+        }
+
+        .step-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+        }
+
+        .step-card.pending {
+            opacity: 0.7;
+        }
+
+        .step-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .step-number {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .step-status {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .step-status.completed {
+            color: var(--accent);
+        }
+
+        .step-status.active {
+            color: var(--primary);
+        }
+
+        .step-status.pending {
+            color: var(--text-secondary);
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Right Sidebar */
+        .lead-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .sidebar-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+            background: var(--surface);
+        }
+
+        .action-btn .icon {
+            font-size: 18px;
+        }
+
+        /* Info List */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .info-value.danger {
+            color: var(--danger);
+        }
+
+        /* Team List */
+        .team-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .team-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .team-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .team-info {
+            flex: 1;
+        }
+
+        .team-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .team-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .lead-detail {
+                grid-template-columns: 1fr;
+            }
+            .lead-sidebar {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+            .lead-sidebar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">B</div>
+                    <div class="logo-text">
+                        <h1>BEVITA CRM</h1>
+                        <p>RX Skincare Platform</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Tổng quan</div>
+                    <a class="nav-item active" onclick="CRM.navigate('dashboard')">
+                        <span class="nav-icon">🏠</span>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Quản lý</div>
+                    <a class="nav-item" onclick="CRM.navigate('smart-intake')">
+                        <span class="nav-icon">🤖</span>
+                        Smart Intake
+                    </a>
+                    <a class="nav-item" onclick="CRM.navigate('skin-profile')">
+                        <span class="nav-icon">🔍</span>
+                        Skin Profile
+                    </a>
+                    <a class="nav-item" onclick="CRM.navigate('rx-protocol')">
+                        <span class="nav-icon">💊</span>
+                        RX Protocol
+                    </a>
+                    <a class="nav-item" onclick="CRM.navigate('ai-engine')">
+                        <span class="nav-icon">🧠</span>
+                        AI Engine
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Kinh doanh</div>
+                    <a class="nav-item" onclick="CRM.navigate('inbox')">
+                        <span class="nav-icon">📥</span>
+                        Inbox
+                        <span class="badge">5</span>
+                    </a>
+                    <a class="nav-item" onclick="CRM.navigate('revenue')">
+                        <span class="nav-icon">💰</span>
+                        Doanh thu
+                    </a>
+                    <a class="nav-item" onclick="CRM.navigate('retention')">
+                        <span class="nav-icon">♾️</span>
+                        Retention
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Hệ thống</div>
+                    <a class="nav-item" onclick="CRM.navigate('auto-tasks')">
+                        <span class="nav-icon">⚙️</span>
+                        Auto Tasks
+                    </a>
+                    <a class="nav-item" onclick="CRM.navigate('auto-flow')">
+                        <span class="nav-icon">🚀</span>
+                        Auto Flow
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="breadcrumb">
+                    <a href="#">BEVITA CRM</a>
+                    <span>/</span>
+                    <span id="breadcrumb-current">Dashboard</span>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Tìm kiếm khách hàng..." id="searchInput">
+                    </div>
+                    <div class="user-menu">
+                        <div class="user-avatar">A</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content" id="pageContent">
+                <!-- Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon teal">📩</div>
+                            <span class="metric-trend up">+8 vs hôm qua</span>
+                        </div>
+                        <div class="metric-value" id="leadsToday">--</div>
+                        <div class="metric-label">Leads hôm nay</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon blue">✓</div>
+                        </div>
+                        <div class="metric-value" id="autoRate">--%</div>
+                        <div class="metric-label">AI Auto Rate TB</div>
+                        <div class="metric-sublabel">7 bước kịch bản</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon orange">🔄</div>
+                        </div>
+                        <div class="metric-value" id="followUpActive">--</div>
+                        <div class="metric-label">Follow-up active</div>
+                        <div class="metric-sublabel">Đang chờ phản hồi</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon red">⏳</div>
+                        </div>
+                        <div class="metric-value" id="waitingReply">--</div>
+                        <div class="metric-label">Chờ phản hồi</div>
+                        <div class="metric-sublabel">3 cần nhắc</div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="leads" onclick="CRM.switchTab('leads')">
+                        📩 Leads
+                    </div>
+                    <div class="tab" data-tab="script" onclick="CRM.switchTab('script')">
+                        📊 Kịch bản 7 bước
+                    </div>
+                    <div class="tab" data-tab="greeting" onclick="CRM.switchTab('greeting')">
+                        💬 Tin chào & Ngoại lệ
+                    </div>
+                    <div class="tab" data-tab="faq" onclick="CRM.switchTab('faq')">
+                        💡 Ngân sách & FAQ
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Danh sách Leads <span id="totalLeads">(0)</span></div>
+                        <div class="table-actions">
+                            <button class="btn btn-secondary" onclick="CRM.refreshData()">
+                                🔄 Tải lại
+                            </button>
+                        </div>
+                    </div>
+                    <div id="tableContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <div>Đang tải dữ liệu...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Lead Detail Modal -->
+    <div class="modal-overlay" id="leadModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Chi tiết khách hàng</div>
+                <button class="modal-close" onclick="CRM.closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="leadModalContent">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

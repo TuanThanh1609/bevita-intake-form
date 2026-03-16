@@ -7,7 +7,7 @@ const CONFIG = {
     // Các API keys đã được di chuyển sang cấu hình bảo mật Environment Variables trên Vercel
     // Front-end sẽ tương tác thông qua các thư mục /api ảo của severless server.
     MAX_IMAGE_SIZE: 1200, // Max width/height in px (resize before upload)
-    APP_VERSION: '20260316_1', // Version for cache busting
+    APP_VERSION: '20260316_2', // Version for cache busting - CRM fields added
 };
 
 // ── Form State ──
@@ -1064,6 +1064,15 @@ const App = {
         state.data.Title = `Lead_${state.data.Full_Name}_${now.toISOString().slice(0,10)}`;
         state.data.Status = 'new';
 
+        // CRM Fields - Initialize tracking
+        state.data.current_step = 7; // Completed all 7 steps
+        state.data.step_status = 'hoan_thanh';
+        state.data.trang_thai = 'Mới tiếp nhận';
+        state.data.follow_up_status = 'active';
+        state.data.nguon = state.data.fbpageid ? 'Facebook Ads' : 'Messenger';
+        state.data.ngay_tiep_nhan = now.toISOString();
+        state.data.last_response = now.toISOString();
+
         // Show loading
         document.getElementById('loadingOverlay').classList.add('active');
 
@@ -1097,6 +1106,16 @@ const App = {
             if (state.data.fbpageid) payload.fbpageid = state.data.fbpageid;
             if (state.data.fb_pid) payload.fb_pid = state.data.fb_pid;
             if (state.data.fbads_id) payload.fbads_id = state.data.fbads_id;
+
+            // CRM Tracking Fields
+            payload.current_step = state.data.current_step || 7;
+            payload.step_status = state.data.step_status || 'hoan_thanh';
+            payload.trang_thai = state.data.trang_thai || 'Mới tiếp nhận';
+            payload.follow_up_status = state.data.follow_up_status || 'active';
+            payload.follow_up_count = 0;
+            payload.nguon = state.data.nguon || 'Messenger';
+            payload.ngay_tiep_nhan = state.data.ngay_tiep_nhan || now.toISOString();
+            payload.last_response = state.data.last_response || now.toISOString();
 
             // Only add URL fields if they have values (NocoDB URL type rejects empty strings)
             if (state.data.Skin_Photos) payload.Skin_Photos = state.data.Skin_Photos;

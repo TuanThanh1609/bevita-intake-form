@@ -22,6 +22,10 @@
     {
       "source": "/api/embed",
       "destination": "/api/embed.js"
+    },
+    {
+      "source": "/api/crm/leads",
+      "destination": "/api/crm.js"
     }
   ]
 }

@@ -1067,6 +1067,19 @@ const CRM = {
                 }
             });
         }
+
+        // Conversation item clicks (delegated)
+        document.getElementById('conversationList')?.addEventListener('click', (e) => {
+            const item = e.target.closest('.conversation-item');
+            if (item) {
+                const id = item.dataset.id;
+                const name = item.dataset.name;
+                const senderId = item.dataset.senderId;
+                if (id && name && senderId) {
+                    this.openConversation(id, encodeURIComponent(name), senderId);
+                }
+            }
+        });
     },
 
     filterConversations(query) {
@@ -1165,7 +1178,7 @@ const CRM = {
         const unreadClass = msg.is_read ? '' : 'unread';
 
         return `
-            <div class="conversation-item ${unreadClass}" onclick="CRM.openConversation('${msg.id}', '${encodeURIComponent(msg.sender_name)}', '${msg.sender_id}')">
+            <div class="conversation-item ${unreadClass}" data-id="${msg.id}" data-name="${this.escapeHtml(msg.sender_name || '')}" data-sender-id="${msg.sender_id}">
                 <div class="conversation-avatar">
                     ${msg.sender_name?.charAt(0).toUpperCase() || '?'}
                 </div>

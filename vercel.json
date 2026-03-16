@@ -34,6 +34,10 @@
     {
       "source": "/api/phacdo",
       "destination": "/api/phacdo.js"
+    },
+    {
+      "source": "/api/conversation",
+      "destination": "/api/conversation.js"
     }
   ]
 }

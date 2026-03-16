@@ -968,38 +968,128 @@ const CRM = {
 
     renderInboxPage(container) {
         container.innerHTML = `
-            <div class="inbox-container">
-                <div class="inbox-header">
-                    <h2>📥 Inbox - Tin nhắn Messenger</h2>
-                    <button type="button" class="btn btn-primary" onclick="CRM.loadInbox()">
-                        🔄 Tải lại
-                    </button>
+            <div class="chat-container">
+                <!-- Chat Sidebar -->
+                <div class="chat-sidebar">
+                    <div class="chat-sidebar-header">
+                        <h3>💬 Hội thoại</h3>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="CRM.loadInbox()">
+                            🔄
+                        </button>
+                    </div>
+                    <div class="chat-search">
+                        <input type="text" class="input" placeholder="Tìm theo tên, SĐT..." id="chatSearchInput">
+                    </div>
+                    <div class="chat-tabs">
+                        <button class="chat-tab active" data-filter="all">Tất cả</button>
+                        <button class="chat-tab" data-filter="unread">Chưa trả lời</button>
+                    </div>
+                    <div class="chat-conversation-list" id="conversationList">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Đang tải...</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="inbox-stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="inboxTotal">0</div>
-                        <div class="stat-label">Tổng tin nhắn</div>
+
+                <!-- Chat Main Area -->
+                <div class="chat-main">
+                    <div class="chat-empty" id="chatEmpty">
+                        <div class="empty-icon">💬</div>
+                        <h3>Chọn một cuộc trò chuyện</h3>
+                        <p>Chọn cuộc trò chuyện từ danh sách bên trái để xem tin nhắn</p>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="inboxUnread">0</div>
-                        <div class="stat-label">Chưa đọc</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="inboxToday">0</div>
-                        <div class="stat-label">Hôm nay</div>
-                    </div>
-                </div>
-                <div class="inbox-content">
-                    <div class="inbox-loading">
-                        <div class="spinner"></div>
-                        <p>Đang tải tin nhắn từ Messenger...</p>
+
+                    <div class="chat-view" id="chatView" style="display: none;">
+                        <div class="chat-header">
+                            <div class="chat-contact-info">
+                                <div class="chat-avatar-lg" id="chatContactAvatar"></div>
+                                <div class="chat-contact-details">
+                                    <h4 id="chatContactName"></h4>
+                                    <span id="chatContactTime"></span>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="btn btn-sm btn-ghost" title="Thông tin khách hàng">👤</button>
+                                <button class="btn btn-sm btn-ghost" title="Lịch sử tư vấn">📋</button>
+                            </div>
+                        </div>
+
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <textarea class="chat-input" id="chatInput" placeholder="Nhập tin nhắn..." rows="1"></textarea>
+                            <button class="btn btn-primary chat-send-btn" id="chatSendBtn" onclick="CRM.sendMessage()">
+                                Gửi
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
 
-        // Load inbox data
+        // Add event listeners
+        this.setupChatListeners();
+
+        // Load conversations
         this.loadInbox();
+    },
+
+    setupChatListeners() {
+        // Search input
+        const searchInput = document.getElementById('chatSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterConversations(e.target.value);
+            });
+        }
+
+        // Chat tabs
+        document.querySelectorAll('.chat-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                this.filterByTab(e.target.dataset.filter);
+            });
+        });
+
+        // Enter to send message
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+        }
+    },
+
+    filterConversations(query) {
+        const items = document.querySelectorAll('.conversation-item');
+        const lowerQuery = query.toLowerCase();
+
+        items.forEach(item => {
+            const name = item.querySelector('.conversation-name')?.textContent?.toLowerCase() || '';
+            const show = name.includes(lowerQuery);
+            item.style.display = show ? 'flex' : 'none';
+        });
+    },
+
+    filterByTab(filter) {
+        const items = document.querySelectorAll('.conversation-item');
+        items.forEach(item => {
+            if (filter === 'all') {
+                item.style.display = 'flex';
+            } else if (filter === 'unread') {
+                const isUnread = item.classList.contains('unread');
+                item.style.display = isUnread ? 'flex' : 'none';
+            }
+        });
     },
 
     async loadInbox() {
@@ -1037,44 +1127,55 @@ const CRM = {
     },
 
     renderInboxMessages(messages) {
-        const container = document.querySelector('.inbox-content');
-        if (!container) return;
+        const listContainer = document.getElementById('conversationList');
+        if (!listContainer) return;
 
         if (messages.length === 0) {
-            container.innerHTML = `
-                <div class="empty-inbox">
+            listContainer.innerHTML = `
+                <div class="empty-state">
                     <div class="empty-icon">📭</div>
                     <h3>Chưa có tin nhắn</h3>
-                    <p>Tin nhắn từ Messenger sẽ hiển thị ở đây</p>
                 </div>
             `;
             return;
         }
 
-        container.innerHTML = `
-            <div class="message-list">
-                ${messages.map(msg => this.renderMessageItem(msg)).join('')}
+        // Store messages for later use
+        this.state.conversations = messages;
+
+        listContainer.innerHTML = `
+            <div class="conversation-list">
+                ${messages.map(msg => this.renderConversationItem(msg)).join('')}
             </div>
         `;
+
+        // Update stats
+        this.updateInboxStats({
+            total: messages.length,
+            unread: messages.filter(m => !m.is_read).length,
+            today: messages.filter(m => {
+                const today = new Date().toDateString();
+                return new Date(m.created_time).toDateString() === today;
+            }).length
+        });
     },
 
-    renderMessageItem(msg) {
+    renderConversationItem(msg) {
         const time = this.formatTimeAgo(msg.created_time);
         const unreadClass = msg.is_read ? '' : 'unread';
 
         return `
-            <div class="message-item ${unreadClass}" onclick="CRM.openMessage(${msg.id})">
-                <div class="message-avatar">
-                    ${msg.avatar ? `<img src="${msg.avatar}" alt="">` : msg.sender_name?.charAt(0) || '?'}
+            <div class="conversation-item ${unreadClass}" onclick="CRM.openConversation('${msg.id}', '${encodeURIComponent(msg.sender_name)}', '${msg.sender_id}')">
+                <div class="conversation-avatar">
+                    ${msg.sender_name?.charAt(0).toUpperCase() || '?'}
                 </div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-name">${this.escapeHtml(msg.sender_name || 'Unknown')}</span>
-                        <span class="message-time">${time}</span>
+                <div class="conversation-info">
+                    <div class="conversation-header">
+                        <span class="conversation-name">${this.escapeHtml(msg.sender_name || 'Unknown')}</span>
+                        <span class="conversation-time">${time}</span>
                     </div>
-                    <div class="message-preview">${this.escapeHtml(msg.message?.substring(0, 100) || '')}</div>
+                    <div class="conversation-preview">${this.escapeHtml(msg.message?.substring(0, 50) || '')}</div>
                 </div>
-                ${msg.is_read ? '' : '<div class="unread-dot"></div>'}
             </div>
         `;
     },
@@ -1089,9 +1190,139 @@ const CRM = {
         if (todayEl) todayEl.textContent = stats.today || 0;
     },
 
-    openMessage(messageId) {
-        console.log('Open message:', messageId);
-        // TODO: Implement message detail view
+    async openConversation(conversationId, senderName, senderId) {
+        console.log('Open conversation:', conversationId, senderName, senderId);
+
+        // Show chat view
+        document.getElementById('chatEmpty').style.display = 'none';
+        document.getElementById('chatView').style.display = 'flex';
+        document.getElementById('chatView').style.flexDirection = 'column';
+
+        // Update header
+        document.getElementById('chatContactName').textContent = decodeURIComponent(senderName);
+        document.getElementById('chatContactAvatar').textContent = decodeURIComponent(senderName).charAt(0).toUpperCase();
+
+        // Store current conversation
+        this.state.currentConversation = {
+            id: conversationId,
+            sender_id: senderId,
+            sender_name: decodeURIComponent(senderName)
+        };
+
+        // Load messages
+        await this.loadConversationMessages(conversationId);
+    },
+
+    async loadConversationMessages(conversationId) {
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.innerHTML = `
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        `;
+
+        try {
+            const response = await fetch(`/api/conversation?conversationId=${conversationId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this.renderChatMessages(data.messages || []);
+            } else {
+                messagesContainer.innerHTML = `
+                    <div class="error-message">
+                        <p>Lỗi: ${data.message}</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error loading messages:', error);
+            messagesContainer.innerHTML = `
+                <div class="error-message">
+                    <p>Lỗi tải tin nhắn</p>
+                </div>
+            `;
+        }
+    },
+
+    renderChatMessages(messages) {
+        const container = document.getElementById('chatMessages');
+        if (!container) return;
+
+        if (messages.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <p>Chưa có tin nhắn</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = messages.map(msg => this.renderChatMessage(msg)).join('');
+        container.scrollTop = container.scrollHeight;
+    },
+
+    renderChatMessage(msg) {
+        const time = this.formatMessageTime(msg.created_time);
+        const isFromPage = msg.is_from_page;
+
+        return `
+            <div class="chat-bubble ${isFromPage ? 'from-page' : 'from-customer'}">
+                <div class="chat-bubble-content">
+                    <p>${this.escapeHtml(msg.message || '')}</p>
+                </div>
+                <span class="chat-bubble-time">${time}</span>
+            </div>
+        `;
+    },
+
+    formatMessageTime(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) +
+               ' ' + date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+    },
+
+    async sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input?.value?.trim();
+
+        if (!message || !this.state.currentConversation) {
+            return;
+        }
+
+        const sendBtn = document.getElementById('chatSendBtn');
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Đang gửi...';
+
+        try {
+            const response = await fetch('/api/conversation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    recipientId: this.state.currentConversation.sender_id,
+                    message: message
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Clear input
+                input.value = '';
+
+                // Reload messages
+                await this.loadConversationMessages(this.state.currentConversation.id);
+            } else {
+                alert('Lỗi gửi tin nhắn: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Lỗi gửi tin nhắn');
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Gửi';
+        }
     },
 
     renderDashboardPage(container) {

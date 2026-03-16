@@ -597,5 +597,12 @@ const CRM = {
 
 // Initialize CRM when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    CRM.init();
+    console.log('🚀 CRM: Initializing...');
+    try {
+        CRM.init();
+        console.log('✅ CRM: Initialized successfully');
+    } catch (e) {
+        console.error('❌ CRM Init Error:', e);
+        alert('CRM Init Error: ' + e.message);
+    }
 });

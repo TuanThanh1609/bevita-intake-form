@@ -222,7 +222,6 @@ const CRM = {
                         <th>Bước</th>
                         <th>Thiếu data</th>
                         <th>Phản hồi cuối</th>
-                        <th>Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -291,9 +290,6 @@ const CRM = {
                 </td>
                 <td>
                     <span class="time-cell ${this.isRecent(lead.last_response) ? 'recent' : ''}">${lastResponse}</span>
-                </td>
-                <td>
-                    <span class="status-badge ${statusClass}">${this.getStatusText(stage)}</span>
                 </td>
             </tr>
         `;

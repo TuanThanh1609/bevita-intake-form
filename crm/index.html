@@ -8,17 +8,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a3b69;
-            --primary-light: #2d5a9e;
-            --accent: #10B981;
-            --accent-light: #D1FAE5;
+            /* Bevita Brand Colors */
+            --primary: #00B0BD;
+            --primary-light: #26C6DA;
+            --primary-100: #B2EBF2;
+            --accent: #FFB300;
+            --accent-light: #FFF8E1;
             --warning: #F59E0B;
             --danger: #EF4444;
-            --bg: #F3F4F6;
+            --bg: #F8FAFC;
             --surface: #FFFFFF;
-            --border: #E5E7EB;
-            --text: #111827;
-            --text-secondary: #6B7280;
+            --border: #E2E8F0;
+            --text: #0F172A;
+            --text-secondary: #64748B;
         }
 
         * {
@@ -43,7 +45,7 @@
         /* Sidebar */
         .sidebar {
             width: 260px;
-            background: var(--primary);
+            background: #1E3A5F;
             color: white;
             padding: 0;
             flex-shrink: 0;
@@ -66,23 +68,26 @@
         .logo-icon {
             width: 40px;
             height: 40px;
-            background: var(--accent);
+            background: linear-gradient(135deg, #00B0BD 0%, #26C6DA 100%);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 18px;
+            color: white;
         }
 
         .logo-text h1 {
             font-size: 18px;
             font-weight: 700;
+            color: white;
         }
 
         .logo-text p {
             font-size: 11px;
             opacity: 0.7;
+            color: rgba(255,255,255,0.7);
         }
 
         .sidebar-nav {
@@ -90,7 +95,7 @@
         }
 
         .nav-section {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .nav-section-title {
@@ -100,6 +105,7 @@
             padding: 0 20px;
             margin-bottom: 8px;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .nav-item {
@@ -111,6 +117,7 @@
             text-decoration: none;
             transition: all 0.2s;
             cursor: pointer;
+            font-size: 14px;
         }
 
         .nav-item:hover {
@@ -119,22 +126,23 @@
         }
 
         .nav-item.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border-left: 3px solid var(--accent);
+            background: rgba(0,176,189,0.2);
+            color: #00B0BD;
+            border-left: 3px solid #00B0BD;
         }
 
         .nav-item .badge {
             margin-left: auto;
-            background: var(--danger);
+            background: #EF4444;
             color: white;
             font-size: 11px;
             padding: 2px 8px;
             border-radius: 10px;
+            font-weight: 600;
         }
 
         .nav-icon {
-            font-size: 18px;
+            font-size: 16px;
             width: 24px;
             text-align: center;
         }
@@ -147,9 +155,9 @@
         }
 
         /* Header */
-        .top-header {
+        .page-header {
             background: var(--surface);
-            padding: 16px 32px;
+            padding: 20px 32px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -157,6 +165,41 @@
             position: sticky;
             top: 0;
             z-index: 100;
+        }
+
+        .page-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .page-header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #00B0BD 0%, #26C6DA 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .page-header-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 4px 0 0 0;
         }
 
         .breadcrumb {
@@ -1231,11 +1274,13 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Header -->
-            <header class="top-header">
-                <div class="breadcrumb">
-                    <a href="#">BEVITA CRM</a>
-                    <span>/</span>
-                    <span id="breadcrumb-current">Dashboard</span>
+            <header class="page-header">
+                <div class="page-header-left">
+                    <div class="page-header-icon">📥</div>
+                    <div class="page-header-info">
+                        <h1 class="page-title">Smart Intake</h1>
+                        <p class="page-subtitle">AI Agent tự vấn online – Nhận diện → Thu thập → Kết nối → Tư vấn → Chốt</p>
+                    </div>
                 </div>
                 <div class="header-actions">
                     <div class="search-box">
@@ -1292,16 +1337,16 @@
                 <!-- Tabs -->
                 <div class="tabs">
                     <div class="tab active" data-tab="leads" onclick="CRM.switchTab('leads')">
-                        📩 Leads
+                        📋 Leads
                     </div>
                     <div class="tab" data-tab="script" onclick="CRM.switchTab('script')">
-                        📊 Kịch bản 7 bước
+                        👁️ Kịch bản 7 bước
                     </div>
                     <div class="tab" data-tab="greeting" onclick="CRM.switchTab('greeting')">
-                        💬 Tin chào & Ngoại lệ
+                        📩 Tin chào & Ngẫu lẻ
                     </div>
                     <div class="tab" data-tab="faq" onclick="CRM.switchTab('faq')">
-                        💡 Ngân sách & FAQ
+                        ❓ Ngân sách & FAQ
                     </div>
                 </div>
 
@@ -1310,7 +1355,7 @@
                     <div class="table-header">
                         <div class="table-title">Danh sách Leads <span id="totalLeads">(0)</span></div>
                         <div class="table-actions">
-                            <button class="btn btn-secondary" onclick="CRM.refreshData()">
+                            <button type="button" class="btn btn-secondary" onclick="CRM.refreshData()">
                                 🔄 Tải lại
                             </button>
                         </div>
@@ -1331,7 +1376,7 @@
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">Chi tiết khách hàng</div>
-                <button class="modal-close" onclick="CRM.closeModal()">×</button>
+                <button type="button" class="modal-close" onclick="CRM.closeModal()">×</button>
             </div>
             <div class="modal-body" id="leadModalContent">
                 <!-- Dynamic Content -->

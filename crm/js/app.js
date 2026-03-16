@@ -37,9 +37,16 @@ const CRM = {
             }
 
             const data = await response.json();
-            this.state.leads = data.list || [];
+
+            // Use API data if available, otherwise fallback to mock
+            if (data.list && data.list.length > 0) {
+                this.state.leads = data.list;
+            } else {
+                console.log('No leads from API, using mock data');
+                this.state.leads = this.getMockLeads();
+            }
         } catch (error) {
-            console.log('Using mock data for demo');
+            console.log('Using mock data for demo:', error.message);
             // Mock data for demonstration
             this.state.leads = this.getMockLeads();
         }

@@ -502,7 +502,7 @@ const CRM = {
                                 <span>${name}</span>
                                 <span class="chat-time">${this.formatTimeOnly(lead.created || lead.CreatedAt)}</span>
                             </div>
-                            SĐT: ${phone}
+                            Chào shop, mình muốn tư vấn về ${need} ạ.
                         </div>
                     </div>
                 </div>

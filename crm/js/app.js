@@ -329,8 +329,8 @@ const CRM = {
                     </div>
 
                     <!-- Steps -->
-                    <div class="steps-grid">
-                        ${this.renderStepCards(lead)}
+                    <div class="steps-list">
+                        ${this.renderStepList(lead)}
                     </div>
                 </div>
 
@@ -415,35 +415,157 @@ const CRM = {
         modal.classList.add('active');
     },
 
-    renderStepCards(lead) {
+    toggleStep(stepId) {
+        const step = document.getElementById(`step-${stepId}`);
+        if (step) {
+            step.classList.toggle('expanded');
+        }
+    },
+
+    renderStepList(lead) {
         const steps = [
-            { id: 1, name: 'Tiếp nhận' },
-            { id: 2, name: 'Thông tin cơ bản + Hình ảnh' },
-            { id: 3, name: 'Mỹ phẩm & Dịch vụ làm đẹp' },
-            { id: 4, name: 'Sức khỏe' },
-            { id: 5, name: 'Ngân sách' },
-            { id: 6, name: 'Xác nhận SĐT & Kết nối' },
-            { id: 7, name: 'Tư vấn phác đồ' },
+            { id: 1, name: 'Nhận diện nhu cầu', icon: '🎯', msgCount: 3, time: '09:48 → 09:50' },
+            { id: 2, name: 'Thông tin cơ bản + Hình da', icon: '👤', msgCount: 4, time: '09:50 → 09:55' },
+            { id: 3, name: 'Mỹ phẩm & Dịch vụ làm đẹp', icon: '💄', msgCount: 5, time: '09:55 → 10:00' },
+            { id: 4, name: 'Sức khỏe', icon: '🏥', msgCount: 2, time: '10:00 → 10:05' },
+            { id: 5, name: 'Ngân sách', icon: '💰', msgCount: 3, time: '10:05 → 10:10' },
+            { id: 6, name: 'Xác nhận SĐT & Kết nối', icon: '📞', msgCount: 2, time: '10:10 → 10:15' },
+            { id: 7, name: 'Tư vấn phác đồ', icon: '📋', msgCount: 5, time: '10:15 → 10:30' },
         ];
 
-        return steps.map(step => {
-            // Logic to determine status
-            // For demo purposes, if step id <= current step, it's completed or active
-            // Let's assume strict linear progress for the visual matching
+        return steps.map((step, index) => {
             const isCompleted = step.id <= (lead.current_step || 1);
-            const statusClass = isCompleted ? 'completed' : '';
-            const statusText = isCompleted ? 'Hoàn thành ✓' : 'Chờ xử lý';
+            const isActive = step.id === (lead.current_step || 1);
+            const isExpanded = isActive || index === 0; // Expand active or first step by default
             
+            let statusClass = '';
+            let statusText = 'Chờ xử lý';
+            let icon = step.icon;
+
+            if (isCompleted) {
+                statusClass = 'completed';
+                statusText = 'Hoàn thành ✓';
+                icon = '✓';
+            } else if (isActive) {
+                statusClass = 'active';
+                statusText = 'Đang xử lý 🔄';
+            }
+
+            // Step Label (B0, B1, etc.)
+            const stepLabel = `B${step.id - 1}`;
+
             return `
-                <div class="step-card ${statusClass}" onclick="CRM.showStepDetail(${lead.Id}, ${step.id})">
-                    <div class="step-header">
-                        <span class="step-badge">B${step.id}</span>
-                        <span class="step-status ${statusClass}">${statusText}</span>
+                <div class="step-item ${statusClass} ${isExpanded ? 'expanded' : ''}" id="step-${step.id}">
+                    <div class="step-header" onclick="CRM.toggleStep(${step.id})">
+                        <div class="step-title-group">
+                            <div class="step-icon">${icon}</div>
+                            <div class="step-info">
+                                <div class="step-name">${stepLabel}: ${step.name}</div>
+                                <div class="step-meta">
+                                    <span>${step.time}</span>
+                                    <span>• ${step.msgCount} tin nhắn</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="step-status-badge">${statusText}</span>
+                            <span class="step-toggle">▼</span>
+                        </div>
                     </div>
-                    <div class="step-name">${step.name}</div>
+                    <div class="step-content">
+                        ${this.renderChatContent(step.id, lead)}
+                    </div>
                 </div>
             `;
         }).join('');
+    },
+
+    renderChatContent(stepId, lead) {
+        // Mock chat content based on step
+        if (stepId === 1) {
+            return `
+                <div class="chat-container">
+                    <div class="chat-message system">
+                        <div class="chat-header">
+                            <span>🤖 HỆ THỐNG</span>
+                            <span class="chat-time">09:48</span>
+                        </div>
+                        <div>
+                            AI nhận diện: Nhu cầu = <b>${(lead.Skin_Condition || ['Nám'])[0]}</b> | Intent = Ready | Urgency = Trung bình
+                        </div>
+                    </div>
+                    <div class="chat-message agent">
+                        <div class="chat-avatar agent">M</div>
+                        <div class="chat-bubble">
+                            <div class="chat-header">
+                                <span>Skin Coach Mai</span>
+                                <span class="chat-time">09:48</span>
+                            </div>
+                            Chào bạn 🌷 Mai là Skin Coach bên Bevita nè.<br><br>
+                            Mai nhận được tin nhắn của bạn rồi. Tình trạng ${(lead.Skin_Condition || ['da'])[0]} khá phổ biến và hoàn toàn có thể cải thiện được nha bạn.<br>
+                            Để Mai tư vấn chính xác nhất, bạn giúp Mai gửi mấy thông tin nhé.
+                        </div>
+                    </div>
+                    <div class="chat-message user">
+                        <div class="chat-avatar user">KH</div>
+                        <div class="chat-bubble">
+                            <div class="chat-header">
+                                <span>Khách hàng</span>
+                                <span class="chat-time">09:50</span>
+                            </div>
+                            Chào shop, mình muốn tư vấn về ${(lead.Skin_Condition || ['da'])[0]} ạ.
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (stepId === 2) {
+            return `
+                <div class="chat-container">
+                    <div class="chat-message agent">
+                        <div class="chat-avatar agent">M</div>
+                        <div class="chat-bubble">
+                            <div class="chat-header">
+                                <span>Skin Coach Mai</span>
+                                <span class="chat-time">09:50</span>
+                            </div>
+                            Bạn giúp Mai gửi thông tin nhé:<br>
+                            • Độ tuổi của bạn<br>
+                            • Bạn đang ở tỉnh/thành nào<br>
+                            • Hình ảnh da mặt 3 góc (trái, phải, chính diện)<br><br>
+                            Bạn chụp hướng mặt ra cửa, ánh sáng tự nhiên là đẹp nhất nha 📷
+                        </div>
+                    </div>
+                    <div class="chat-message user">
+                        <div class="chat-avatar user">KH</div>
+                        <div class="chat-bubble">
+                            <div class="chat-header">
+                                <span>Khách hàng</span>
+                                <span class="chat-time">09:52</span>
+                            </div>
+                            Mình ${lead.Age_Group || '30'} tuổi, ở ${lead.Location || 'TP.HCM'} ạ.
+                        </div>
+                    </div>
+                    <div class="chat-message system">
+                        <div class="chat-header">
+                            <span>🤖 HỆ THỐNG</span>
+                            <span class="chat-time">09:52</span>
+                        </div>
+                        <div>
+                            ✅ Đã thu thập: Tuổi (${lead.Age_Group || '30'}), Tỉnh/thành (${lead.Location || 'TP.HCM'})<br>
+                            ⏳ Thiếu: Hình da mặt 3 góc
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="chat-container">
+                    <div class="chat-message system">
+                        <div>⏳ Đang chờ dữ liệu bước này...</div>
+                    </div>
+                </div>
+            `;
+        }
     },
 
     // ── Actions ──

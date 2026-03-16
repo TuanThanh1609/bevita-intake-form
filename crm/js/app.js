@@ -30,22 +30,28 @@ const CRM = {
         try {
             // For demo, use mock data if API not available
             // In production, fetch from NocoDB
+            console.log('Fetching leads from API...');
             const response = await fetch('/api/crm/leads');
 
+            console.log('API response status:', response.status);
+
             if (!response.ok) {
-                throw new Error('API not available');
+                throw new Error('API not available: ' + response.status);
             }
 
             const data = await response.json();
+            console.log('API data received:', data);
 
             // Use API data if available, otherwise fallback to mock
             if (data.list && data.list.length > 0) {
                 this.state.leads = data.list;
+                console.log('Loaded', data.list.length, 'leads from API');
             } else {
                 console.log('No leads from API, using mock data');
                 this.state.leads = this.getMockLeads();
             }
         } catch (error) {
+            console.error('Error fetching leads:', error);
             console.log('Using mock data for demo:', error.message);
             // Mock data for demonstration
             this.state.leads = this.getMockLeads();

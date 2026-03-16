@@ -352,6 +352,7 @@ const CRM = {
                         <div class="sidebar-title">
                             <i>🔜</i> Hành động tiếp theo
                         </div>
+                        ${this.renderActionSuggestions(leadForView)}
                         <div class="action-grid">
                             <div class="action-btn" onclick="CRM.callLead(${leadForView.Id})">
                                 <span class="action-icon">📞</span>
@@ -1036,6 +1037,103 @@ const CRM = {
         return this.escapeHtml(value).replace(/`/g, '&#96;');
     },
 
+    // Render action suggestions based on lead status
+    renderActionSuggestions(lead) {
+        const step = lead.current_step || 1;
+        const trang_thai = lead.trang_thai || '';
+
+        let suggestions = [];
+
+        // B0-B5: Data collection phase
+        if (step <= 6) {
+            // Check what data is missing
+            if (!lead.Skin_Condition || (Array.isArray(lead.Skin_Condition) && lead.Skin_Condition.length === 0)) {
+                suggestions.push({ type: 'followup', text: 'Yêu cầu khách gửi hình da' });
+            }
+            if (!lead.Budget) {
+                suggestions.push({ type: 'trustbuild', text: 'Hỏi ngân sách chăm sóc da' });
+            }
+            if (!lead.History_Cosmetics) {
+                suggestions.push({ type: 'trustbuild', text: 'Tìm hiểu sản phẩm đang dùng' });
+            }
+            if (!lead.Phone_Number || lead.Phone_Number.length < 10) {
+                suggestions.push({ type: 'followup', text: 'Xác nhận số điện thoại' });
+            }
+        }
+
+        // B6: Waiting for consultant to send treatment plan (step 7)
+        if (step === 7) {
+            suggestions.push({ type: 'followup', text: 'Tạo & gửi phác đồ điều trị' });
+        }
+
+        // After treatment plan sent (step 8 = B7)
+        if (step >= 8) {
+            if (trang_thai.includes('Đã chốt')) {
+                suggestions.push({ type: 'followup', text: 'Theo dõi sau bán hàng' });
+            } else {
+                suggestions.push({ type: 'followup', text: 'Chốt đơn / Lên lịch hẹn' });
+            }
+        }
+
+        // If no specific suggestions, show default
+        if (suggestions.length === 0) {
+            suggestions.push({ type: 'followup', text: 'Tiếp tục thu thập thông tin' });
+        }
+
+        // Render suggestions
+        return `
+            <div style="margin-bottom: 12px;">
+                ${suggestions.map(s => `
+                    <div class="suggestion-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; background: ${s.type === 'followup' ? '#FFF3E0' : '#E3F2FD'}; border-radius: 6px; margin-bottom: 6px; cursor: pointer;" onclick="CRM.handleSuggestion('${s.type}', ${lead.Id})">
+                        <span style="font-size: 14px;">${s.type === 'followup' ? '📍' : '💡'}</span>
+                        <span style="font-size: 13px; color: #333; line-height: 1.4;">${s.text}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    handleSuggestion(type, leadId) {
+        const lead = this.state.leads.find(l => l.Id === leadId);
+        if (!lead) return;
+
+        if (type === 'followup') {
+            // Quick actions for followup
+            const actions = [
+                { name: '📞 Gọi điện', action: () => this.callLead(leadId) },
+                { name: '💬 Nhắn Zalo', action: () => this.messageLead(leadId) },
+                { name: '📝 Ghi chú', action: () => this.addNote(leadId) }
+            ];
+
+            const choice = prompt('Chọn hành động:\n' + actions.map((a, i) => `${i + 1}. ${a.name}`).join('\n'));
+            if (choice && actions[parseInt(choice) - 1]) {
+                actions[parseInt(choice) - 1].action();
+            }
+        } else if (type === 'trustbuild') {
+            // For trustbuild, show question templates
+            const templates = [
+                'Chị có thể cho em biết sản phẩm chị đang dùng không?',
+                'Chị đã từng thử các giải pháp nào cho làn da trước đây chưa ạ?',
+                'Ngân sách chị dành cho việc chăm sóc da mỗi tháng là khoảng bao nhiêu?'
+            ];
+            const choice = prompt('Chọn câu hỏi:\n' + templates.map((t, i) => `${i + 1}. ${t}`).join('\n'));
+            if (choice && templates[parseInt(choice) - 1]) {
+                alert('Câu hỏi: ' + templates[parseInt(choice) - 1]);
+            }
+        }
+    },
+
+    getMissingData(lead) {
+        const missing = [];
+        if (!lead.Skin_Condition || (Array.isArray(lead.Skin_Condition) && lead.Skin_Condition.length === 0)) missing.push('Hình da');
+        if (!lead.Budget) missing.push('Ngân sách');
+        if (!lead.Phone_Number) missing.push('SĐT');
+        if (!lead.History_Cosmetics) missing.push('SP đang dùng');
+        if (!lead.History_Spa) missing.push('Dịch vụ spa');
+        if (!lead.Health_Status) missing.push('Sức khỏe');
+        return missing;
+    },
+
     normalizeMulti(value) {
         if (!value) return [];
         if (Array.isArray(value)) return value.map(v => String(v)).filter(Boolean);
@@ -1075,6 +1173,7 @@ const CRM = {
         if (stepId === 4) return [lead.Health_Status, lead.Supplements, lead.Lifestyle_Sleep, lead.Lifestyle_Stress].filter(has).length;
         if (stepId === 5) return has(lead.Budget) ? 1 : 0;
         if (stepId === 6) return has(lead.Phone_Number) ? 1 : 0;
+        if (stepId === 7) return has(lead.phac_do) ? 1 : 0; // B6 - Consultant step
         return [lead.Current_Routine, lead.Routine_Photos, lead.tu_van_vien_notes, lead.Note].filter(has).length;
     },
 
@@ -1088,8 +1187,9 @@ const CRM = {
     inferCurrentStepFromData(lead) {
         const has = (v) => v !== null && v !== undefined && String(v).trim() !== '';
 
-        if (lead.last_step === 'completed') return 7;
-        if (typeof lead.trang_thai === 'string' && (lead.trang_thai.includes('Đã mua') || lead.trang_thai.includes('Đã chốt'))) return 7;
+        // B7 (step 8): Hoàn thành - đã gửi phác đồ
+        if (lead.last_step === 'completed' || lead.phac_do) return 8;
+        if (typeof lead.trang_thai === 'string' && (lead.trang_thai.includes('Đã mua') || lead.trang_thai.includes('Đã chốt'))) return 8;
 
         let step = 1;
 
@@ -1102,6 +1202,7 @@ const CRM = {
         if (this.countStepFilled(5, lead) === 1) step = Math.max(step, 5);
         if (this.countStepFilled(6, lead) === 1) step = Math.max(step, 6);
 
+        // B6 (step 7): Consultant gửi phác đồ
         const step7Signals = [
             lead.Current_Routine,
             lead.Routine_Photos,

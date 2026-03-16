@@ -59,6 +59,7 @@ const CRM = {
 
         this.renderMetrics();
         this.renderLeadsTable();
+        console.log('✅ CRM: Rendered', this.state.leads.length, 'leads');
     },
 
     getMockLeads() {
@@ -231,6 +232,7 @@ const CRM = {
 
         container.innerHTML = html;
         document.getElementById('totalLeads').textContent = `(${leads.length})`;
+        console.log('✅ Rendered leads table with', leads.length, 'rows');
     },
 
     renderLeadRow(lead) {

@@ -163,7 +163,7 @@ const CRM = {
         }).length;
 
         // Auto rate (leads with nhucau from URL - simulated)
-        const autoRate = leads.length > 0 ? Math.round((leads.filter(l => l.nhucau || l.n guon === 'Facebook Ads').length / leads.length) * 100) : 0;
+        const autoRate = leads.length > 0 ? Math.round((leads.filter(l => l.nhucau || l.nguon === 'Facebook Ads').length / leads.length) * 100) : 0;
 
         // Follow-up active
         const followUpActive = leads.filter(l => l.follow_up_status === 'active').length;

@@ -1,0 +1,96 @@
+/* ============================================
+   BEVITA CRM - INPUT COMPONENT
+   ============================================ */
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bv-space-2, 8px);
+}
+
+/* Label */
+.input-label {
+    font-size: var(--bv-font-size-sm, 14px);
+    font-weight: 600;
+    color: var(--bv-gray-700, #334155);
+}
+
+.input-label-required::after {
+    content: " *";
+    color: var(--bv-error, #EF4444);
+}
+
+/* Input Field */
+.input {
+    width: 100%;
+    padding: var(--bv-space-3, 12px) var(--bv-space-4, 16px);
+    font-family: var(--bv-font-family, 'Nunito', sans-serif);
+    font-size: var(--bv-font-size-sm, 14px);
+    color: var(--bv-gray-800, #1E293B);
+    background: var(--bv-white, #FFFFFF);
+    border: 1px solid var(--bv-gray-200, #E2E8F0);
+    border-radius: var(--bv-radius-sm, 8px);
+    transition: all var(--bv-transition-fast, 150ms ease);
+    outline: none;
+}
+
+.input:focus {
+    border-color: var(--bv-primary, #00B0BD);
+    box-shadow: 0 0 0 3px var(--bv-primary-100, #B2EBF2);
+}
+
+.input::placeholder {
+    color: var(--bv-gray-400, #94A3B8);
+}
+
+.input:disabled {
+    background: var(--bv-gray-50, #F8FAFC);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Error State */
+.input-error {
+    border-color: var(--bv-error, #EF4444);
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 3px var(--bv-error-light, #FEE2E2);
+}
+
+.input-error-message {
+    font-size: var(--bv-font-size-xs, 12px);
+    color: var(--bv-error, #EF4444);
+    margin-top: var(--bv-space-1, 4px);
+}
+
+/* Textarea */
+textarea.input {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Input with Icon */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper .input-icon {
+    position: absolute;
+    left: var(--bv-space-3, 12px);
+    color: var(--bv-gray-400, #94A3B8);
+    pointer-events: none;
+}
+
+.input-wrapper .input {
+    padding-left: var(--bv-space-10, 40px);
+}
+
+/* Input Helper */
+.input-helper {
+    font-size: var(--bv-font-size-xs, 12px);
+    color: var(--bv-gray-500, #64748B);
+    margin-top: var(--bv-space-1, 4px);
+}

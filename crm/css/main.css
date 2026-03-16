@@ -1,0 +1,20 @@
+/* ============================================
+   BEVITA CRM - MAIN STYLESHEET
+   Import all design system components
+   ============================================ */
+
+/* Design Tokens */
+@import url('./design-system.css');
+
+/* Components */
+@import url('./components/button.css');
+@import url('./components/input.css');
+@import url('./components/card.css');
+@import url('./components/badge.css');
+@import url('./components/select.css');
+@import url('./components/avatar.css');
+@import url('./components/modal.css');
+@import url('./components/table.css');
+
+/* Layout & App Specific */
+@import url('./layout.css');

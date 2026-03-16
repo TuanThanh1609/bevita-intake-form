@@ -1,0 +1,93 @@
+/* ============================================
+   BEVITA CRM - CARD COMPONENT
+   ============================================ */
+
+/* Base Card */
+.card {
+    background: var(--bv-white, #FFFFFF);
+    border-radius: var(--bv-radius-md, 12px);
+    box-shadow: var(--bv-shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
+    overflow: hidden;
+}
+
+/* Card Variants */
+.card-elevated {
+    box-shadow: var(--bv-shadow-md, 0 4px 12px rgba(0,0,0,0.08));
+}
+
+.card-glow {
+    box-shadow: var(--bv-shadow-glow, 0 0 20px rgba(0,176,189,0.15));
+}
+
+/* Card Parts */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bv-space-4, 16px) var(--bv-space-5, 20px);
+    border-bottom: 1px solid var(--bv-gray-100, #F1F5F9);
+}
+
+.card-title {
+    font-size: var(--bv-font-size-lg, 18px);
+    font-weight: 700;
+    color: var(--bv-gray-900, #0F172A);
+    margin: 0;
+}
+
+.card-description {
+    font-size: var(--bv-font-size-sm, 14px);
+    color: var(--bv-gray-500, #64748B);
+    margin-top: var(--bv-space-1, 4px);
+}
+
+.card-body {
+    padding: var(--bv-space-5, 20px);
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--bv-space-3, 12px);
+    padding: var(--bv-space-4, 16px) var(--bv-space-5, 20px);
+    border-top: 1px solid var(--bv-gray-100, #F1F5F9);
+    background: var(--bv-gray-50, #F8FAFC);
+}
+
+/* Interactive Card */
+.card-interactive {
+    cursor: pointer;
+    transition: all var(--bv-transition-normal, 250ms ease);
+}
+
+.card-interactive:hover {
+    box-shadow: var(--bv-shadow-md, 0 4px 12px rgba(0,0,0,0.08));
+    transform: translateY(-2px);
+}
+
+/* Card Grid */
+.card-grid {
+    display: grid;
+    gap: var(--bv-space-4, 16px);
+}
+
+.card-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.card-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.card-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 768px) {
+    .card-grid-2,
+    .card-grid-3,
+    .card-grid-4 {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,128 @@
+/* ============================================
+   BEVITA CRM - BUTTON COMPONENT
+   ============================================ */
+
+/* Button Variants */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bv-space-2, 8px);
+    padding: var(--bv-space-3, 12px) var(--bv-space-5, 20px);
+    font-family: var(--bv-font-family, 'Nunito', sans-serif);
+    font-size: var(--bv-font-size-sm, 14px);
+    font-weight: 600;
+    line-height: 1.4;
+    border-radius: var(--bv-radius-sm, 8px);
+    cursor: pointer;
+    transition: all var(--bv-transition-normal, 250ms ease);
+    border: none;
+    outline: none;
+    text-decoration: none;
+}
+
+/* Focus State */
+.btn:focus-visible {
+    outline: 2px solid var(--bv-primary, #00B0BD);
+    outline-offset: 2px;
+}
+
+/* Primary - Teal */
+.btn-primary {
+    background: linear-gradient(135deg, var(--bv-primary, #00B0BD) 0%, var(--bv-primary-400, #26C6DA) 100%);
+    color: var(--bv-white, #FFFFFF);
+    box-shadow: var(--bv-shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
+}
+
+.btn-primary:hover {
+    box-shadow: var(--bv-shadow-glow, 0 0 20px rgba(0,176,189,0.15));
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Secondary - Gold */
+.btn-secondary {
+    background: linear-gradient(135deg, var(--bv-accent, #FFB300) 0%, var(--bv-accent-400, #FFCA28) 100%);
+    color: var(--bv-gray-900, #0F172A);
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 0 20px rgba(255,179,0,0.2);
+    transform: translateY(-1px);
+}
+
+/* Ghost - Outline */
+.btn-ghost {
+    background: transparent;
+    color: var(--bv-gray-600, #475569);
+    border: 1px solid var(--bv-gray-200, #E2E8F0);
+}
+
+.btn-ghost:hover {
+    background: var(--bv-gray-50, #F8FAFC);
+    border-color: var(--bv-gray-300, #CBD5E1);
+}
+
+/* Danger */
+.btn-danger {
+    background: var(--bv-error, #EF4444);
+    color: var(--bv-white, #FFFFFF);
+}
+
+.btn-danger:hover {
+    background: #DC2626;
+}
+
+/* Sizes */
+.btn-sm {
+    padding: var(--bv-space-2, 8px) var(--bv-space-3, 12px);
+    font-size: var(--bv-font-size-xs, 12px);
+}
+
+.btn-lg {
+    padding: var(--bv-space-4, 16px) var(--bv-space-6, 24px);
+    font-size: var(--bv-font-size-base, 16px);
+}
+
+/* Full Width */
+.btn-full {
+    width: 100%;
+}
+
+/* Disabled */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Icon Button */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: var(--bv-radius-sm, 8px);
+}
+
+.btn-icon.btn-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.btn-icon.btn-lg {
+    width: 48px;
+    height: 48px;
+}
+
+/* Button Group */
+.btn-group {
+    display: inline-flex;
+    gap: var(--bv-space-2, 8px);
+}
+
+.btn-group .btn {
+    margin: 0;
+}

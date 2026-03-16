@@ -1,0 +1,153 @@
+/* ============================================
+   BEVITA CRM - TABLE COMPONENT
+   ============================================ */
+
+/* Table Container */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--bv-radius-md, 12px);
+    border: 1px solid var(--bv-gray-200, #E2E8F0);
+    background: var(--bv-white, #FFFFFF);
+}
+
+/* Base Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--bv-font-size-sm, 14px);
+}
+
+/* Header */
+.table th {
+    padding: var(--bv-space-3, 12px) var(--bv-space-4, 16px);
+    text-align: left;
+    font-weight: 600;
+    color: var(--bv-gray-600, #475569);
+    background: var(--bv-gray-50, #F8FAFC);
+    border-bottom: 1px solid var(--bv-gray-200, #E2E8F0);
+    white-space: nowrap;
+}
+
+.table th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.table th.sortable:hover {
+    background: var(--bv-gray-100, #F1F5F9);
+}
+
+.table th .sort-icon {
+    margin-left: var(--bv-space-1, 4px);
+    opacity: 0.5;
+}
+
+.table th.sorted .sort-icon {
+    opacity: 1;
+    color: var(--bv-primary, #00B0BD);
+}
+
+/* Body */
+.table td {
+    padding: var(--bv-space-3, 12px) var(--bv-space-4, 16px);
+    color: var(--bv-gray-700, #334155);
+    border-bottom: 1px solid var(--bv-gray-100, #F1F5F9);
+    vertical-align: middle;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hover Row */
+.table tbody tr {
+    transition: background var(--bv-transition-fast);
+}
+
+.table tbody tr:hover td {
+    background: var(--bv-gray-50, #F8FAFC);
+}
+
+/* Striped */
+.table-striped tbody tr:nth-child(even) td {
+    background: var(--bv-gray-50, #F8FAFC);
+}
+
+.table-striped tbody tr:nth-child(even):hover td {
+    background: var(--bv-gray-100, #F1F5F9);
+}
+
+/* Clickable Row */
+.table tbody tr.clickable {
+    cursor: pointer;
+}
+
+.table tbody tr.clickable:hover td {
+    background: var(--bv-primary-50, #E0F7FA);
+}
+
+/* Table Footer */
+.table tfoot td {
+    padding: var(--bv-space-3, 12px) var(--bv-space-4, 16px);
+    font-weight: 600;
+    background: var(--bv-gray-50, #F8FAFC);
+    border-top: 1px solid var(--bv-gray-200, #E2E8F0);
+}
+
+/* Table Caption */
+.table caption {
+    padding: var(--bv-space-3, 12px) var(--bv-space-4, 16px);
+    text-align: left;
+    font-weight: 600;
+    color: var(--bv-gray-700, #334155);
+    caption-side: top;
+}
+
+/* Responsive Table */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Empty State */
+.table-empty {
+    padding: var(--bv-space-12, 48px) !important;
+    text-align: center;
+}
+
+.table-empty-icon {
+    font-size: 48px;
+    margin-bottom: var(--bv-space-4, 16px);
+    opacity: 0.5;
+}
+
+.table-empty-title {
+    font-size: var(--bv-font-size-lg, 18px);
+    font-weight: 600;
+    color: var(--bv-gray-700, #334155);
+    margin-bottom: var(--bv-space-2, 8px);
+}
+
+.table-empty-description {
+    font-size: var(--bv-font-size-sm, 14px);
+    color: var(--bv-gray-500, #64748B);
+}
+
+/* Pagination */
+.table-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--bv-space-4, 16px);
+    border-top: 1px solid var(--bv-gray-100, #F1F5F9);
+}
+
+.table-pagination-info {
+    font-size: var(--bv-font-size-sm, 14px);
+    color: var(--bv-gray-600, #475569);
+}
+
+.table-pagination-controls {
+    display: flex;
+    gap: var(--bv-space-2, 8px);
+}

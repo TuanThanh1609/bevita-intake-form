@@ -1,0 +1,70 @@
+/* ============================================
+   BEVITA CRM - BADGE COMPONENT
+   ============================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bv-space-1, 4px);
+    padding: var(--bv-space-1, 4px) var(--bv-space-3, 12px);
+    font-size: var(--bv-font-size-xs, 12px);
+    font-weight: 600;
+    line-height: 1;
+    border-radius: var(--bv-radius-full, 9999px);
+    white-space: nowrap;
+}
+
+/* Status Colors */
+.badge-success {
+    background: var(--bv-success-light, #D1FAE5);
+    color: var(--bv-success, #10B981);
+}
+
+.badge-warning {
+    background: var(--bv-warning-light, #FEF3C7);
+    color: var(--bv-warning, #F59E0B);
+}
+
+.badge-error {
+    background: var(--bv-error-light, #FEE2E2);
+    color: var(--bv-error, #EF4444);
+}
+
+.badge-info {
+    background: var(--bv-info-light, #DBEAFE);
+    color: var(--bv-info, #3B82F6);
+}
+
+/* Neutral */
+.badge-neutral {
+    background: var(--bv-gray-100, #F1F5F9);
+    color: var(--bv-gray-600, #475569);
+}
+
+/* Brand Colors */
+.badge-primary {
+    background: var(--bv-primary-100, #B2EBF2);
+    color: var(--bv-primary, #00B0BD);
+}
+
+.badge-accent {
+    background: var(--bv-accent-100, #FFECB3);
+    color: var(--bv-accent, #FFB300);
+}
+
+/* Size Variants */
+.badge-sm {
+    padding: 2px var(--bv-space-2, 8px);
+    font-size: 10px;
+}
+
+.badge-lg {
+    padding: var(--bv-space-2, 8px) var(--bv-space-4, 16px);
+    font-size: var(--bv-font-size-sm, 14px);
+}
+
+/* With Icon */
+.badge-icon {
+    width: 14px;
+    height: 14px;
+}

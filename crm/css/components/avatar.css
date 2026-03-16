@@ -1,0 +1,124 @@
+/* ============================================
+   BEVITA CRM - AVATAR COMPONENT
+   ============================================ */
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--bv-radius-full, 9999px);
+    background: linear-gradient(135deg, var(--bv-primary, #00B0BD) 0%, var(--bv-primary-400, #26C6DA) 100%);
+    color: var(--bv-white, #FFFFFF);
+    font-weight: 600;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* Sizes */
+.avatar-xs {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: var(--bv-font-size-xs, 12px);
+}
+
+.avatar-md {
+    width: 40px;
+    height: 40px;
+    font-size: var(--bv-font-size-sm, 14px);
+}
+
+.avatar-lg {
+    width: 48px;
+    height: 48px;
+    font-size: var(--bv-font-size-base, 16px);
+}
+
+.avatar-xl {
+    width: 64px;
+    height: 64px;
+    font-size: var(--bv-font-size-lg, 18px);
+}
+
+.avatar-2xl {
+    width: 80px;
+    height: 80px;
+    font-size: var(--bv-font-size-xl, 20px);
+}
+
+/* Image */
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Avatar Group */
+.avatar-group {
+    display: flex;
+}
+
+.avatar-group .avatar {
+    margin-left: -8px;
+    border: 2px solid var(--bv-white, #FFFFFF);
+}
+
+.avatar-group .avatar:first-child {
+    margin-left: 0;
+}
+
+/* Status Indicator */
+.avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: var(--bv-radius-full);
+    border: 2px solid var(--bv-white, #FFFFFF);
+}
+
+.avatar-status-online {
+    background: var(--bv-success, #10B981);
+}
+
+.avatar-status-offline {
+    background: var(--bv-gray-400, #94A3B8);
+}
+
+.avatar-status-busy {
+    background: var(--bv-error, #EF4444);
+}
+
+/* Avatar with Name */
+.avatar-with-name {
+    display: flex;
+    align-items: center;
+    gap: var(--bv-space-3, 12px);
+}
+
+.avatar-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.avatar-name {
+    font-size: var(--bv-font-size-sm, 14px);
+    font-weight: 600;
+    color: var(--bv-gray-900, #0F172A);
+}
+
+.avatar-subtitle {
+    font-size: var(--bv-font-size-xs, 12px);
+    color: var(--bv-gray-500, #64748B);
+}

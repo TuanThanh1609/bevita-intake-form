@@ -424,35 +424,30 @@ const CRM = {
 
     renderStepList(lead) {
         const steps = [
-            { id: 1, name: 'Nhận diện nhu cầu', icon: '🎯', msgCount: 3, time: '09:48 → 09:50' },
-            { id: 2, name: 'Thông tin cơ bản + Hình da', icon: '👤', msgCount: 4, time: '09:50 → 09:55' },
-            { id: 3, name: 'Mỹ phẩm & Dịch vụ làm đẹp', icon: '💄', msgCount: 5, time: '09:55 → 10:00' },
-            { id: 4, name: 'Sức khỏe', icon: '🏥', msgCount: 2, time: '10:00 → 10:05' },
-            { id: 5, name: 'Ngân sách', icon: '💰', msgCount: 3, time: '10:05 → 10:10' },
-            { id: 6, name: 'Xác nhận SĐT & Kết nối', icon: '📞', msgCount: 2, time: '10:10 → 10:15' },
-            { id: 7, name: 'Tư vấn phác đồ', icon: '📋', msgCount: 5, time: '10:15 → 10:30' },
+            { id: 1, name: 'Nhận diện nhu cầu', icon: '🎯' },
+            { id: 2, name: 'Thông tin cơ bản + Hình da', icon: '👤' },
+            { id: 3, name: 'Mỹ phẩm & Dịch vụ làm đẹp', icon: '💄' },
+            { id: 4, name: 'Sức khỏe', icon: '🏥' },
+            { id: 5, name: 'Ngân sách', icon: '💰' },
+            { id: 6, name: 'Xác nhận SĐT & Kết nối', icon: '📞' },
+            { id: 7, name: 'Tư vấn phác đồ', icon: '📋' },
         ];
 
         return steps.map((step, index) => {
-            const isCompleted = step.id <= (lead.current_step || 1);
-            const isActive = step.id === (lead.current_step || 1);
-            const isExpanded = isActive || index === 0; // Expand active or first step by default
-            
-            let statusClass = '';
-            let statusText = 'Chờ xử lý';
-            let icon = step.icon;
+            const currentStep = lead.current_step || 1;
+            const isActive = step.id === currentStep;
+            const isExpanded = isActive || index === 0;
 
-            if (isCompleted) {
-                statusClass = 'completed';
-                statusText = 'Hoàn thành ✓';
-                icon = '✓';
-            } else if (isActive) {
-                statusClass = 'active';
-                statusText = 'Đang xử lý 🔄';
-            }
+            const statusKey = step.id < currentStep ? 'hoan_thanh' : (isActive ? (lead.step_status || 'dang_xu_ly') : 'cho');
+            const statusText = this.getStepStatusText(statusKey);
+            const isCompleted = statusKey === 'hoan_thanh';
 
-            // Step Label (B0, B1, etc.)
+            const statusClass = isCompleted ? 'completed' : '';
+            const icon = isCompleted ? '✓' : step.icon;
+
             const stepLabel = `B${step.id - 1}`;
+            const filledCount = this.countStepFilled(step.id, lead);
+            const metaText = `${filledCount} dữ liệu`;
 
             return `
                 <div class="step-item ${statusClass} ${isExpanded ? 'expanded' : ''}" id="step-${step.id}">
@@ -462,13 +457,12 @@ const CRM = {
                             <div class="step-info">
                                 <div class="step-name">${stepLabel}: ${step.name}</div>
                                 <div class="step-meta">
-                                    <span>${step.time}</span>
-                                    <span>• ${step.msgCount} tin nhắn</span>
+                                    <span>• ${metaText}</span>
                                 </div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <span class="step-status-badge">${statusText}</span>
+                            <span class="step-status-badge">${this.escapeHtml(statusText)}</span>
                             <span class="step-toggle">▼</span>
                         </div>
                     </div>
@@ -481,91 +475,216 @@ const CRM = {
     },
 
     renderChatContent(stepId, lead) {
-        // Mock chat content based on step
+        const name = this.escapeHtml(lead.Full_Name || 'Khách hàng');
+        const phone = this.escapeHtml(lead.Phone_Number || 'Chưa có');
+        const age = this.escapeHtml(lead.Age_Group || 'Chưa có');
+        const location = this.escapeHtml(lead.Location || 'Chưa có');
+        const skinConditions = this.escapeHtml(this.normalizeMulti(lead.Skin_Condition).join(' / ') || 'Chưa có');
+        const need = this.escapeHtml(lead.nhucau || this.normalizeMulti(lead.Skin_Condition)[0] || 'Chưa xác định');
+
         if (stepId === 1) {
             return `
                 <div class="chat-container">
                     <div class="chat-message system">
                         <div class="chat-header">
                             <span>🤖 HỆ THỐNG</span>
-                            <span class="chat-time">09:48</span>
+                            <span class="chat-time">${this.formatTimeOnly(lead.created || lead.CreatedAt)}</span>
                         </div>
                         <div>
-                            AI nhận diện: Nhu cầu = <b>${(lead.Skin_Condition || ['Nám'])[0]}</b> | Intent = Ready | Urgency = Trung bình
-                        </div>
-                    </div>
-                    <div class="chat-message agent">
-                        <div class="chat-avatar agent">M</div>
-                        <div class="chat-bubble">
-                            <div class="chat-header">
-                                <span>Skin Coach Mai</span>
-                                <span class="chat-time">09:48</span>
-                            </div>
-                            Chào bạn 🌷 Mai là Skin Coach bên Bevita nè.<br><br>
-                            Mai nhận được tin nhắn của bạn rồi. Tình trạng ${(lead.Skin_Condition || ['da'])[0]} khá phổ biến và hoàn toàn có thể cải thiện được nha bạn.<br>
-                            Để Mai tư vấn chính xác nhất, bạn giúp Mai gửi mấy thông tin nhé.
+                            AI nhận diện: Nhu cầu = <b>${need}</b><br>
+                            Vấn đề da: <b>${skinConditions}</b>
                         </div>
                     </div>
                     <div class="chat-message user">
                         <div class="chat-avatar user">KH</div>
                         <div class="chat-bubble">
                             <div class="chat-header">
-                                <span>Khách hàng</span>
-                                <span class="chat-time">09:50</span>
+                                <span>${name}</span>
+                                <span class="chat-time">${this.formatTimeOnly(lead.created || lead.CreatedAt)}</span>
                             </div>
-                            Chào shop, mình muốn tư vấn về ${(lead.Skin_Condition || ['da'])[0]} ạ.
+                            SĐT: ${phone}
                         </div>
                     </div>
                 </div>
             `;
-        } else if (stepId === 2) {
+        }
+
+        if (stepId === 2) {
+            const photos = [
+                ...this.splitUrls(lead.Skin_Photos),
+                ...this.splitUrls(lead.Skin_photo_2),
+                ...this.splitUrls(lead.Skin_photo_3),
+            ].filter(Boolean);
+
+            const photoGrid = photos.length
+                ? `<div class="photo-grid">
+                        ${photos.slice(0, 6).map(url => `<div class="photo-item"><img src="${this.escapeAttr(url)}" alt="Skin photo" loading="lazy"></div>`).join('')}
+                   </div>`
+                : '';
+
+            const missing = [];
+            if (!lead.Age_Group) missing.push('Tuổi');
+            if (!lead.Location) missing.push('Tỉnh/thành');
+            if (photos.length < 3) missing.push('Hình da mặt 3 góc');
+
+            const collected = [
+                lead.Age_Group ? `Tuổi (${lead.Age_Group})` : null,
+                lead.Location ? `Tỉnh/thành (${lead.Location})` : null,
+                photos.length ? `Hình da (${photos.length} ảnh)` : null,
+            ].filter(Boolean).join(', ') || 'Chưa có';
+
             return `
                 <div class="chat-container">
                     <div class="chat-message agent">
                         <div class="chat-avatar agent">M</div>
                         <div class="chat-bubble">
                             <div class="chat-header">
-                                <span>Skin Coach Mai</span>
-                                <span class="chat-time">09:50</span>
+                                <span>Skin Coach</span>
+                                <span class="chat-time">${this.formatTimeOnly(lead.created || lead.CreatedAt)}</span>
                             </div>
-                            Bạn giúp Mai gửi thông tin nhé:<br>
-                            • Độ tuổi của bạn<br>
-                            • Bạn đang ở tỉnh/thành nào<br>
-                            • Hình ảnh da mặt 3 góc (trái, phải, chính diện)<br><br>
-                            Bạn chụp hướng mặt ra cửa, ánh sáng tự nhiên là đẹp nhất nha 📷
+                            Bạn giúp mình gửi thông tin nhé:<br>
+                            • Độ tuổi<br>
+                            • Tỉnh/thành<br>
+                            • Hình ảnh da mặt 3 góc (trái, phải, chính diện)
                         </div>
                     </div>
                     <div class="chat-message user">
                         <div class="chat-avatar user">KH</div>
                         <div class="chat-bubble">
                             <div class="chat-header">
-                                <span>Khách hàng</span>
-                                <span class="chat-time">09:52</span>
+                                <span>${name}</span>
+                                <span class="chat-time">${this.formatTimeOnly(lead.UpdatedAt || lead.updated || lead.last_response)}</span>
                             </div>
-                            Mình ${lead.Age_Group || '30'} tuổi, ở ${lead.Location || 'TP.HCM'} ạ.
+                            <div class="kv">
+                                <div class="k">Độ tuổi</div><div class="v">${age}</div>
+                                <div class="k">Tỉnh/thành</div><div class="v">${location}</div>
+                                <div class="k">Vấn đề da</div><div class="v">${skinConditions}</div>
+                            </div>
+                            ${photoGrid}
                         </div>
                     </div>
                     <div class="chat-message system">
                         <div class="chat-header">
                             <span>🤖 HỆ THỐNG</span>
-                            <span class="chat-time">09:52</span>
+                            <span class="chat-time">${this.formatTimeOnly(lead.UpdatedAt || lead.updated || lead.last_response)}</span>
                         </div>
                         <div>
-                            ✅ Đã thu thập: Tuổi (${lead.Age_Group || '30'}), Tỉnh/thành (${lead.Location || 'TP.HCM'})<br>
-                            ⏳ Thiếu: Hình da mặt 3 góc
+                            ✅ Đã thu thập: ${this.escapeHtml(collected)}<br>
+                            ${missing.length ? `⏳ Thiếu: ${this.escapeHtml(missing.join(', '))}` : '✅ Đủ dữ liệu bước này'}
                         </div>
-                    </div>
-                </div>
-            `;
-        } else {
-            return `
-                <div class="chat-container">
-                    <div class="chat-message system">
-                        <div>⏳ Đang chờ dữ liệu bước này...</div>
                     </div>
                 </div>
             `;
         }
+
+        if (stepId === 3) {
+            const cosmetics = this.escapeHtml(lead.History_Cosmetics || 'Chưa có');
+            const spa = this.escapeHtml(lead.History_Spa || 'Chưa có');
+            const spaService = this.escapeHtml(lead.History_Spa_Service || 'Chưa có');
+            const spaResults = this.escapeHtml(lead.History_Spa_Results || 'Chưa có');
+
+            return `
+                <div class="chat-container">
+                    <div class="chat-message system">
+                        <div class="chat-header">
+                            <span>🤖 HỆ THỐNG</span>
+                            <span class="chat-time">${this.formatTimeOnly(lead.UpdatedAt || lead.last_response)}</span>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Lịch sử mỹ phẩm</div><div class="v">${cosmetics}</div>
+                            <div class="k">Lịch sử spa</div><div class="v">${spa}</div>
+                            <div class="k">Liệu trình</div><div class="v">${spaService}</div>
+                            <div class="k">Kết quả</div><div class="v">${spaResults}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (stepId === 4) {
+            const health = this.escapeHtml(lead.Health_Status || 'Chưa có');
+            const supplements = this.escapeHtml(lead.Supplements || 'Chưa có');
+            const sleep = this.escapeHtml(lead.Lifestyle_Sleep || 'Chưa có');
+            const stress = this.escapeHtml(lead.Lifestyle_Stress || 'Chưa có');
+
+            return `
+                <div class="chat-container">
+                    <div class="chat-message system">
+                        <div class="chat-header">
+                            <span>🤖 HỆ THỐNG</span>
+                            <span class="chat-time">${this.formatTimeOnly(lead.UpdatedAt || lead.last_response)}</span>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Tình trạng sức khỏe</div><div class="v">${health}</div>
+                            <div class="k">Thực phẩm chức năng</div><div class="v">${supplements}</div>
+                            <div class="k">Giấc ngủ</div><div class="v">${sleep}</div>
+                            <div class="k">Mức độ stress</div><div class="v">${stress}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (stepId === 5) {
+            const budget = this.escapeHtml(lead.Budget || 'Chưa có');
+            return `
+                <div class="chat-container">
+                    <div class="chat-message system">
+                        <div class="chat-header">
+                            <span>🤖 HỆ THỐNG</span>
+                            <span class="chat-time">${this.formatTimeOnly(lead.UpdatedAt || lead.last_response)}</span>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Ngân sách</div><div class="v">${budget}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (stepId === 6) {
+            const channel = this.escapeHtml(lead.nguon || 'Chưa có');
+            return `
+                <div class="chat-container">
+                    <div class="chat-message system">
+                        <div class="chat-header">
+                            <span>🤖 HỆ THỐNG</span>
+                            <span class="chat-time">${this.formatTimeOnly(lead.UpdatedAt || lead.last_response)}</span>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Số điện thoại</div><div class="v">${phone}</div>
+                            <div class="k">Kênh</div><div class="v">${channel}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const routine = this.escapeHtml(lead.Current_Routine || 'Chưa có');
+        const routinePhotos = this.splitUrls(lead.Routine_Photos);
+        const routineGrid = routinePhotos.length
+            ? `<div class="photo-grid">
+                    ${routinePhotos.slice(0, 6).map(url => `<div class="photo-item"><img src="${this.escapeAttr(url)}" alt="Routine photo" loading="lazy"></div>`).join('')}
+               </div>`
+            : '';
+
+        const note = this.escapeHtml(lead.tu_van_vien_notes || lead.Note || 'Chưa có');
+
+        return `
+            <div class="chat-container">
+                <div class="chat-message system">
+                    <div class="chat-header">
+                        <span>🤖 HỆ THỐNG</span>
+                        <span class="chat-time">${this.formatTimeOnly(lead.UpdatedAt || lead.last_response)}</span>
+                    </div>
+                    <div class="kv">
+                        <div class="k">Routine hiện tại</div><div class="v">${routine}</div>
+                        <div class="k">Ghi chú</div><div class="v">${note}</div>
+                    </div>
+                    ${routineGrid}
+                </div>
+            </div>
+        `;
     },
 
     // ── Actions ──
@@ -714,6 +833,69 @@ const CRM = {
             'cho': 'Chờ'
         };
         return map[status] || status;
+    },
+
+    escapeHtml(value) {
+        const str = value === null || value === undefined ? '' : String(value);
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    },
+
+    escapeAttr(value) {
+        return this.escapeHtml(value).replace(/`/g, '&#96;');
+    },
+
+    normalizeMulti(value) {
+        if (!value) return [];
+        if (Array.isArray(value)) return value.map(v => String(v)).filter(Boolean);
+        if (typeof value === 'string') return value.split(',').map(s => s.trim()).filter(Boolean);
+        return [String(value)];
+    },
+
+    splitUrls(value) {
+        if (!value) return [];
+        if (Array.isArray(value)) return value.map(v => String(v)).filter(Boolean);
+        if (typeof value !== 'string') return [String(value)];
+
+        const text = value.trim();
+        if (!text) return [];
+
+        if ((text.startsWith('[') && text.endsWith(']')) || (text.startsWith('{') && text.endsWith('}'))) {
+            try {
+                const parsed = JSON.parse(text);
+                if (Array.isArray(parsed)) return parsed.map(v => String(v)).filter(Boolean);
+                if (parsed && typeof parsed === 'object') return Object.values(parsed).map(v => String(v)).filter(Boolean);
+            } catch (_) {}
+        }
+
+        return text.split(',').map(s => s.trim()).filter(Boolean);
+    },
+
+    countStepFilled(stepId, lead) {
+        const has = (v) => v !== null && v !== undefined && String(v).trim() !== '';
+        const countPhotos = (urls) => this.splitUrls(urls).length;
+
+        if (stepId === 1) return (has(lead.nhucau) || this.normalizeMulti(lead.Skin_Condition).length > 0) ? 1 : 0;
+        if (stepId === 2) {
+            const photos = countPhotos(lead.Skin_Photos) + countPhotos(lead.Skin_photo_2) + countPhotos(lead.Skin_photo_3);
+            return (has(lead.Age_Group) ? 1 : 0) + (has(lead.Location) ? 1 : 0) + (photos ? 1 : 0);
+        }
+        if (stepId === 3) return [lead.History_Cosmetics, lead.History_Spa, lead.History_Spa_Service, lead.History_Spa_Results].filter(has).length;
+        if (stepId === 4) return [lead.Health_Status, lead.Supplements, lead.Lifestyle_Sleep, lead.Lifestyle_Stress].filter(has).length;
+        if (stepId === 5) return has(lead.Budget) ? 1 : 0;
+        if (stepId === 6) return has(lead.Phone_Number) ? 1 : 0;
+        return [lead.Current_Routine, lead.Routine_Photos, lead.tu_van_vien_notes, lead.Note].filter(has).length;
+    },
+
+    formatTimeOnly(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     }
 };
 

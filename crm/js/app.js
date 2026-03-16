@@ -1069,17 +1069,21 @@ const CRM = {
         }
 
         // Conversation item clicks (delegated)
-        document.getElementById('conversationList')?.addEventListener('click', (e) => {
-            const item = e.target.closest('.conversation-item');
-            if (item) {
-                const id = item.dataset.id;
-                const name = item.dataset.name;
-                const senderId = item.dataset.senderId;
-                if (id && name && senderId) {
-                    this.openConversation(id, encodeURIComponent(name), senderId);
+        const convList = document.getElementById('conversationList');
+        if (convList) {
+            convList.addEventListener('click', (e) => {
+                const item = e.target.closest('.conversation-item');
+                if (item) {
+                    const id = item.dataset.id;
+                    const name = item.dataset.name;
+                    const senderId = item.dataset.senderId;
+                    console.log('Clicked conversation:', id, name, senderId);
+                    if (id && name && senderId) {
+                        this.openConversation(id, encodeURIComponent(name), senderId);
+                    }
                 }
-            }
-        });
+            });
+        }
     },
 
     filterConversations(query) {

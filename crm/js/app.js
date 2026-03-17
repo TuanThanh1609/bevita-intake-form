@@ -1215,24 +1215,45 @@ const CRM = {
     async openConversation(conversationId, senderName, senderId) {
         console.log('Open conversation:', conversationId, senderName, senderId);
 
-        // Show chat view
-        document.getElementById('chatEmpty').style.display = 'none';
-        document.getElementById('chatView').style.display = 'flex';
-        document.getElementById('chatView').style.flexDirection = 'column';
+        try {
+            // Get DOM elements with null checks
+            const chatEmpty = document.getElementById('chatEmpty');
+            const chatView = document.getElementById('chatView');
+            const chatContactName = document.getElementById('chatContactName');
+            const chatContactAvatar = document.getElementById('chatContactAvatar');
 
-        // Update header
-        document.getElementById('chatContactName').textContent = decodeURIComponent(senderName);
-        document.getElementById('chatContactAvatar').textContent = decodeURIComponent(senderName).charAt(0).toUpperCase();
+            console.log('Elements found:', { chatEmpty: !!chatEmpty, chatView: !!chatView, chatContactName: !!chatContactName });
 
-        // Store current conversation
-        this.state.currentConversation = {
-            id: conversationId,
-            sender_id: senderId,
-            sender_name: decodeURIComponent(senderName)
-        };
+            if (!chatEmpty || !chatView) {
+                console.error('Chat elements not found!');
+                return;
+            }
 
-        // Load messages
-        await this.loadConversationMessages(conversationId);
+            // Show chat view
+            chatEmpty.style.display = 'none';
+            chatView.style.display = 'flex';
+            chatView.style.flexDirection = 'column';
+
+            // Update header
+            if (chatContactName) {
+                chatContactName.textContent = decodeURIComponent(senderName);
+            }
+            if (chatContactAvatar) {
+                chatContactAvatar.textContent = decodeURIComponent(senderName).charAt(0).toUpperCase();
+            }
+
+            // Store current conversation
+            this.state.currentConversation = {
+                id: conversationId,
+                sender_id: senderId,
+                sender_name: decodeURIComponent(senderName)
+            };
+
+            // Load messages
+            await this.loadConversationMessages(conversationId);
+        } catch (error) {
+            console.error('Error opening conversation:', error);
+        }
     },
 
     async loadConversationMessages(conversationId) {

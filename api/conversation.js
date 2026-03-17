@@ -82,7 +82,11 @@ async function handleGetMessages(req, res, pageId, accessToken) {
         return res.status(200).json({
             success: true,
             conversation_id: conversationId,
-            messages: transformedMessages
+            messages: transformedMessages,
+            conversation: {
+                id: conversationId,
+                messages: transformedMessages
+            }
         });
 
     } catch (error) {

@@ -1238,9 +1238,17 @@ const CRM = {
             }
 
             // Show chat view
+            console.log('Before - chatEmpty display:', chatEmpty.style.display, 'chatView display:', chatView.style.display);
             chatEmpty.style.display = 'none';
+            chatEmpty.style.visibility = 'hidden';
+            chatEmpty.style.height = '0';
             chatView.style.display = 'flex';
             chatView.style.flexDirection = 'column';
+            chatView.style.width = '100%';
+            chatView.style.height = '100%';
+            chatView.style.visibility = 'visible';
+            chatView.style.opacity = '1';
+            console.log('After - chatView display:', chatView.style.display);
 
             // Update header
             if (chatContactName) {
@@ -1285,8 +1293,14 @@ const CRM = {
 
             console.log('Conversation data:', data);
 
+            console.log('Conversation API response:', data);
+
+            // Handle both response formats
+            const messages = data.messages || (data.conversation?.messages) || [];
+            console.log('Messages to render:', messages.length);
+
             if (data.success) {
-                this.renderChatMessages(data.messages || []);
+                this.renderChatMessages(messages);
             } else {
                 messagesContainer.innerHTML = `
                     <div class="error-message">
@@ -1306,9 +1320,14 @@ const CRM = {
 
     renderChatMessages(messages) {
         const container = document.getElementById('chatMessages');
-        if (!container) return;
+        console.log('renderChatMessages - container:', !!container, 'messages:', messages?.length);
 
-        if (messages.length === 0) {
+        if (!container) {
+            console.error('chatMessages container NOT FOUND!');
+            return;
+        }
+
+        if (!messages || messages.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
                     <p>Chưa có tin nhắn</p>
@@ -1317,7 +1336,9 @@ const CRM = {
             return;
         }
 
-        container.innerHTML = messages.map(msg => this.renderChatMessage(msg)).join('');
+        const html = messages.map(msg => this.renderChatMessage(msg)).join('');
+        console.log('Rendering', messages.length, 'messages, HTML length:', html.length);
+        container.innerHTML = html;
         container.scrollTop = container.scrollHeight;
     },
 

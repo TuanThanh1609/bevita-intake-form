@@ -190,11 +190,16 @@ const CRM = {
             return lastResponse < oneHourAgo && l.trang_thai !== 'Đã chốt';
         }).length;
 
-        // Update DOM
-        document.getElementById('leadsToday').textContent = leadsToday;
-        document.getElementById('autoRate').textContent = autoRate + '%';
-        document.getElementById('followUpActive').textContent = followUpActive || 12;
-        document.getElementById('waitingReply').textContent = waitingReply || 5;
+        // Update DOM with null checks
+        const leadsTodayEl = document.getElementById('leadsToday');
+        const autoRateEl = document.getElementById('autoRate');
+        const followUpActiveEl = document.getElementById('followUpActive');
+        const waitingReplyEl = document.getElementById('waitingReply');
+
+        if (leadsTodayEl) leadsTodayEl.textContent = leadsToday;
+        if (autoRateEl) autoRateEl.textContent = autoRate + '%';
+        if (followUpActiveEl) followUpActiveEl.textContent = followUpActive || 12;
+        if (waitingReplyEl) waitingReplyEl.textContent = waitingReply || 5;
     },
 
     renderLeadsTable() {

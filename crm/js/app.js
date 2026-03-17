@@ -1084,18 +1084,21 @@ const CRM = {
         // Conversation item clicks (delegated)
         const convList = document.getElementById('conversationList');
         if (convList) {
+            console.log('✅ Conversation list found, attaching click listener');
             convList.addEventListener('click', (e) => {
                 const item = e.target.closest('.conversation-item');
                 if (item) {
                     const id = item.dataset.id;
                     const name = item.dataset.name;
                     const senderId = item.dataset.senderId;
-                    console.log('Clicked conversation:', id, name, senderId);
+                    console.log('🖱️ Clicked conversation:', id, name, senderId);
                     if (id && name && senderId) {
                         this.openConversation(id, encodeURIComponent(name), senderId);
                     }
                 }
             });
+        } else {
+            console.error('❌ Conversation list NOT found!');
         }
     },
 
@@ -1221,7 +1224,7 @@ const CRM = {
     },
 
     async openConversation(conversationId, senderName, senderId) {
-        console.log('Open conversation:', conversationId, senderName, senderId);
+        console.log('🔵 Open conversation:', conversationId, senderName, senderId);
 
         try {
             // Get DOM elements with null checks
@@ -1229,26 +1232,27 @@ const CRM = {
             const chatView = document.getElementById('chatView');
             const chatContactName = document.getElementById('chatContactName');
             const chatContactAvatar = document.getElementById('chatContactAvatar');
+            const chatMain = document.querySelector('.chat-main');
 
-            console.log('Elements found:', { chatEmpty: !!chatEmpty, chatView: !!chatView, chatContactName: !!chatContactName });
+            console.log('📍 Elements found:', {
+                chatEmpty: !!chatEmpty,
+                chatView: !!chatView,
+                chatContactName: !!chatContactName,
+                chatMain: !!chatMain
+            });
 
             if (!chatEmpty || !chatView) {
-                console.error('Chat elements not found!');
+                console.error('❌ Chat elements not found! chatEmpty:', !!chatEmpty, 'chatView:', !!chatView);
                 return;
             }
 
-            // Show chat view
-            console.log('Before - chatEmpty display:', chatEmpty.style.display, 'chatView display:', chatView.style.display);
+            // Show chat view - use class manipulation
+            console.log('📍 Before - chatEmpty:', chatEmpty.style.display, 'chatView:', chatView.style.display);
             chatEmpty.style.display = 'none';
-            chatEmpty.style.visibility = 'hidden';
-            chatEmpty.style.height = '0';
             chatView.style.display = 'flex';
             chatView.style.flexDirection = 'column';
-            chatView.style.width = '100%';
-            chatView.style.height = '100%';
             chatView.style.visibility = 'visible';
-            chatView.style.opacity = '1';
-            console.log('After - chatView display:', chatView.style.display);
+            console.log('📍 After - chatView:', chatView.style.display);
 
             // Update header
             if (chatContactName) {

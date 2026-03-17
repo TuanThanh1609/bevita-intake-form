@@ -21,8 +21,13 @@ const CRM = {
     async init() {
         console.log('🚀 Initializing CRM Dashboard...');
         this.initTheme();
-        await this.loadLeads();
-        this.startAutoRefresh();
+
+        // Only load leads if on leads page (tableContent exists)
+        if (document.getElementById('tableContent')) {
+            await this.loadLeads();
+            this.startAutoRefresh();
+        }
+
         this.setupEventListeners();
     },
 
@@ -205,6 +210,9 @@ const CRM = {
     renderLeadsTable() {
         const leads = this.state.leads;
         const container = document.getElementById('tableContent');
+
+        // Skip if container doesn't exist (not on leads page)
+        if (!container) return;
 
         if (leads.length === 0) {
             container.innerHTML = `
@@ -1258,6 +1266,12 @@ const CRM = {
 
     async loadConversationMessages(conversationId) {
         const messagesContainer = document.getElementById('chatMessages');
+
+        if (!messagesContainer) {
+            console.error('chatMessages container not found!');
+            return;
+        }
+
         messagesContainer.innerHTML = `
             <div class="loading">
                 <div class="spinner"></div>
@@ -1265,8 +1279,11 @@ const CRM = {
         `;
 
         try {
-            const response = await fetch(`/api/conversation?conversationId=${conversationId}`);
+            console.log('Loading conversation:', conversationId);
+            const response = await fetch(`/api/conversation?conversationId=${encodeURIComponent(conversationId)}`);
             const data = await response.json();
+
+            console.log('Conversation data:', data);
 
             if (data.success) {
                 this.renderChatMessages(data.messages || []);

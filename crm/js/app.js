@@ -1249,10 +1249,14 @@ const CRM = {
             // Show chat view - use class manipulation
             console.log('📍 Before - chatEmpty:', chatEmpty.style.display, 'chatView:', chatView.style.display);
             chatEmpty.style.display = 'none';
+            chatView.classList.remove('hidden');
             chatView.style.display = 'flex';
             chatView.style.flexDirection = 'column';
             chatView.style.visibility = 'visible';
-            console.log('📍 After - chatView:', chatView.style.display);
+            chatView.style.opacity = '1';
+            // Force reflow
+            void chatView.offsetWidth;
+            console.log('📍 After - chatView display:', getComputedStyle(chatView).display);
 
             // Update header
             if (chatContactName) {
